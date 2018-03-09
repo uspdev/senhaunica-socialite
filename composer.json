@@ -3,7 +3,7 @@
     "description": "Senhaunica OAuth1 Provider for Laravel Socialite",
     "license": "MIT",
     "authors": [{
-        "name": "Thiago",
+        "name": "Thiago Gomes Veríssimo",
         "email": "thiago.verissimo@usp.br"
     }],
     "require": {
