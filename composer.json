@@ -1,0 +1,18 @@
+{
+    "name": "socialiteproviders/senhaunica",
+    "description": "Senhaunica OAuth1 Provider for Laravel Socialite",
+    "license": "MIT",
+    "authors": [{
+        "name": "Thiago",
+        "email": "thiago.verissimo@usp.br"
+    }],
+    "require": {
+        "php": ">=5.5.9",
+        "socialiteproviders/manager": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SocialiteProviders\\Senhaunica\\": "src/"
+        }
+    }
+}
