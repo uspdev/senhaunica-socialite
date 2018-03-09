@@ -1,6 +1,6 @@
 ## Provider para utilização de senha única USP no Laravel 
 
-Dependências:
+Dependências em PHP:
 
     php-curl
 
