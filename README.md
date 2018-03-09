@@ -7,4 +7,4 @@ Dependências:
 Instalação:
 
     composer config repositories.senhaunica git https://github.com/uspdev/senhaunica.git
-    composer require uspdev/senhaunica:dev-master
+    composer require socialiteproviders/senhaunica:dev-master
