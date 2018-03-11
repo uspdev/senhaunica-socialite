@@ -48,14 +48,12 @@ class Server extends BaseServer
      */
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {
-        /*
+        
         $user           = new User();
-        $user->id       = $data['id'];
-        $user->nickname = $data['nickname'];
-        $user->name     = $data['name'];
-        $user->email    = $data['email'];
-        $user->avatar   = $data['avatar'];
-
+        $user->id       = $data['loginUsuario'];
+        $user->name     = $data['nomeUsuario'];
+        $user->email    = $data['emailPrincipalUsuario'];
+/*
         $used = ['id', 'nickname', 'name', 'email', 'avatar'];
 
         foreach ($data as $key => $value) {
@@ -65,9 +63,9 @@ class Server extends BaseServer
         }
 
         $user->extra = array_diff_key($data, array_flip($used));
-
+*/
         return $user;
-        */
+       
     }
 
     /**
