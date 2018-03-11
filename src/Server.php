@@ -88,4 +88,16 @@ class Server extends BaseServer
     {
         return $data['screen_name'];
     }
+    
+    protected function createTemporaryCredentials($body)
+    {
+        parse_str($body, $data);
+        if (!$data || !is_array($data)) {
+            throw new CredentialsException('Unable to parse temporary credentials response.');
+        }
+        $temporaryCredentials = new TemporaryCredentials();
+        $temporaryCredentials->setIdentifier($data['oauth_token']);
+        $temporaryCredentials->setSecret($data['oauth_token_secret']);
+        return $temporaryCredentials;
+    }
 }
