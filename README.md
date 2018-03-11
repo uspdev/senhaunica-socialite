@@ -35,18 +35,6 @@ Parâmetros no .env/.env.example:
     SENHAUNICA_KEY=fflch_sti
     SENHAUNICA_SECRET=gjgdfjk
     SENHAUNICA_CALLBACK_ID=85
-    
-Na migration que cria a tabela users
-
-    $table->string('password')->nullable();
-    $table->string('codpes');
-    
-Adicionar codpes no model User:
-
-    protected $fillable = [
-        'name', 'email', 'password','codpes',
-    ];
-
 
 Adiconar métodos em LoginController:
 
@@ -59,19 +47,7 @@ Adiconar métodos em LoginController:
     public function handleProviderCallback()
     {
         $user = Socialite::driver('senhaunica')->user();
-
-        $authUser = User::where('codpes', $user->id)->first();
-        if ($authUser) {
-            return $authUser;
-        }
-        return User::create([
-            'name'     => $user->name,
-            'email'    => $user->email,
-            'codpes' => $user->id,
-        ]);
-
-        Auth::login($authUser, true);
-        return redirect('/');
+        // aqui vc pode inserir o usuário no banco de dados local, fazer o login etc.
     }
 
 Rotas:
