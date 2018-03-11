@@ -110,7 +110,7 @@ class Server extends BaseServer
             $temporaryIdentifier = $temporaryIdentifier->getIdentifier();
         }
 
-        $parameters = array('oauth_token' => $temporaryIdentifier,'callback_id' => '86');
+        $parameters = array('oauth_token' => $temporaryIdentifier,'callback_id' => env('SENHAUNICA_CALLBACK_ID'));
 
         $url = $this->urlAuthorization();
         $queryString = http_build_query($parameters);
