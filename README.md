@@ -50,3 +50,8 @@ Adiconar métodos no Controller de login:
             // $user->token;
         }
     }
+
+Rotas:
+
+    Route::get('login/senhaunica', 'Auth\LoginController@redirectToProvider');
+    Route::get('login/senhaunica/callback', 'Auth\LoginController@handleProviderCallback');
