@@ -55,17 +55,29 @@ Adiconar métodos em LoginController:
     {
         return Socialite::driver('senhaunica')->redirect();
     }
+
     public function handleProviderCallback()
     {
         $user = Socialite::driver('senhaunica')->user();
+
+        $authUser = User::where('codpes', $user->id)->first();
+        if ($authUser) {
+            return $authUser;
+        }
+        return User::create([
+            'name'     => $user->name,
+            'email'    => $user->email,
+            'codpes' => $user->id,
+        ]);
+
+        Auth::login($authUser, true);
+        return redirect('/');
     }
 
 Rotas:
 
     Route::get('login/senhaunica', 'Auth\LoginController@redirectToProvider');
     Route::get('login/senhaunica/callback', 'Auth\LoginController@handleProviderCallback');
-    
-    
     
 # Extras
 
