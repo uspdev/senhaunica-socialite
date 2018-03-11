@@ -151,4 +151,47 @@ class Server extends BaseServer
 
         return $this->createTokenCredentials((string) $response->getBody());
     }
+    
+    // change request form 'get' to 'post'
+    protected function fetchUserDetails(TokenCredentials $tokenCredentials, $force = true)
+    {
+        
+        if (!$this->cachedUserDetailsResponse || $force) {
+            $url = $this->urlUserDetails();
+            $client = $this->createHttpClient();
+            $headers = $this->getHeaders($tokenCredentials, 'POST', $url);
+
+            try {
+                $response = $client->post($url, [
+                    'headers' => $headers,
+                ]);
+            } catch (BadResponseException $e) {
+                $response = $e->getResponse();
+                $body = $response->getBody();
+                $statusCode = $response->getStatusCode();
+
+                throw new \Exception(
+                    "Received error [$body] with status code [$statusCode] when retrieving token credentials."
+                );
+            }
+            switch ($this->responseType) {
+                case 'json':
+                    $this->cachedUserDetailsResponse = json_decode((string) $response->getBody(), true);
+                    break;
+
+                case 'xml':
+                    $this->cachedUserDetailsResponse = simplexml_load_string((string) $response->getBody());
+                    break;
+
+                case 'string':
+                    parse_str((string) $response->getBody(), $this->cachedUserDetailsResponse);
+                    break;
+
+                default:
+                    throw new \InvalidArgumentException("Invalid response type [{$this->responseType}].");
+            }
+        }
+
+        return $this->cachedUserDetailsResponse;
+    }
 }
