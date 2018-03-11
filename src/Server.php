@@ -100,4 +100,20 @@ class Server extends BaseServer
         $temporaryCredentials->setSecret($data['oauth_token_secret']);
         return $temporaryCredentials;
     }
+    
+    public function getAuthorizationUrl($temporaryIdentifier)
+    {
+        if ($temporaryIdentifier instanceof TemporaryCredentials) {
+            $temporaryIdentifier = $temporaryIdentifier->getIdentifier();
+        }
+
+        $parameters = array('oauth_token' => $temporaryIdentifier,'callback_id' => '86');
+
+        $url = $this->urlAuthorization();
+        $queryString = http_build_query($parameters);
+
+        return $this->buildUrl($url, $queryString);
+    }
+
+
 }
