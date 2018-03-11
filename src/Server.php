@@ -53,8 +53,8 @@ class Server extends BaseServer
         $user->id       = $data['loginUsuario'];
         $user->name     = $data['nomeUsuario'];
         $user->email    = $data['emailPrincipalUsuario'];
-/*
-        $used = ['id', 'nickname', 'name', 'email', 'avatar'];
+
+        $used = ['loginUsuario', 'nomeUsuario', 'email', 'emailPrincipalUsuario'];
 
         foreach ($data as $key => $value) {
             if (!in_array($key, $used)) {
@@ -63,7 +63,7 @@ class Server extends BaseServer
         }
 
         $user->extra = array_diff_key($data, array_flip($used));
-*/
+
         return $user;
        
     }
