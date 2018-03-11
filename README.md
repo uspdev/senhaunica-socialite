@@ -18,7 +18,7 @@ No array $provider de config\app.php adicione a linha:
 No array $listen app/Providers/EventServiceProvider.php adicione o array:
 
     \SocialiteProviders\Manager\SocialiteWasCalled::class => [
-        'SocialiteProviders\senhaunica\SenhaunicaExtendSocialite@handle',
+        'SocialiteProviders\Senhaunica\SenhaunicaExtendSocialite@handle',
     ],
     
 Em config/services.php:
