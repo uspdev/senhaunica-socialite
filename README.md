@@ -48,7 +48,7 @@ Adiconar métodos no Controller de login:
 
         public function handleProviderCallback()
         {
-            $user = Socialite::driver('github')->user();
+            $user = Socialite::driver('senhaunica')->user();
             // $user->token;
         }
     }
