@@ -26,6 +26,7 @@ Em config/services.php:
     'senhaunica' => [
         'client_id' => env('SENHAUNICA_KEY'),
         'client_secret' => env('SENHAUNICA_SECRET'),
+         'redirect' => '/',
     ], 
     
     
@@ -35,24 +36,16 @@ Parâmetros no .env/.env.example:
     SENHAUNICA_SECRET=gjgdfjk
     SENHAUNICA_CALLBACK_ID=85
 
-Adiconar métodos no Controller de login:
+Adiconar métodos em LoginController:
 
-    namespace App\Http\Controllers\Auth;
     use Socialite;
-
-    class LoginController extends Controller
+    public function redirectToProvider()
     {
-        public function redirectToProvider()
-        {
-            return Socialite::driver('senhaunica')
-                ->redirect();
-        }
-
-        public function handleProviderCallback()
-        {
-            $user = Socialite::driver('senhaunica')->user();
-            // $user->token;
-        }
+        return Socialite::driver('senhaunica')->redirect();
+    }
+    public function handleProviderCallback()
+    {
+        $user = Socialite::driver('senhaunica')->user();
     }
 
 Rotas:
