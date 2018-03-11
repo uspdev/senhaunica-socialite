@@ -21,25 +21,10 @@ class Provider extends AbstractProvider
 
         $user = $this->server->getUserDetails($token = $this->getToken());
 
-        return (new User())->setRaw($user->extra)->map([
+        return (new User())->map([
             'id'       => $user->id,
             'name'     => $user->name,
             'email'    => $user->email,
         ])->setToken($token->getIdentifier(), $token->getSecret());
     }
-
-/*    
-    protected function mapUserToObject(array $user)
-    {
-        var_dump($user); die();
-        return (new User())->setRaw($user['extra'])->map([
-            'id'       => $user['id'],
-            'nickname' => null,
-            'name'     => $user['name'],
-            'email'    => null,
-            'avatar'   => $user['avatar'],
-        ]);
-    }
-*/
-
 }
