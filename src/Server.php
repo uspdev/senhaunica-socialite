@@ -147,8 +147,8 @@ class Server extends BaseServer
             return $this->handleTokenCredentialsBadResponse($e);
         }
 
-       // return $this->createTokenCredentials((string) $response->getBody());
-        return (string)$response->getBody();
+       return $this->createTokenCredentials((string) $response->getBody());
+       
     }
     
     // change request form 'get' to 'post'
