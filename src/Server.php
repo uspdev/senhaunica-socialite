@@ -47,25 +47,13 @@ class Server extends BaseServer
      * {@inheritDoc}
      */
     public function userDetails($data, TokenCredentials $tokenCredentials)
-    {
-        
+    {  
         $user           = new User();
         $user->id       = $data['loginUsuario'];
         $user->name     = $data['nomeUsuario'];
         $user->email    = $data['emailPrincipalUsuario'];
 
-        $used = ['loginUsuario', 'nomeUsuario', 'email', 'emailPrincipalUsuario'];
-
-        foreach ($data as $key => $value) {
-            if (!in_array($key, $used)) {
-                $used[] = $key;
-            }
-        }
-
-        $user->extra = array_diff_key($data, array_flip($used));
-
         return $user;
-       
     }
 
     /**
