@@ -25,8 +25,7 @@ Em config/services.php:
 
     'senhaunica' => [
         'client_id' => env('SENHAUNICA_KEY'),
-        'client_secret' => env('SENHAUNICA_SECRET'), //remover não é necessário
-        'redirect' => env('SENHAUNICA_REDIRECT_URI'),  
+        'client_secret' => env('SENHAUNICA_SECRET'),
     ], 
     
     
@@ -34,7 +33,6 @@ Parâmetros no .env/.env.example:
 
     SENHAUNICA_KEY=fflch_sti
     SENHAUNICA_SECRET=gjgdfjk
-    SENHAUNICA_REDIRECT_URI=http://localhost:8989  //remover não é necessário
     SENHAUNICA_CALLBACK_ID=85
 
 Adiconar métodos no Controller de login:
