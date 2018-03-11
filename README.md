@@ -28,3 +28,25 @@ Em config/services.php:
         'client_secret' => env('SENHAUNICA_SECRET'),
         'redirect' => env('SENHAUNICA_REDIRECT_URI'),  
     ], 
+    
+    
+    <?php
+
+Adiconar métodos no Controller de login:
+
+    namespace App\Http\Controllers\Auth;
+    use Socialite;
+
+    class LoginController extends Controller
+    {
+        public function redirectToProvider()
+        {
+            return Socialite::driver('senhaunica')->redirect();
+        }
+
+        public function handleProviderCallback()
+        {
+            $user = Socialite::driver('github')->user();
+            // $user->token;
+        }
+    }
