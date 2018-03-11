@@ -35,6 +35,11 @@ Parâmetros no .env/.env.example:
     SENHAUNICA_KEY=fflch_sti
     SENHAUNICA_SECRET=gjgdfjk
     SENHAUNICA_CALLBACK_ID=85
+    
+Na migration que cria a tabela users
+
+    $table->string('password')->nullable();
+    $table->string('codpes');
 
 Adiconar métodos em LoginController:
 
@@ -52,6 +57,7 @@ Rotas:
 
     Route::get('login/senhaunica', 'Auth\LoginController@redirectToProvider');
     Route::get('login/senhaunica/callback', 'Auth\LoginController@handleProviderCallback');
+    
     
     
 # Extras
