@@ -9,7 +9,7 @@ Dependências em PHP:
 Instalação:
 
     composer config repositories.SenhaunicaSocialite git https://github.com/uspdev/SenhaunicaSocialite.git
-    composer require socialiteproviders/SenhaunicaSocialite:dev-master
+    composer require socialiteproviders/senhaunica:dev-master
     
 No array $provider de config\app.php adicione a linha:
     
