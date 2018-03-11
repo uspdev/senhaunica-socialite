@@ -151,7 +151,7 @@ class Server extends BaseServer
        
     }
     
-    // change request form 'get' to 'post'
+    // change request from 'get' to 'post'
     protected function fetchUserDetails(TokenCredentials $tokenCredentials, $force = true)
     {
         
