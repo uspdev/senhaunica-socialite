@@ -30,7 +30,7 @@ Em config/services.php:
     ], 
     
     
-Paramêtros no .env e .env.example:
+Parâmetros no .env/.env.example:
 
     SENHAUNICA_KEY=fflch_sti
     SENHAUNICA_SECRET=gjgdfjk
