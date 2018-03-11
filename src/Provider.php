@@ -13,8 +13,6 @@ class Provider extends AbstractProvider
     const IDENTIFIER = 'SENHAUNICA';
 
     /**
-     * {@inheritDoc}
-     */
     public function user()
     {
         if (! $this->hasNecessaryVerifier()) {
@@ -22,10 +20,6 @@ class Provider extends AbstractProvider
         }
 
         $user = $this->server->getUserDetails($token = $this->getToken());
-        
-        /*************teste
-        var_dump($user); die();
-        ***************/
 
         return (new User())->setRaw($user->extra)->map([
             'id'       => $user->id,
@@ -34,5 +28,18 @@ class Provider extends AbstractProvider
             'email'    => $user->email,
             'avatar'   => $user->avatar,
         ])->setToken($token->getIdentifier(), $token->getSecret());
+    }
+    */
+    
+    protected function mapUserToObject(array $user)
+    {
+        var_dump($user); die();
+        return (new User())->setRaw($user['extra'])->map([
+            'id'       => $user['id'],
+            'nickname' => null,
+            'name'     => $user['name'],
+            'email'    => null,
+            'avatar'   => $user['avatar'],
+        ]);
     }
 }
