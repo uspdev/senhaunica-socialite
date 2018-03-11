@@ -48,6 +48,7 @@ class Server extends BaseServer
      */
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {
+        /*
         $user           = new User();
         $user->id       = $data['id'];
         $user->nickname = $data['nickname'];
@@ -66,6 +67,7 @@ class Server extends BaseServer
         $user->extra = array_diff_key($data, array_flip($used));
 
         return $user;
+        */
     }
 
     /**
@@ -73,7 +75,7 @@ class Server extends BaseServer
      */
     public function userUid($data, TokenCredentials $tokenCredentials)
     {
-        return $data['id'];
+        //return $data['id'];
     }
 
     /**
@@ -81,7 +83,7 @@ class Server extends BaseServer
      */
     public function userEmail($data, TokenCredentials $tokenCredentials)
     {
-        return $data['email'];
+        //return $data['email'];
     }
 
     /**
@@ -89,9 +91,10 @@ class Server extends BaseServer
      */
     public function userScreenName($data, TokenCredentials $tokenCredentials)
     {
-        return $data['screen_name'];
+        //return $data['screen_name'];
     }
     
+    // removing $data['oauth_callback_confirmed'] from createTemporaryCredentials
     protected function createTemporaryCredentials($body)
     {
         parse_str($body, $data);
@@ -104,6 +107,7 @@ class Server extends BaseServer
         return $temporaryCredentials;
     }
     
+    // adding callback_id parameter
     public function getAuthorizationUrl($temporaryIdentifier)
     {
         if ($temporaryIdentifier instanceof TemporaryCredentials) {
@@ -117,6 +121,4 @@ class Server extends BaseServer
 
         return $this->buildUrl($url, $queryString);
     }
-
-
 }
