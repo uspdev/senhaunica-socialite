@@ -121,4 +121,34 @@ class Server extends BaseServer
 
         return $this->buildUrl($url, $queryString);
     }
+    
+    // adding oauth_verifier to $uri
+    public function getTokenCredentials(TemporaryCredentials $temporaryCredentials, $temporaryIdentifier, $verifier)
+    {
+        if ($temporaryIdentifier !== $temporaryCredentials->getIdentifier()) {
+            throw new \InvalidArgumentException(
+                'Temporary identifier passed back by server does not match that of stored temporary credentials.
+                Potential man-in-the-middle.'
+            );
+        }
+        $uri = $this->urlTokenCredentials();
+        $bodyParameters = array('oauth_verifier' => $verifier);
+
+        $uri = $this->urlTokenCredentials().'?oauth_verifier='.$verifier;
+        $bodyParameters = ['oauth_verifier' => $verifier, 'oauth_token' => $temporaryIdentifier];
+
+        $client = $this->createHttpClient();
+        $headers = $this->getHeaders($temporaryCredentials, 'POST', $uri, $bodyParameters);
+
+        try {
+            $response = $client->post($uri, [
+                'headers' => $headers,
+                'form_params' => $bodyParameters,
+            ]);
+        } catch (BadResponseException $e) {
+            return $this->handleTokenCredentialsBadResponse($e);
+        }
+
+        return $this->createTokenCredentials((string) $response->getBody());
+    }
 }
