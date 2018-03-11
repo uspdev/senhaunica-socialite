@@ -61,3 +61,13 @@ Rotas:
 
     Route::get('login/senhaunica', 'Auth\LoginController@redirectToProvider');
     Route::get('login/senhaunica/callback', 'Auth\LoginController@handleProviderCallback');
+    
+    
+# Extras
+
+Caso deseje ver todos parâmetros retornados no requisição, em Server.php:
+
+    public function userDetails($data, TokenCredentials $tokenCredentials)
+    {  
+        var_dump($data); die();
+    }
