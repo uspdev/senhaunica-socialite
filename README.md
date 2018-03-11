@@ -8,8 +8,8 @@ Dependências em PHP:
 
 Instalação:
 
-    composer config repositories.senhaunica git https://github.com/uspdev/senhaunica.git
-    composer require socialiteproviders/senhaunica:dev-master
+    composer config repositories.SenhaunicaSocialite git https://github.com/uspdev/SenhaunicaSocialite.git
+    composer require socialiteproviders/SenhaunicaSocialite:dev-master
     
 No array $provider de config\app.php adicione a linha:
     
