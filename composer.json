@@ -8,6 +8,7 @@
     }],
     "require": {
         "php": ">=5.5.9",
+        "laravel/socialite": "^3.0",
         "socialiteproviders/manager": "^3.0"
     },
     "autoload": {
