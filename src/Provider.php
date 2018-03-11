@@ -22,6 +22,10 @@ class Provider extends AbstractProvider
         }
 
         $user = $this->server->getUserDetails($token = $this->getToken());
+        
+        /*************teste
+        var_dump($user); die();
+        ***************/
 
         return (new User())->setRaw($user->extra)->map([
             'id'       => $user->id,
