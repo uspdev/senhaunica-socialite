@@ -40,6 +40,13 @@ Na migration que cria a tabela users
 
     $table->string('password')->nullable();
     $table->string('codpes');
+    
+Adicionar codpes no model User:
+
+    protected $fillable = [
+        'name', 'email', 'password','codpes',
+    ];
+
 
 Adiconar métodos em LoginController:
 
