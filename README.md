@@ -41,7 +41,9 @@ Adiconar métodos no Controller de login:
     {
         public function redirectToProvider()
         {
-            return Socialite::driver('senhaunica')->redirect();
+            return Socialite::driver('senhaunica')
+                ->with(['callback_id' => '85'])
+                ->redirect();
         }
 
         public function handleProviderCallback()
