@@ -52,6 +52,17 @@ class Server extends BaseServer
         $user->id       = $data['loginUsuario'];
         $user->name     = $data['nomeUsuario'];
         $user->email    = $data['emailPrincipalUsuario'];
+        if (isset($data['vinculo'])){
+            $vinculo = $data['vinculo'][0];
+            
+            $user->tipoVinculo = (isset($vinculo['tipoVinculo']) ? $vinculo['tipoVinculo']: '');
+            $user->codigoSetor = (isset($vinculo['codigoSetor']) ? $vinculo['codigoSetor']: '');
+            $user->nomeAbreviadoSetor = (isset($vinculo['nomeAbreviadoSetor']) ? $vinculo['nomeAbreviadoSetor']: '');
+            $user->codigoUnidade = (isset($vinculo['codigoUnidade']) ? $vinculo['codigoUnidade']: '');
+            $user->siglaUnidade = (isset($vinculo['siglaUnidade']) ? $vinculo['siglaUnidade']: '');
+            $user->nomeUnidade = (isset($vinculo['nomeUnidade']) ? $vinculo['nomeUnidade']: '');
+            $user->nomeAbreviadoFuncao = (isset($vinculo['nomeAbreviadoFuncao']) ? $vinculo['nomeAbreviadoFuncao']: '');
+        }
 
         return $user;
     }
