@@ -20,11 +20,13 @@ class Provider extends AbstractProvider
         }
 
         $user = $this->server->getUserDetails($token = $this->getToken());
-
+        /*
         return (new User())->map([
             'id'       => $user->id,
             'name'     => $user->name,
             'email'    => $user->email,
         ])->setToken($token->getIdentifier(), $token->getSecret());
+        */
+        return $user->setToken($token->getIdentifier(), $token->getSecret());
     }
 }
