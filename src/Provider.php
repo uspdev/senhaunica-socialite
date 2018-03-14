@@ -28,11 +28,13 @@ class Provider extends AbstractProvider
             
             'tipoVinculo'         => $user->tipoVinculo,
             'codigoSetor'         => $user->codigoSetor, 
-            'nomeAbreviadoSetor'  => $user->nomeAbreviadoSetor, 
+            'nomeAbreviadoSetor'  => $user->nomeAbreviadoSetor,
+            'nomeSetor'           => $user->nomeSetor,
             'codigoUnidade'       => $user->codigoUnidade,
             'siglaUnidade'        => $user->siglaUnidade, 
             'nomeUnidade'         => $user->nomeUnidade,
             'nomeAbreviadoFuncao' => $user->nomeAbreviadoFuncao,
+            'vinculosAdicionais'  => $user->vinculosAdicionais,
             
         ])->setToken($token->getIdentifier(), $token->getSecret());
 
