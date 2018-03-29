@@ -1,6 +1,7 @@
 <?php
 
-namespace SocialiteProviders\Senhaunica;
+//namespace SocialiteProviders\Senhaunica;
+namespace Uspdev\SenhaunicaSocialite;
 
 use SocialiteProviders\Manager\SocialiteWasCalled;
 

@@ -1,6 +1,7 @@
 <?php
 
-namespace SocialiteProviders\Senhaunica;
+//namespace SocialiteProviders\Senhaunica;
+namespace Uspdev\SenhaunicaSocialite;
 
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use SocialiteProviders\Manager\OAuth1\Server as BaseServer;
