@@ -11,10 +11,6 @@ Instalação:
     composer config repositories.SenhaunicaSocialite git https://github.com/uspdev/SenhaunicaSocialite.git
     composer require socialiteproviders/senhaunica:dev-master
     
-No array $provider de config\app.php adicione a linha:
-    
-    \SocialiteProviders\Manager\ServiceProvider::class,
-    
 No array $listen app/Providers/EventServiceProvider.php adicione o array:
 
     \SocialiteProviders\Manager\SocialiteWasCalled::class => [
@@ -63,3 +59,6 @@ Caso deseje ver todos parâmetros retornados no requisição, em Server.php:
     {  
         var_dump($data); die();
     }
+# Hangout
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/jLFM2AUFJgw" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
