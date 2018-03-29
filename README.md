@@ -8,8 +8,7 @@ Dependências em PHP:
 
 Instalação:
 
-    composer config repositories.SenhaunicaSocialite git https://github.com/uspdev/SenhaunicaSocialite.git
-    composer require socialiteproviders/senhaunica:dev-master
+    composer require uspdev/senhaunica-socialite
     
 No array $listen app/Providers/EventServiceProvider.php adicione o array:
 
