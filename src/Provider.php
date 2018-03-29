@@ -26,6 +26,16 @@ class Provider extends AbstractProvider
             'id'       => $user->id,
             'name'     => $user->name,
             'email'    => $user->email,
+            
+            'tipoVinculo'         => $user->tipoVinculo,
+            'codigoSetor'         => $user->codigoSetor, 
+            'nomeAbreviadoSetor'  => $user->nomeAbreviadoSetor, 
+            'codigoUnidade'       => $user->codigoUnidade,
+            'siglaUnidade'        => $user->siglaUnidade, 
+            'nomeUnidade'         => $user->nomeUnidade,
+            'nomeAbreviadoFuncao' => $user->nomeAbreviadoFuncao,
+            
         ])->setToken($token->getIdentifier(), $token->getSecret());
+
     }
 }

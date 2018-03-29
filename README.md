@@ -8,12 +8,8 @@ Dependências em PHP:
 
 Instalação:
 
-    composer config repositories.senhaunica git https://github.com/uspdev/senhaunica.git
+    composer config repositories.SenhaunicaSocialite git https://github.com/uspdev/SenhaunicaSocialite.git
     composer require socialiteproviders/senhaunica:dev-master
-    
-No array $provider de config\app.php adicione a linha:
-    
-    \SocialiteProviders\Manager\ServiceProvider::class,
     
 No array $listen app/Providers/EventServiceProvider.php adicione o array:
 
@@ -25,43 +21,35 @@ Em config/services.php:
 
     'senhaunica' => [
         'client_id' => env('SENHAUNICA_KEY'),
-        'client_secret' => env('SENHAUNICA_SECRET'), //remover não é necessário
-        'redirect' => env('SENHAUNICA_REDIRECT_URI'),  
+        'client_secret' => env('SENHAUNICA_SECRET'),
+         'redirect' => '/',
     ], 
     
     
-Paramêtros no .env e .env.example:
+Parâmetros no .env/.env.example:
 
     SENHAUNICA_KEY=fflch_sti
     SENHAUNICA_SECRET=gjgdfjk
-    SENHAUNICA_REDIRECT_URI=http://localhost:8989  //remover não é necessário
     SENHAUNICA_CALLBACK_ID=85
 
-Adiconar métodos no Controller de login:
+Adiconar métodos em LoginController:
 
-    namespace App\Http\Controllers\Auth;
     use Socialite;
-
-    class LoginController extends Controller
+    public function redirectToProvider()
     {
-        public function redirectToProvider()
-        {
-            return Socialite::driver('senhaunica')
-                ->redirect();
-        }
+        return Socialite::driver('senhaunica')->redirect();
+    }
 
-        public function handleProviderCallback()
-        {
-            $user = Socialite::driver('senhaunica')->user();
-            // $user->token;
-        }
+    public function handleProviderCallback()
+    {
+        $user = Socialite::driver('senhaunica')->user();
+        // aqui vc pode inserir o usuário no banco de dados local, fazer o login etc.
     }
 
 Rotas:
 
     Route::get('login/senhaunica', 'Auth\LoginController@redirectToProvider');
     Route::get('login/senhaunica/callback', 'Auth\LoginController@handleProviderCallback');
-    
     
 # Extras
 
@@ -71,3 +59,4 @@ Caso deseje ver todos parâmetros retornados no requisição, em Server.php:
     {  
         var_dump($data); die();
     }
+# [Hangout](https://youtu.be/jLFM2AUFJgw)
