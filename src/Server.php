@@ -59,10 +59,18 @@ class Server extends BaseServer
             $user->tipoVinculo = (isset($vinculo['tipoVinculo']) ? $vinculo['tipoVinculo']: '');
             $user->codigoSetor = (isset($vinculo['codigoSetor']) ? $vinculo['codigoSetor']: '');
             $user->nomeAbreviadoSetor = (isset($vinculo['nomeAbreviadoSetor']) ? $vinculo['nomeAbreviadoSetor']: '');
+            $user->nomeSetor = (isset($vinculo['nomeSetor']) ? $vinculo['nomeSetor']: '');
             $user->codigoUnidade = (isset($vinculo['codigoUnidade']) ? $vinculo['codigoUnidade']: '');
             $user->siglaUnidade = (isset($vinculo['siglaUnidade']) ? $vinculo['siglaUnidade']: '');
             $user->nomeUnidade = (isset($vinculo['nomeUnidade']) ? $vinculo['nomeUnidade']: '');
             $user->nomeAbreviadoFuncao = (isset($vinculo['nomeAbreviadoFuncao']) ? $vinculo['nomeAbreviadoFuncao']: '');
+            if(count($data['vinculo']) > 1){
+                array_shift($data['vinculo']);
+                $user->vinculosAdicionais = $data['vinculo'];
+            } else {
+                $user->vinculosAdicionais = array();
+            }
+
         }
 
         return $user;
