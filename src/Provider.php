@@ -26,7 +26,7 @@ class Provider extends AbstractProvider
             'id'       => $user->id,
             'name'     => $user->name,
             'email'    => $user->email,
-            
+            'codpes'              => $user->codpes,
             'tipoVinculo'         => $user->tipoVinculo,
             'codigoSetor'         => $user->codigoSetor, 
             'nomeAbreviadoSetor'  => $user->nomeAbreviadoSetor,

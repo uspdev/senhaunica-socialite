@@ -53,6 +53,7 @@ class Server extends BaseServer
         $user->id       = $data['loginUsuario'];
         $user->name     = $data['nomeUsuario'];
         $user->email    = $data['emailPrincipalUsuario'];
+        $user->codpes   = $data['loginUsuario'];
         if (isset($data['vinculo'])){
             $vinculo = $data['vinculo'][0];
             
