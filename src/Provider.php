@@ -24,7 +24,7 @@ class Provider extends AbstractProvider
 
         return (new User())->map([
             'codpes'              => $user->codpes,
-            'nome'                => $user->nome,
+            'nompes'              => $user->nompes,
             'email'               => $user->email,
             'emailUsp'            => $user->emailUsp,
             'emailAlternativo'    => $user->emailAlternativo,
