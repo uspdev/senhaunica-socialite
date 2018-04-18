@@ -51,7 +51,7 @@ class Server extends BaseServer
     {  
         $user                      = new User();
         $user->codpes              = $data['loginUsuario'];
-        $user->nome                = $data['nomeUsuario'];
+        $user->nompes              = $data['nomeUsuario'];
         $user->email               = $data['emailPrincipalUsuario'];
         $user->emailUsp            = $data['emailUspUsuario'];
         $user->emailAlternativo    = $data['emailAlternativoUsuario'];
