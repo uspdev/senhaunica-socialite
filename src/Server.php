@@ -49,29 +49,28 @@ class Server extends BaseServer
      */
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {  
-        $user           = new User();
-        $user->id       = $data['loginUsuario'];
-        $user->name     = $data['nomeUsuario'];
-        $user->email    = $data['emailPrincipalUsuario'];
-        $user->codpes   = $data['loginUsuario'];
-        if (isset($data['vinculo'])){
-            $vinculo = $data['vinculo'][0];
-            
-            $user->tipoVinculo = (isset($vinculo['tipoVinculo']) ? $vinculo['tipoVinculo']: '');
-            $user->codigoSetor = (isset($vinculo['codigoSetor']) ? $vinculo['codigoSetor']: '');
-            $user->nomeAbreviadoSetor = (isset($vinculo['nomeAbreviadoSetor']) ? $vinculo['nomeAbreviadoSetor']: '');
-            $user->nomeSetor = (isset($vinculo['nomeSetor']) ? $vinculo['nomeSetor']: '');
-            $user->codigoUnidade = (isset($vinculo['codigoUnidade']) ? $vinculo['codigoUnidade']: '');
-            $user->siglaUnidade = (isset($vinculo['siglaUnidade']) ? $vinculo['siglaUnidade']: '');
-            $user->nomeUnidade = (isset($vinculo['nomeUnidade']) ? $vinculo['nomeUnidade']: '');
-            $user->nomeAbreviadoFuncao = (isset($vinculo['nomeAbreviadoFuncao']) ? $vinculo['nomeAbreviadoFuncao']: '');
-            if(count($data['vinculo']) > 1){
-                array_shift($data['vinculo']);
-                $user->vinculosAdicionais = $data['vinculo'];
-            } else {
-                $user->vinculosAdicionais = array();
-            }
-
+        $user                      = new User();
+        $user->codpes              = $data['loginUsuario'];
+        $user->name                = $data['nomeUsuario'];
+        $user->email               = $data['emailPrincipalUsuario'];
+        $user->emailUsp            = $data['emailUspUsuario'];
+        $user->emailAlternativo    = $data['emailAlternativoUsuario'];
+        $user->telefone            = $data['numeroTelefoneFormatado'];
+        /*
+        *    Dentro do Vinculo terão as seguintes informações
+        *    'tipoVinculo'
+        *    'codigoSetor'
+        *    'nomeAbreviadoSetor'
+        *    'nomeSetor'
+        *    'codigoUnidade'
+        *    'siglaUnidade'
+        *    'nomeUnidade'
+        *    'nomeAbreviadoFuncao'
+        */
+        if ($data['tipoUsuario'] == 'I'){
+            $user->vinculo = $data['vinculo'];
+        } else {
+            $user->vinculo = array();
         }
 
         return $user;

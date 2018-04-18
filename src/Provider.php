@@ -23,19 +23,13 @@ class Provider extends AbstractProvider
         $user = $this->server->getUserDetails($token = $this->getToken());
 
         return (new User())->map([
-            'id'       => $user->id,
-            'name'     => $user->name,
-            'email'    => $user->email,
             'codpes'              => $user->codpes,
-            'tipoVinculo'         => $user->tipoVinculo,
-            'codigoSetor'         => $user->codigoSetor, 
-            'nomeAbreviadoSetor'  => $user->nomeAbreviadoSetor,
-            'nomeSetor'           => $user->nomeSetor,
-            'codigoUnidade'       => $user->codigoUnidade,
-            'siglaUnidade'        => $user->siglaUnidade, 
-            'nomeUnidade'         => $user->nomeUnidade,
-            'nomeAbreviadoFuncao' => $user->nomeAbreviadoFuncao,
-            'vinculosAdicionais'  => $user->vinculosAdicionais,
+            'name'                => $user->name,
+            'email'               => $user->email,
+            'emailUsp'            => $user->emailUsp,
+            'emailAlternativo'    => $user->emailAlternativo,
+            'telefone'            => $user->telefone,
+            'vinculo'             => $user->vinculo,
             
         ])->setToken($token->getIdentifier(), $token->getSecret());
 
