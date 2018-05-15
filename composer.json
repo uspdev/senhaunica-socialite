@@ -2,7 +2,7 @@
     "name": "uspdev/senhaunica-socialite",
     "description": "Senhaunica OAuth1 Provider for Laravel Socialite",
     "minimum-stability": "dev",
-    "homepage": "https://github.com/uspdev/SenhaunicaSocialite",
+    "homepage": "https://github.com/uspdev/senhaunica-socialite",
     "type": "library",
     "license": "GPL-2.0-or-later",
 
