@@ -1,6 +1,7 @@
 ## Provider para utilização de senha única USP no Laravel
 
 Hangout sobre a utilização desta biblioteca
+
 [![Hangout senha única laravel](https://img.youtube.com/vi/jLFM2AUFJgw/0.jpg)](https://youtu.be/jLFM2AUFJgw)
 
 Dependências em PHP:
