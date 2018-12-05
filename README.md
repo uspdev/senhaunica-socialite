@@ -1,21 +1,31 @@
-## Provider para utilização de senha única USP no Laravel 
+## Provider para utilização de senha única USP no Laravel
+
+Hangout sobre a utilização desta biblioteca
+[![Hangout senha única laravel](https://img.youtube.com/vi/jLFM2AUFJgw/0.jpg)](https://youtu.be/jLFM2AUFJgw)
 
 Dependências em PHP:
 
     php-curl
-    
-## usage
+
+## Usage
 
 Instalação:
 
     composer require uspdev/senhaunica-socialite
     
-No array $listen app/Providers/EventServiceProvider.php adicione o array:
+Exemplo de como o array $listen em *app/Providers/EventServiceProvider.php*
+deve carregar o driver senhaunica:
 
-    \SocialiteProviders\Manager\SocialiteWasCalled::class => [
-        'Uspdev\SenhaunicaSocialite\SenhaunicaExtendSocialite@handle',
-    ],
-    
+    protected $listen = [
+        Registered::class => [
+            SendEmailVerificationNotification::class,
+        ],
+
+        \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+            'Uspdev\SenhaunicaSocialite\SenhaunicaExtendSocialite@handle',
+        ],
+    ];
+
 Em config/services.php:
 
     'senhaunica' => [
@@ -23,9 +33,8 @@ Em config/services.php:
         'client_secret' => env('SENHAUNICA_SECRET'),
          'redirect' => '/',
     ], 
-    
-    
-Parâmetros no .env/.env.example:
+
+Parâmetros no .env:
 
     SENHAUNICA_KEY=fflch_sti
     SENHAUNICA_SECRET=gjgdfjk
@@ -49,8 +58,8 @@ Rotas:
 
     Route::get('login/senhaunica', 'Auth\LoginController@redirectToProvider');
     Route::get('login/senhaunica/callback', 'Auth\LoginController@handleProviderCallback');
-    
-# Extras
+
+# Informations to developers:
 
 Caso deseje ver todos parâmetros retornados no requisição, em Server.php:
 
@@ -58,4 +67,3 @@ Caso deseje ver todos parâmetros retornados no requisição, em Server.php:
     {  
         var_dump($data); die();
     }
-# [Hangout](https://youtu.be/jLFM2AUFJgw)
