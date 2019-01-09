@@ -1,6 +1,5 @@
 <?php
 
-//namespace SocialiteProviders\Senhaunica;
 namespace Uspdev\SenhaunicaSocialite;
 
 use SocialiteProviders\Manager\OAuth1\AbstractProvider;
@@ -12,7 +11,6 @@ class Provider extends AbstractProvider
      * Unique Provider Identifier.
      */
     const IDENTIFIER = 'SENHAUNICA';
-
 
     public function user()
     {
@@ -30,7 +28,6 @@ class Provider extends AbstractProvider
             'emailAlternativo'    => $user->emailAlternativo,
             'telefone'            => $user->telefone,
             'vinculo'             => $user->vinculo,
-            
         ])->setToken($token->getIdentifier(), $token->getSecret());
 
     }

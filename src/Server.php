@@ -1,13 +1,11 @@
 <?php
 
-//namespace SocialiteProviders\Senhaunica;
 namespace Uspdev\SenhaunicaSocialite;
 
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use SocialiteProviders\Manager\OAuth1\Server as BaseServer;
 use SocialiteProviders\Manager\OAuth1\User;
 
-//use League\OAuth1\Client\Credentials\CredentialsException;
 use League\OAuth1\Client\Credentials\TemporaryCredentials;
 
 class Server extends BaseServer
@@ -120,7 +118,7 @@ class Server extends BaseServer
             $temporaryIdentifier = $temporaryIdentifier->getIdentifier();
         }
 
-        $parameters = array('oauth_token' => $temporaryIdentifier,'callback_id' => env('SENHAUNICA_CALLBACK_ID'));
+        $parameters = array('oauth_token' => $temporaryIdentifier,'callback_id' => config('services.senhaunica.callback_id'));
 
         $url = $this->urlAuthorization();
         $queryString = http_build_query($parameters);
