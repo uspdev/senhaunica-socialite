@@ -9,13 +9,23 @@ use SocialiteProviders\Manager\OAuth1\User;
 use League\OAuth1\Client\Credentials\TemporaryCredentials;
 
 class Server extends BaseServer
-{
+{   
+    protected $base_url_usp;
+    public function baseUrlUsp() {
+        if( config('services.senhaunica.dev') == 'yes' ){
+            $this->base_url_usp = 'https://dev.uspdigital.usp.br/wsusuario/oauth';
+        } else {
+            $this->base_url_usp = 'https://uspdigital.usp.br/wsusuario/oauth';
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     public function urlTemporaryCredentials()
     {
-        return 'https://uspdigital.usp.br/wsusuario/oauth/request_token';
+        $this->baseUrlUsp();
+        return "{$this->base_url_usp}/request_token";
     }
 
     /**
@@ -23,7 +33,8 @@ class Server extends BaseServer
      */
     public function urlAuthorization()
     {
-        return 'https://uspdigital.usp.br/wsusuario/oauth/authorize';
+        $this->baseUrlUsp();
+        return "{$this->base_url_usp}/authorize";
     }
 
     /**
@@ -31,7 +42,8 @@ class Server extends BaseServer
      */
     public function urlTokenCredentials()
     {
-        return 'https://uspdigital.usp.br/wsusuario/oauth/access_token';
+        $this->baseUrlUsp();
+        return "{$this->base_url_usp}/access_token";
     }
 
     /**
@@ -39,7 +51,8 @@ class Server extends BaseServer
      */
     public function urlUserDetails()
     {
-        return 'https://uspdigital.usp.br/wsusuario/oauth/usuariousp';
+        $this->baseUrlUsp();
+        return "{$this->base_url_usp}/usuariousp";
     }
 
     /**

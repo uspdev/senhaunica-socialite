@@ -1,21 +1,21 @@
 ## Provider para utilização de senha única USP no Laravel
 
-Hangout sobre a utilização desta biblioteca
+Hangout sobre a utilização desta biblioteca:
 
 [![Hangout senha única laravel](https://img.youtube.com/vi/jLFM2AUFJgw/0.jpg)](https://youtu.be/jLFM2AUFJgw)
 
-Dependências em PHP:
+Dependências em PHP, além das default do laravel:
 
     php-curl
 
-## Usage
+## Uso
 
 Instalação:
 
     composer require uspdev/senhaunica-socialite
     
 Exemplo de como o array $listen em *app/Providers/EventServiceProvider.php*
-deve carregar o driver senhaunica:
+deve carregar o driver *senhaunica*:
 
     protected $listen = [
         Registered::class => [
@@ -33,39 +33,88 @@ Em config/services.php:
         'client_id' => env('SENHAUNICA_KEY'),
         'client_secret' => env('SENHAUNICA_SECRET'),
         'callback_id' => env('SENHAUNICA_CALLBACK_ID'),
-         'redirect' => '/',
+        'dev' => env('SENHAUNICA_DEV','no'),
+        'redirect' => '/',
     ], 
 
 Parâmetros no .env:
 
     SENHAUNICA_KEY=fflch_sti
-    SENHAUNICA_SECRET=gjgdfjk
+    SENHAUNICA_SECRET=sua_super_chave_segura
+
+Callnack Id cadastrado:
+
+    https://dev.uspdigital.usp.br/adminws/oauthConsumidorAcessar
+    https://uspdigital.usp.br/adminws/oauthConsumidorAcessar
     SENHAUNICA_CALLBACK_ID=85
 
-Adiconar métodos em LoginController:
+O seguinte parâmetro diz se você quer trabalhar no ambiente dev (https://dev.uspdigital.usp.br/):
 
-    use Socialite;
-    public function redirectToProvider()
-    {
-        return Socialite::driver('senhaunica')->redirect();
-    }
+    SENHAUNICA_DEV=yes
 
-    public function handleProviderCallback()
-    {
-        $user = Socialite::driver('senhaunica')->user();
-        // aqui vc pode inserir o usuário no banco de dados local, fazer o login etc.
-    }
-
-Rotas:
+É necessário ao menos duas rotas:
 
     Route::get('login/senhaunica', 'Auth\LoginController@redirectToProvider');
     Route::get('login/senhaunica/callback', 'Auth\LoginController@handleProviderCallback');
 
-# Informations to developers:
+Adiconar métodos em LoginController:
+
+    <?php
+
+    namespace App\Http\Controllers\Auth;
+
+    use App\Http\Controllers\Controller;
+    use App\Providers\RouteServiceProvider;
+    use Illuminate\Foundation\Auth\AuthenticatesUsers;
+
+    use Socialite;
+    use App\User;
+    use Auth;
+    use Illuminate\Http\Request;
+
+    class LoginController extends Controller
+    {
+
+        use AuthenticatesUsers;
+        protected $redirectTo = '/';
+
+        public function __construct()
+        {
+            $this->middleware('guest')->except('logout');
+        }
+
+        public function redirectToProvider()
+        {
+            return Socialite::driver('senhaunica')->redirect();
+        }
+
+        public function handleProviderCallback()
+        {
+            $userSenhaUnica = Socialite::driver('senhaunica')->user();
+            $user = User::where('codpes',$userSenhaUnica->codpes)->first();
+
+            if (is_null($user)) $user = new User;
+
+            // bind do dados retornados
+            $user->codpes = $userSenhaUnica->codpes;
+            $user->email = $userSenhaUnica->email;
+            $user->name = $userSenhaUnica->nompes;
+            $user->save();
+            Auth::login($user, true);
+            return redirect('/');
+        }
+
+        public function logout(Request $request) {
+            Auth::logout();
+            return redirect('/');
+        }
+    }
+
+# Informações para desenvolverdores(as):
 
 Caso deseje ver todos parâmetros retornados no requisição, em Server.php:
 
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {  
-        var_dump($data); die();
+        dd($data);
     }
