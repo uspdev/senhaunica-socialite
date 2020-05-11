@@ -37,15 +37,15 @@ Em config/services.php:
         'redirect' => '/',
     ], 
 
+Cadastre o Callback Id:
+
+- dev: https://dev.uspdigital.usp.br/adminws/oauthConsumidorAcessar
+- prod: https://uspdigital.usp.br/adminws/oauthConsumidorAcessar
+
 Parâmetros no .env:
 
     SENHAUNICA_KEY=fflch_sti
     SENHAUNICA_SECRET=sua_super_chave_segura
-
-Callnack Id cadastrado:
-
-    https://dev.uspdigital.usp.br/adminws/oauthConsumidorAcessar
-    https://uspdigital.usp.br/adminws/oauthConsumidorAcessar
     SENHAUNICA_CALLBACK_ID=85
 
 O seguinte parâmetro diz se você quer trabalhar no ambiente dev (https://dev.uspdigital.usp.br/):
