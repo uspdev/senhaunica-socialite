@@ -80,7 +80,7 @@ Adiconar métodos em LoginController:
 
         public function __construct()
         {
-            $this->middleware('guest')->except('logout');
+            $this->middleware('guest');
         }
 
         public function redirectToProvider()
@@ -101,11 +101,6 @@ Adiconar métodos em LoginController:
             $user->name = $userSenhaUnica->nompes;
             $user->save();
             Auth::login($user, true);
-            return redirect('/');
-        }
-
-        public function logout(Request $request) {
-            Auth::logout();
             return redirect('/');
         }
     }
