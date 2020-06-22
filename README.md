@@ -2,7 +2,8 @@
 
 Hangout sobre a utilização desta biblioteca:
 
-[![Hangout senha única laravel](https://img.youtube.com/vi/jLFM2AUFJgw/0.jpg)](https://youtu.be/jLFM2AUFJgw)
+ - [1.x](https://youtu.be/jLFM2AUFJgw)
+ - [2.x](https://www.youtube.com/watch?v=t6Zf3nK-oIo)
 
 Dependências em PHP, além das default do laravel:
 
