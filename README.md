@@ -55,8 +55,8 @@ O seguinte parâmetro diz se você quer trabalhar no ambiente dev (https://dev.u
 
 É necessário ao menos duas rotas:
 
-    Route::get('login/senhaunica', 'Auth\LoginController@redirectToProvider');
-    Route::get('login/senhaunica/callback', 'Auth\LoginController@handleProviderCallback');
+    Route::get('login/senhaunica', [LoginController::class, 'redirectToProvider']);
+    Route::get('callback', [LoginController::class, 'handleProviderCallback']);
 
 Adiconar métodos em LoginController:
 
@@ -69,7 +69,7 @@ Adiconar métodos em LoginController:
     use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
     use Socialite;
-    use App\User;
+    use App\Models\User;
     use Auth;
     use Illuminate\Http\Request;
 
