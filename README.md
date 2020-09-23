@@ -1,6 +1,6 @@
 ## Provider para utilização de senha única USP no Laravel
 
-Hangout sobre a utilização desta biblioteca:
+Vídeos sobre a utilização desta biblioteca:
 
  - [1.x](https://youtu.be/jLFM2AUFJgw)
  - [2.x](https://www.youtube.com/watch?v=t6Zf3nK-oIo)
@@ -15,8 +15,8 @@ Instalação:
 
     composer require uspdev/senhaunica-socialite
     
-Exemplo de como o array $listen em *app/Providers/EventServiceProvider.php*
-deve carregar o driver *senhaunica*:
+Exemplo de como o array `$listen` em `app/Providers/EventServiceProvider.php`
+deve carregar o driver `senhaunica`:
 
     protected $listen = [
         Registered::class => [
@@ -28,7 +28,7 @@ deve carregar o driver *senhaunica*:
         ],
     ];
 
-Em config/services.php:
+Em `config/services.php:
 
     'senhaunica' => [
         'client_id' => env('SENHAUNICA_KEY'),
