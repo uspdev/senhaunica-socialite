@@ -2,20 +2,17 @@
 
 namespace Uspdev\SenhaunicaSocialite;
 
+use League\OAuth1\Client\Credentials\TemporaryCredentials;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use SocialiteProviders\Manager\OAuth1\Server as BaseServer;
 use SocialiteProviders\Manager\OAuth1\User;
 
-use League\OAuth1\Client\Credentials\TemporaryCredentials;
-
 class Server extends BaseServer
 {   
-    protected $base_url_usp;
+    protected $base_url_usp = 'https://uspdigital.usp.br/wsusuario/oauth';
     public function baseUrlUsp() {
-        if( config('services.senhaunica.dev') == 'yes' ){
-            $this->base_url_usp = 'https://dev.uspdigital.usp.br/wsusuario/oauth';
-        } else {
-            $this->base_url_usp = 'https://uspdigital.usp.br/wsusuario/oauth';
+        if (config('services.senhaunica.dev') != "no") {
+            $this->base_url_usp = config('services.senhaunica.dev');
         }
     }
 

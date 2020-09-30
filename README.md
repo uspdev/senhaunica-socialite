@@ -49,9 +49,10 @@ Parâmetros no .env:
     SENHAUNICA_SECRET=sua_super_chave_segura
     SENHAUNICA_CALLBACK_ID=85
 
-O seguinte parâmetro diz se você quer trabalhar no ambiente dev (https://dev.uspdigital.usp.br/):
+O seguinte parâmetro diz se você quer trabalhar no ambiente dev:
 
-    SENHAUNICA_DEV=yes
+    SENHAUNICA_DEV="https://dev.uspdigital.usp.br/wsusuario/oauth"
+
 
 É necessário ao menos duas rotas:
 
