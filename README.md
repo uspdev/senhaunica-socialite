@@ -109,9 +109,16 @@ Adiconar métodos em LoginController:
 
 # Informações para desenvolverdores(as):
 
+## Direto na aplicação
+
 Caso deseje ver todos parâmetros retornados no requisição, em Server.php:
 
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {  
         dd($data);
     }
+
+## Debug
+Outra possibilidade é configurar a variável `APP_DEBUG` como `true`. Isso salvará em JSON as informações obtidas de `<Servidor de OAuth1>/wsusuario/oauth/usuariousp` no diretório `storage/app/debug/oauth` por número USP.
+
+Ex: para o número USP 3141592, os dados erão salvos em `storage/app/debug/oauth/3141592.json`.
