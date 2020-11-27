@@ -2,6 +2,7 @@
 
 namespace Uspdev\SenhaunicaSocialite;
 
+use Illuminate\Support\Facades\Storage;
 use League\OAuth1\Client\Credentials\TemporaryCredentials;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use SocialiteProviders\Manager\OAuth1\Server as BaseServer;
@@ -56,7 +57,11 @@ class Server extends BaseServer
      * {@inheritDoc}
      */
     public function userDetails($data, TokenCredentials $tokenCredentials)
-    {  
+    {
+        if (getenv("APP_DEBUG") == "true") {
+            Storage::put("debug/oauth/".$data['loginUsuario'].".json", json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        }
+
         $user                      = new User();
         $user->codpes              = $data['loginUsuario'];
         $user->nompes              = $data['nomeUsuario'];
