@@ -75,11 +75,6 @@ Adiconar métodos em LoginController:
     class LoginController extends Controller
     {
 
-        public function __construct()
-        {
-            $this->middleware('guest');
-        }
-
         public function redirectToProvider()
         {
             return Socialite::driver('senhaunica')->redirect();
