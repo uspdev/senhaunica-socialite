@@ -66,7 +66,6 @@ Adiconar métodos em LoginController:
     namespace App\Http\Controllers\Auth;
 
     use App\Http\Controllers\Controller;
-    use App\Providers\RouteServiceProvider;
 
     use Socialite;
     use App\Models\User;
