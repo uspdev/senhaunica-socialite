@@ -67,7 +67,6 @@ Adiconar métodos em LoginController:
 
     use App\Http\Controllers\Controller;
     use App\Providers\RouteServiceProvider;
-    use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
     use Socialite;
     use App\Models\User;
@@ -76,9 +75,6 @@ Adiconar métodos em LoginController:
 
     class LoginController extends Controller
     {
-
-        use AuthenticatesUsers;
-        protected $redirectTo = '/';
 
         public function __construct()
         {
