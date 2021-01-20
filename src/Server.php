@@ -127,7 +127,7 @@ class Server extends BaseServer
     }
     
     // adding callback_id parameter
-    public function getAuthorizationUrl($temporaryIdentifier)
+    public function getAuthorizationUrl($temporaryIdentifier, array $options = [])
     {
         if ($temporaryIdentifier instanceof TemporaryCredentials) {
             $temporaryIdentifier = $temporaryIdentifier->getIdentifier();
