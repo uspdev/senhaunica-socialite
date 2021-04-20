@@ -58,7 +58,7 @@ class Server extends BaseServer
      */
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {
-        if (getenv("APP_DEBUG") == "true") {
+        if (config('services.senhaunica.debug') == true) {
             Storage::put("debug/oauth/".$data['loginUsuario'].".json", json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         }
 
