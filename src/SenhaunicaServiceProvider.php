@@ -2,10 +2,10 @@
 
 namespace Uspdev\SenhaunicaSocialite;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Uspdev\SenhaunicaSocialite\Providers\AuthServiceProvider;
 use Uspdev\SenhaunicaSocialite\Providers\EventServiceProvider;
-use Illuminate\Support\Facades\Route;
 
 class SenhaunicaServiceProvider extends ServiceProvider
 {
@@ -17,31 +17,42 @@ class SenhaunicaServiceProvider extends ServiceProvider
         // registra eventos
         $this->app->register(EventServiceProvider::class);
 
-        // registra gates
-        $this->app->register(AuthServiceProvider::class);
+        // registra gates se habilitado no config
+        if (config('senhaunica.gates')) {
+            $this->app->register(AuthServiceProvider::class);
+        }
     }
 
     public function boot()
     {
 
-        // registra rotas
-        $this->registerRoutes();
-        //$this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        // registra rotas se habilitado no config
+        if (config('senhaunica.routes')) {
+            $this->registerRoutes();
+        }
 
         if ($this->app->runningInConsole()) {
             // exportar configuracao
             // php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="config"
-            //$this->publishes([__DIR__ . '/../config/config.php' => config_path('senhaunica.php')], 'config');
+            $this->publishes([__DIR__ . '/../config/config.php' => config_path('senhaunica.php')], 'config');
 
             // Export the migration
             // php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
-            if (!class_exists('UpdateUsersTable')) {
-                $this->publishes([
-                    __DIR__ . '/../database/migrations/update_users_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_update_users_table.php'),
-                ], 'migrations');
-            }
+            $this->publishes([
+                __DIR__ . '/../database/migrations/update_senhaunica_users_table.php.stub' => $this->getMigrationFilename(),
+            ], 'migrations');
         }
 
+    }
+
+    protected function getMigrationFilename()
+    {
+        $match = glob(database_path('migrations/' . '*_update_senhaunica_users_table.php'));
+        if ($match) {
+            return $match[0];
+        } else {
+            return database_path('migrations/' . date('Y_m_d_His', time()) . '_update_senhaunica_users_table.php');
+        }
     }
 
     protected function registerRoutes()
