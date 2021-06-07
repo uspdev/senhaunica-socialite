@@ -17,6 +17,10 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('admin', function ($user) {
             return $user->level == 'admin' ? true : false;
         });
+
+        Gate::define('gerente', function ($user) {
+            return ($user->level == 'gerente' ||  $user->level == 'admin') ? true : false;
+        });
         
         Gate::define('user', function ($user) {
             return $user;

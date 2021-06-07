@@ -19,8 +19,13 @@ class SenhaunicaController extends Controller
         $user = User::firstOrNew(['codpes' => $userSenhaUnica->codpes]);
 
         // vamos verificar no config se o usuário é admin
-        if (strpos(config('senhaunica.admins'), $userSenhaUnica->codpes) !== false) {
+        if (in_array($userSenhaUnica->codpes, config('senhaunica.admins'))) {
             $user->level = 'admin';
+        }
+
+        // vamos verificar no config se o usuário é gerente
+        if (in_array($userSenhaUnica->codpes, config('senhaunica.gerentes'))) {
+            $user->level = 'gerente';
         }
 
         // bind dos dados retornados
