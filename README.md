@@ -20,10 +20,18 @@ Dependências em PHP, além das default do laravel:
 
 Esta biblioteca modifica a tabela `users` padrão do laravel acrescentando os campos `codpes` e `level`, e também modifica o campo `password` deixando-o opcional.
 
+Caso você queira, pode usar a persistência da forma que for mais conveniente porém, para usar as rotas e controller internos você deve utilizar esta migration ou executar manualmente as alterações correspondentes. 
+
     php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
 
     php artisan migrate
 
+
+#### Arquivo de configuração
+
+Caso você queira usar as rotas e controller internos publique o arquivo de configuração e ajuste conforme necessário. Para usar os gates internos também é neessário habilitá-lo no arquivo de configuração.
+
+    php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="config"
 
 #### Cadastre o `callback_id`
 
@@ -32,15 +40,12 @@ A url é o que está cadastrado no `APP_URL` mais `/callback`.
 -   dev: https://dev.uspdigital.usp.br/adminws/oauthConsumidorAcessar
 -   prod: https://uspdigital.usp.br/adminws/oauthConsumidorAcessar
 
-#### Coloque variáveis no .env e .env.example
+#### Coloque variáveis no .env e .env.example da sua aplicação
 
     # uspdev/senhaunica-socialite
     SENHAUNICA_KEY=fflch_sti
     SENHAUNICA_SECRET=sua_super_chave_segura
     SENHAUNICA_CALLBACK_ID=85
-
-    # Esses usuários terão privilégios de admin
-    SENHAUNICA_ADMINS=11111,22222,33333
 
     # Habilite para salvar o retorno em storage/app/debug/oauth/
     #SENHAUNICA_DEBUG=true
@@ -48,12 +53,27 @@ A url é o que está cadastrado no `APP_URL` mais `/callback`.
     # URL do servidor oauth no ambiente de dev
     #SENHAUNICA_DEV="https://dev.uspdigital.usp.br/wsusuario/oauth"
 
-### Gates
+    # Esses usuários terão privilégios especiais 
+    # se senhaunica.gates = true
+    #SENHAUNICA_ADMINS=11111,22222,33333
+    #SENHAUNICA_GERENTES=4444,5555,6666
 
-Esta biblioteca fornece os gates `admin` e `user` como uma forma simples de autorização.
 
+#### Gates
 
-## Atualizando a partir da versão 2
+Esta biblioteca fornece, opcionalmente, os gates `admin`, `gerente` e `user` como uma forma simples de autorização. Para habilitar ajuste apropriadamente no arquivo `config/senhaunica.php` Use conforme a necessidade em sua aplicação.
+
+* user é todo usuário autenticado 
+* todo admin é gerente também
+* admins e gerentes devem estar cadastrados no .env
+
+#### Rotas e controllers
+
+Essa biblioteca fornece rotas internas para login e logout e o respoectivo controller. Para usá-los habilite no arquivo `config/senhaunica.php`.
+
+### Atualizando
+
+Caso queira utilizar os recursos internos de rotas e gates você deve remover as referências prévias.
 
 Atualize o composer.json para usar a versão `"^3.0"`
 
