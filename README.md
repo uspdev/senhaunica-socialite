@@ -2,145 +2,37 @@
 
 Vídeos sobre a utilização desta biblioteca:
 
-- [1.x](https://youtu.be/jLFM2AUFJgw)
-- [2.x](https://www.youtube.com/watch?v=t6Zf3nK-oIo)
+-   [1.x](https://youtu.be/jLFM2AUFJgw)
+-   [2.x](https://www.youtube.com/watch?v=t6Zf3nK-oIo)
+-   [3.x] ...
 
 Dependências em PHP, além das default do laravel:
 
     php-curl
 
-## Uso
-
-Instalação:
+### Instalação
 
     composer require uspdev/senhaunica-socialite
 
-## Arquivos a serem ajustados
+### Configuração nova
 
-Alguns dos ajustes são obrigatórios, outros opcionais. Adapte-os à sua necessidade.
+#### Publique e rode as migrations
 
-#### Arquivo `app/Providers/EventServiceProvider.php`
+Esta biblioteca modifica a tabela `users` padrão do laravel acrescentando os campos `codpes` e `level`, e também modifica o campo `password` deixando-o opcional.
 
-Exemplo de como o array `$listen` deve carregar o driver `senhaunica`:
+    php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
 
-```php
-protected $listen = [
-    Registered::class => [
-        SendEmailVerificationNotification::class,
-    ],
+    php artisan migrate
 
-    \SocialiteProviders\Manager\SocialiteWasCalled::class => [
-        'Uspdev\SenhaunicaSocialite\SenhaunicaExtendSocialite@handle',
-    ],
-];
-```
-
-#### Arquivo `config/services.php`
-
-```php
-'senhaunica' => [
-    'client_id' => env('SENHAUNICA_KEY'),
-    'client_secret' => env('SENHAUNICA_SECRET'),
-    'callback_id' => env('SENHAUNICA_CALLBACK_ID'),
-    'dev' => env('SENHAUNICA_DEV','no'),
-    'redirect' => '/',
-    'admins' => env('SENHAUNICA_ADMINS'),
-    'debug' => (bool) env('SENHAUNICA_DEBUG', false),
-],
-```
-
-#### Arquivo `routes/web.php`
-
-Adicionar as rotas. É necessário ao menos `login` e `callback`. Um `logout` também é bom:
-
-```php
-use App\Http\Controllers\Auth\LoginController;
-...
-Route::get('login', [LoginController::class, 'redirectToProvider']);
-Route::get('callback', [LoginController::class, 'handleProviderCallback']);
-Route::post('logout', [LoginController::class, 'logout']);
-```
-
-#### Arquivo `app/Http/Controllers/Auth/LoginController.php`
-
-```php
-<?php
-
-namespace App\Http\Controllers\Auth;
-
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use Auth;
-use Socialite;
-
-class LoginController extends Controller
-{
-
-    public function redirectToProvider()
-    {
-        return Socialite::driver('senhaunica')->redirect();
-    }
-
-    public function handleProviderCallback()
-    {
-        $userSenhaUnica = Socialite::driver('senhaunica')->user();
-        $user = User::firstOrNew(['codpes' => $userSenhaUnica->codpes]);
-
-        // vamos verificar no config se o usuário é admin
-        if (strpos(config('services.senhaunica.admins'), $userSenhaUnica->codpes) !== false) {
-            $user->level = 'admin';
-        }
-
-        // bind dos dados retornados
-        $user->codpes = $userSenhaUnica->codpes;
-        $user->email = $userSenhaUnica->email;
-        $user->name = $userSenhaUnica->nompes;
-        $user->save();
-        Auth::login($user, true);
-        return redirect('/');
-    }
-
-    public function logout()
-    {
-        Auth::logout();
-        return redirect('/');
-    }
-}
-```
-
-#### Arquivo `database/migrations/...00_create_users_table.php`
-
-É necessário criar alguns campos no BD. Se é um projeto novo, edite direto no arquivo, se não crie uma migration para as alterações. Não esqueça de rodar `php artisan migrate` ou `php artisan migrate:fresh` depois das alterações.
-
-```php
-$table->string('password')->nullable(); # deixar opcional
-
-$table->integer('codpes');
-$table->string('level')->nullable();
-```
-
-#### Arquivo `App\Providers\AuthServiceProvider.php`
-
-Opcionalmente, adicione alguns gates no método `boot()`:
-
-```php
-Gate::define('admin', function ($user) {
-    return $user->level == 'admin' ? true : false;
-});
-
-Gate::define('user', function ($user) {
-    return $user;
-});
-```
 
 #### Cadastre o `callback_id`
 
 A url é o que está cadastrado no `APP_URL` mais `/callback`.
 
-- dev: https://dev.uspdigital.usp.br/adminws/oauthConsumidorAcessar
-- prod: https://uspdigital.usp.br/adminws/oauthConsumidorAcessar
+-   dev: https://dev.uspdigital.usp.br/adminws/oauthConsumidorAcessar
+-   prod: https://uspdigital.usp.br/adminws/oauthConsumidorAcessar
 
-#### Parâmetros no .env e .env.example:
+#### Coloque variáveis no .env e .env.example
 
     # uspdev/senhaunica-socialite
     SENHAUNICA_KEY=fflch_sti
@@ -155,6 +47,25 @@ A url é o que está cadastrado no `APP_URL` mais `/callback`.
 
     # URL do servidor oauth no ambiente de dev
     #SENHAUNICA_DEV="https://dev.uspdigital.usp.br/wsusuario/oauth"
+
+### Gates
+
+Esta biblioteca fornece os gates `admin` e `user` como uma forma simples de autorização.
+
+
+## Atualizando a partir da versão 2
+
+Atualize o composer.json para usar a versão `"^3.0"`
+
+Deve-se desfazer as alterações indicadas na versão 2 para usar as novas funcionalidades.
+
+    app/Providers/EventServiceProvider.php, remover as linhas que chamam o SenhaunicaSocialite
+    config/services.php, remover a seção senhaunica
+    routes/web.php, remover as rotas login, callback e logout
+    app/Http/Controllers/Auth/LoginController.php, apagar o arquivo
+    App\Providers\AuthServiceProvider.php, remover gates admin e user
+
+Confira o .env se está de acordo com as recomendações atuais.
 
 ## Informações para desenvolvedores(as):
 
