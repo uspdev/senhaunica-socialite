@@ -31,19 +31,11 @@ class SenhaunicaController extends Controller
         // vamos verificar no config se o usuário é admin
         if (in_array($userSenhaUnica->codpes, config('senhaunica.admins'))) {
             $user->givePermissionTo('admin');
-        } else {
-            if($user->hasPermissionTo('admin')) {
-                $user->revokePermissionTo('admin');
-            }
         }
 
         // vamos verificar no config se o usuário é gerente
         if (in_array($userSenhaUnica->codpes, config('senhaunica.gerentes'))) {
             $user->givePermissionTo('gerente');
-        } else {
-            if($user->hasPermissionTo('gerente')) {
-                $user->revokePermissionTo('gerente');
-            }
         }
 
         // dafault
