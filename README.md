@@ -16,9 +16,31 @@ Dependências em PHP, além das default do laravel:
 
 ### Configuração nova
 
+#### Configuração da biblioteca laravel-permission
+
+A biblioteca [laravel-permission](https://github.com/spatie/laravel-permission/) é poderosa, flexível e bem estabelecida pela comunidade laravel no quesito grupos e permissões. Por padrão, os números USP inseridos em SENHAUNICA_ADMINS e SENHAUNICA_GERENTES ganharão as permissões admin e gerente respectivamente.
+Todos usuários por padrão ganham a permission *user*. Essas permissões são automaticamente Gates, assim não é necessário definí-las em *AuthServiceProvider*.
+Duas configurações são necessárias:
+
+1) publicar as migrations da laravel-permission:
+
+    php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
+
+2) Dentro da classe do model User declarar:
+
+    use \Spatie\Permission\Traits\HasRoles;
+
+Neste momento você tem um poder enorme de regras de permissionamento no seu sistema, podendo criar outras permissions, agrupá-las em roles ou mesmo listar as permissões de um usuários, como:
+
+    $user->getAllPermissions()
+
+Ou listar todos usuários com uma dada permissão:
+
+    $users = User::permission('admin')->get();
+
 #### Publique e rode as migrations
 
-Esta biblioteca modifica a tabela `users` padrão do laravel acrescentando os campos `codpes` e `level`, e também modifica o campo `password` deixando-o opcional.
+Esta biblioteca modifica a tabela `users` padrão do laravel acrescentando o campo `codpes` e modifica o campo `password` deixando-o opcional.
 
 Caso você queira, pode usar a persistência da forma que for mais conveniente porém, para usar as rotas/controller internos você deve utilizar esta migration ou executar manualmente as alterações correspondentes. 
 
@@ -88,7 +110,7 @@ Para usar os gates e rotas/controller internos verifique /ajuste os seguintes ar
 * `routes/web.php`, remover as rotas login, callback e logout
 * `App/Http/Controllers/Auth/LoginController.php`, apagar o arquivo
 * `App\Providers\AuthServiceProvider.php`, remover gates admin e user
-* A tabela `users` deve possuir as colunas `codpes` e `level`. Se for o caso, publique a migration e ajuste o arquivo publicado conforme sua necessidade
+* A tabela `users` deve possuir a coluna `codpes`. Se for o caso, publique a migration e ajuste o arquivo publicado conforme sua necessidade
 
 Confira o .env se está de acordo com as recomendações atuais.
 

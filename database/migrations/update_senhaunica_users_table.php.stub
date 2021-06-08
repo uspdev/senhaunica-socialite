@@ -19,9 +19,6 @@ class UpdateSenhaunicaUsersTable extends Migration
             if (!Schema::hasColumn('users', 'codpes')) {
                 $table->integer('codpes');
             }
-            if (!Schema::hasColumn('users', 'level')) {
-                $table->string('level')->nullable();
-            }
         });
     }
 
@@ -34,6 +31,5 @@ class UpdateSenhaunicaUsersTable extends Migration
     {
         // Não vamos remover as colunas para preservar os dados
         //$table->dropColumn('codpes');
-        //$table->dropColumn('level');
     }
 }

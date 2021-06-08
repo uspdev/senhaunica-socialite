@@ -6,6 +6,8 @@ use App\Models\User;
 use Auth;
 use Socialite;
 
+use Spatie\Permission\Models\Permission;
+
 class SenhaunicaController extends Controller
 {
     public function redirectToProvider()
@@ -18,15 +20,26 @@ class SenhaunicaController extends Controller
         $userSenhaUnica = Socialite::driver('senhaunica')->user();
         $user = User::firstOrNew(['codpes' => $userSenhaUnica->codpes]);
 
+        // garantindo que as permissions existam
+        $permissions = ['admin','gerente','user'];
+        foreach($permissions as $permission){
+            if(!Permission::findByName($permission)){
+                Permission::create(['name' => $permission]);
+            }
+        }
+        
         // vamos verificar no config se o usuário é admin
         if (in_array($userSenhaUnica->codpes, config('senhaunica.admins'))) {
-            $user->level = 'admin';
+            $user->givePermissionTo('admin');
         }
 
         // vamos verificar no config se o usuário é gerente
         if (in_array($userSenhaUnica->codpes, config('senhaunica.gerentes'))) {
-            $user->level = 'gerente';
+            $user->givePermissionTo('gerente');
         }
+
+        // dafault
+        $user->givePermissionTo('user');
 
         // bind dos dados retornados
         $user->codpes = $userSenhaUnica->codpes;
