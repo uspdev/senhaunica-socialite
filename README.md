@@ -24,8 +24,6 @@ Caso você queira, pode usar a persistência da forma que for mais conveniente p
 
     php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
 
-    php artisan migrate
-
 #### Configuração da biblioteca laravel-permission
 
 A biblioteca [laravel-permission](https://github.com/spatie/laravel-permission/) é poderosa, flexível e bem estabelecida pela comunidade laravel no quesito grupos e permissões. Por padrão, os números USP inseridos em SENHAUNICA_ADMINS e SENHAUNICA_GERENTES ganharão as permissões admin e gerente respectivamente.
@@ -35,6 +33,7 @@ Duas configurações são necessárias:
 Publicar as migrations da laravel-permission:
 
     php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
+    php artisan migrate
 
 Dentro da classe do model User declarar:
 
