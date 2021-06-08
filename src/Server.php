@@ -12,8 +12,8 @@ class Server extends BaseServer
 {   
     protected $base_url_usp = 'https://uspdigital.usp.br/wsusuario/oauth';
     public function baseUrlUsp() {
-        if (config('services.senhaunica.dev') != "no") {
-            $this->base_url_usp = config('services.senhaunica.dev');
+        if (config('senhaunica.dev') != "no") {
+            $this->base_url_usp = config('senhaunica.dev');
         }
     }
 
@@ -58,7 +58,7 @@ class Server extends BaseServer
      */
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {
-        if (config('services.senhaunica.debug') == true) {
+        if (config('senhaunica.debug') == true) {
             Storage::put("debug/oauth/".$data['loginUsuario'].".json", json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         }
 
@@ -133,7 +133,7 @@ class Server extends BaseServer
             $temporaryIdentifier = $temporaryIdentifier->getIdentifier();
         }
 
-        $parameters = array('oauth_token' => $temporaryIdentifier,'callback_id' => config('services.senhaunica.callback_id'));
+        $parameters = array('oauth_token' => $temporaryIdentifier,'callback_id' => config('senhaunica.callback_id'));
 
         $url = $this->urlAuthorization();
         $queryString = http_build_query($parameters);
