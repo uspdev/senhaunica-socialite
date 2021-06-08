@@ -96,7 +96,7 @@ Confira o .env se está de acordo com as recomendações atuais.
 
 ### Direto na aplicação
 
-Caso deseje ver todos parâmetros retornados no requisição, em Server.php:
+Caso deseje ver todos parâmetros retornados na requisição, em Server.php:
 
 ```php
 public function userDetails($data, TokenCredentials $tokenCredentials)
