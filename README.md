@@ -32,7 +32,7 @@ Duas configurações são necessárias:
 
 Publicar as migrations da laravel-permission:
 
-    php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
+    php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
     php artisan migrate
 
 Dentro da classe do model User declarar:
