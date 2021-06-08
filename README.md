@@ -20,18 +20,11 @@ Dependências em PHP, além das default do laravel:
 
 Esta biblioteca modifica a tabela `users` padrão do laravel acrescentando os campos `codpes` e `level`, e também modifica o campo `password` deixando-o opcional.
 
-Caso você queira, pode usar a persistência da forma que for mais conveniente porém, para usar as rotas e controller internos você deve utilizar esta migration ou executar manualmente as alterações correspondentes. 
+Caso você queira, pode usar a persistência da forma que for mais conveniente porém, para usar as rotas/controller internos você deve utilizar esta migration ou executar manualmente as alterações correspondentes. 
 
     php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
 
     php artisan migrate
-
-
-#### Arquivo de configuração
-
-Caso você queira usar as rotas e controller internos publique o arquivo de configuração e ajuste conforme necessário. Para usar os gates internos também é neessário habilitá-lo no arquivo de configuração.
-
-    php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="config"
 
 #### Cadastre o `callback_id`
 
@@ -47,43 +40,55 @@ A url é o que está cadastrado no `APP_URL` mais `/callback`.
     SENHAUNICA_SECRET=sua_super_chave_segura
     SENHAUNICA_CALLBACK_ID=85
 
-    # Habilite para salvar o retorno em storage/app/debug/oauth/
-    #SENHAUNICA_DEBUG=true
-
     # URL do servidor oauth no ambiente de dev
     #SENHAUNICA_DEV="https://dev.uspdigital.usp.br/wsusuario/oauth"
 
+    # Habilite para salvar o retorno em storage/app/debug/oauth/
+    #SENHAUNICA_DEBUG=true
+
     # Esses usuários terão privilégios especiais 
-    # se senhaunica.gates = true
     #SENHAUNICA_ADMINS=11111,22222,33333
     #SENHAUNICA_GERENTES=4444,5555,6666
+
+#### Arquivo de configuração
+
+Caso você queira modificar o comportamento padrão de algumas partes como por exemplo, desabilitar os gates internos, publique o arquivo de configuração e ajuste conforme necessário. A publicação é necessária somente se for alterar alguma configuração.
+
+    php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="config"
 
 
 #### Gates
 
-Esta biblioteca fornece, opcionalmente, os gates `admin`, `gerente` e `user` como uma forma simples de autorização. Para habilitar ajuste apropriadamente no arquivo `config/senhaunica.php` Use conforme a necessidade em sua aplicação.
+Esta biblioteca fornece, por padrão, os gates `admin`, `gerente` e `user` como uma forma simples de autorização. Caso você não queira utilizar esses gates, desabilite no arquivo `config/senhaunica.php`. Use conforme a necessidade em sua aplicação.
 
-* user é todo usuário autenticado 
-* todo admin é gerente também
-* admins e gerentes devem estar cadastrados no .env
+* **user** é todo usuário autenticado 
+* todo **admin** é **gerente** também
+* **admins** e **gerentes** devem estar cadastrados no `.env` para serem populados no BD apropriadamente
 
 #### Rotas e controllers
 
-Essa biblioteca fornece rotas internas para login e logout e o respoectivo controller. Para usá-los habilite no arquivo `config/senhaunica.php`.
+Essa biblioteca fornece rotas internas para login e logout e o respectivo controller para utilizar a senha única de forma **exclusiva**. Com isso, não é necessário criar essas rotas/controller manualmente. 
+
+Caso sua aplicação exija um processo mais complexo, desative no arquivo `config/senhaunica.php`.
 
 ### Atualizando
 
-Caso queira utilizar os recursos internos de rotas e gates você deve remover as referências prévias.
+A atualização para essa versão exije aguns ajustes no código.
 
-Atualize o composer.json para usar a versão `"^3.0"`
+Primeiramente atualize o `composer.json` para usar a nova versão e rode `composer install`
 
-Deve-se desfazer as alterações indicadas na versão 2 para usar as novas funcionalidades.
+    "uspdev/senhaunica-socialite": "^3.0"
 
-    app/Providers/EventServiceProvider.php, remover as linhas que chamam o SenhaunicaSocialite
-    config/services.php, remover a seção senhaunica
-    routes/web.php, remover as rotas login, callback e logout
-    app/Http/Controllers/Auth/LoginController.php, apagar o arquivo
-    App\Providers\AuthServiceProvider.php, remover gates admin e user
+Deve-se desfazer/verificar **pelo menos** os seguintes arquivos:
+* `app/Providers/EventServiceProvider.php`, remover as linhas que chamam o SenhaunicaSocialite
+* `config/services.php`, remover a seção senhaunica
+* Se não for usar os gates e rotas/controller internos, desative-os no `config/senhaunica.php`
+
+Para usar os gates e rotas/controller internos verifique /ajuste os seguintes arquivos:
+* `routes/web.php`, remover as rotas login, callback e logout
+* `App/Http/Controllers/Auth/LoginController.php`, apagar o arquivo
+* `App\Providers\AuthServiceProvider.php`, remover gates admin e user
+* A tabela `users` deve possuir as colunas `codpes` e `level`. Se for o caso, publique a migration e ajuste o arquivo publicado conforme sua necessidade
 
 Confira o .env se está de acordo com as recomendações atuais.
 
