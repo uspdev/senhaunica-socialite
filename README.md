@@ -16,17 +16,27 @@ Dependências em PHP, além das default do laravel:
 
 ### Configuração nova
 
+#### Publique e rode as migrations
+
+Esta biblioteca modifica a tabela `users` padrão do laravel acrescentando o campo `codpes` e modifica o campo `password` deixando-o opcional.
+
+Caso você queira, pode usar a persistência da forma que for mais conveniente porém, para usar as rotas/controller internos você deve utilizar esta migration ou executar manualmente as alterações correspondentes. 
+
+    php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
+
+    php artisan migrate
+
 #### Configuração da biblioteca laravel-permission
 
 A biblioteca [laravel-permission](https://github.com/spatie/laravel-permission/) é poderosa, flexível e bem estabelecida pela comunidade laravel no quesito grupos e permissões. Por padrão, os números USP inseridos em SENHAUNICA_ADMINS e SENHAUNICA_GERENTES ganharão as permissões admin e gerente respectivamente.
 Todos usuários por padrão ganham a permission *user*. Essas permissões são automaticamente Gates, assim não é necessário definí-las em *AuthServiceProvider*.
 Duas configurações são necessárias:
 
-1) publicar as migrations da laravel-permission:
+Publicar as migrations da laravel-permission:
 
     php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
 
-2) Dentro da classe do model User declarar:
+Dentro da classe do model User declarar:
 
     use \Spatie\Permission\Traits\HasRoles;
 
@@ -38,15 +48,6 @@ Ou listar todos usuários com uma dada permissão:
 
     $users = User::permission('admin')->get();
 
-#### Publique e rode as migrations
-
-Esta biblioteca modifica a tabela `users` padrão do laravel acrescentando o campo `codpes` e modifica o campo `password` deixando-o opcional.
-
-Caso você queira, pode usar a persistência da forma que for mais conveniente porém, para usar as rotas/controller internos você deve utilizar esta migration ou executar manualmente as alterações correspondentes. 
-
-    php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
-
-    php artisan migrate
 
 #### Cadastre o `callback_id`
 
