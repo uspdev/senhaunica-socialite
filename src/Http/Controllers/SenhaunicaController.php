@@ -23,11 +23,9 @@ class SenhaunicaController extends Controller
         // garantindo que as permissions existam
         $permissions = ['admin','gerente','user'];
         foreach($permissions as $permission){
-            if(!Permission::findByName($permission)){
-                Permission::create(['name' => $permission]);
-            }
+            Permission::findOrCreate($permission);
         }
-        
+
         // vamos verificar no config se o usuário é admin
         if (in_array($userSenhaUnica->codpes, config('senhaunica.admins'))) {
             $user->givePermissionTo('admin');

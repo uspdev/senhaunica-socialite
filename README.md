@@ -32,7 +32,7 @@ Duas configurações são necessárias:
 
 Neste momento você tem um poder enorme de regras de permissionamento no seu sistema, podendo criar outras permissions, agrupá-las em roles ou mesmo listar as permissões de um usuários, como:
 
-    $user->getAllPermissions()
+    $user->getPermissionNames();
 
 Ou listar todos usuários com uma dada permissão:
 
