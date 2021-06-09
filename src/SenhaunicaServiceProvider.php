@@ -16,6 +16,11 @@ class SenhaunicaServiceProvider extends ServiceProvider
 
         // registra eventos
         $this->app->register(EventServiceProvider::class);
+
+        // registra gates
+        if (config('senhaunica.permission')) {
+            $this->app->register(AuthServiceProvider::class);
+        }
     }
 
     public function boot()
