@@ -81,10 +81,16 @@ Por padrão a versão 3 incorpora autorização e rotas/controller internos. Se 
 
 A tabela `users` deve possuir a coluna `codpes`. Se for o caso, publique a migration e ajuste o arquivo publicado conforme sua necessidade.
 
-Para usar a autorização, é necessário publicar e migrar as tabelas correspondentes:
+Para usar a autorização, é necessário:
 
-    php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
-    php artisan migrate
+* Incluir a trait no model do user
+
+        use \Spatie\Permission\Traits\HasRoles;
+
+* publicar e migrar as tabelas correspondentes:
+
+        php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
+        php artisan migrate
 
 Confira o `.env` se está de acordo com as recomendações atuais.
 
