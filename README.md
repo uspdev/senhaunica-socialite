@@ -95,6 +95,8 @@ Para usar a autorização, é necessário:
 
 Confira o `.env` se está de acordo com as recomendações atuais.
 
+OBS.: a variável `ADMINS` foi renomeada para `SENHAUNICA_ADMINS`.
+
 ### Arquivo de configuração
 
 Caso você queira modificar o comportamento padrão de algumas partes como por exemplo, desabilitar a autorização ou as rotas internas, publique o arquivo de configuração e ajuste conforme necessário. A publicação é necessária somente se for alterar alguma configuração.
