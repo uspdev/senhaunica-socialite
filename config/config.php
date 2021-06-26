@@ -14,4 +14,6 @@ return [
     'dev' => env('SENHAUNICA_DEV', 'no'),
     'debug' => (bool) env('SENHAUNICA_DEBUG', false),
     'callback_id' => env('SENHAUNICA_CALLBACK_ID'),
+
+    'drop_admins' => (bool) env('SENHAUNICA_DROP_ADMINS', false),
 ];
