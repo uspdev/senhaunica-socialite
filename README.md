@@ -51,15 +51,18 @@ A url é o que está cadastrado no `APP_URL` mais `/callback`, exemplo: `http://
     SENHAUNICA_SECRET=sua_super_chave_segura
     SENHAUNICA_CALLBACK_ID=85
 
-    # URL do servidor oauth no ambiente de dev
+    # URL do servidor oauth no ambiente de dev (default: no)
     #SENHAUNICA_DEV="https://dev.uspdigital.usp.br/wsusuario/oauth"
 
-    # Habilite para salvar o retorno em storage/app/debug/oauth/
+    # Habilite para salvar o retorno em storage/app/debug/oauth/ (default: false)
     #SENHAUNICA_DEBUG=true
 
     # Esses usuários terão privilégios especiais
     #SENHAUNICA_ADMINS=11111,22222,33333
     #SENHAUNICA_GERENTES=4444,5555,6666
+
+    # Se true, os privilégios especiais serão revogados ao remover da lista (default: false)
+    #SENHAUNICA_DROP_PERMISSIONS=true
 
 ### Atualizando à partir da versão 2
 

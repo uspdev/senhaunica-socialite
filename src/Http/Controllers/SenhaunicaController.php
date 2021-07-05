@@ -30,7 +30,8 @@ class SenhaunicaController extends Controller
             if (in_array($userSenhaUnica->codpes, config('senhaunica.admins'))) {
                 $user->givePermissionTo('admin');
             } else {
-                if (config('senhaunica.drop_admins')) {
+                // vamos revogar o acesso se dropPermissions
+                if (config('senhaunica.dropPermissions')) {
                     $user->revokePermissionTo('admin');
                 }
             }
@@ -38,6 +39,10 @@ class SenhaunicaController extends Controller
             // vamos verificar no config se o usuário é gerente
             if (in_array($userSenhaUnica->codpes, config('senhaunica.gerentes'))) {
                 $user->givePermissionTo('gerente');
+            } else {
+                if (config('senhaunica.dropPermissions')) {
+                    $user->revokePermissionTo('gerente');
+                }
             }
 
             // default
@@ -56,6 +61,8 @@ class SenhaunicaController extends Controller
     public function logout()
     {
         Auth::logout();
+        session()->invalidate();
+        session()->regenerateToken();
         return redirect('/');
     }
 }
