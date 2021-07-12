@@ -138,6 +138,8 @@ Como as permissões são gates, eles podem ser usados diretamente no blade com a
 
 ## Informações para desenvolvedores(as):
 
+### Senhaunica-faker
+
 Em ambiente de desenvolvimento, ao invés de usar a autenticação por senha única, é possivel utilizar a biblioteca [senhaunica-faker](https://github.com/uspdev/senhaunica-faker). Essa biblioteca simula o servidor de autenticação retornando dados fake para a aplicação.
 
 ### Direto na aplicação

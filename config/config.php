@@ -5,6 +5,8 @@ return [
     'routes' => true, // usa rotas e controller internos
     'prefix' => '', // coloque um prefixo em caso de colisão de rotas (login, callback e logout).
     'middleware' => ['web'], // you probably want to include 'web' here
+    'session_key' => 'senhaunica-socialite', // chave da sessão. Troque em caso de colisão com outra variável de sessão.
+
 
     // usa as permissoes internas, padrão para v3.
     // Se false não usará permission ao efetuar login
