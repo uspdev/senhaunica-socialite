@@ -2,9 +2,12 @@
 
 Biblioteca que permite integrar sua aplicação laravel com a autenticação centralizada da USP utilizando a senha única. 
 
-Além da comunicação com o servidor de autenticação, ele também fornece as rotas e controllers necessários para efetuar o login e logout da aplicação.
+Como funcionalidades adicionais, além da comunicação com o servidor de autenticação, ele também fornece:
+* as rotas e controllers necessários para efetuar o login e logout da aplicação;
+* um sistema mínimo de autorização em três níveis (permission) para a aplicação;
+* uma rota `/loginas` quer permite assumir identidade de outra pessoa.
 
-Também fornece um sistema mínimo de autorização em três níveis (permission) para a aplicação.
+> OBS.: Os recursos adicionais podem ser desativados caso não deseje utilizar. 
 
 Vídeos sobre a utilização desta biblioteca:
 
@@ -98,7 +101,7 @@ Para usar a autorização, é necessário:
 
 Confira o `.env` se está de acordo com as recomendações atuais.
 
-OBS.: a variável `ADMINS` foi renomeada para `SENHAUNICA_ADMINS`.
+> OBS.: a variável `ADMINS` foi renomeada para `SENHAUNICA_ADMINS`.
 
 ### Arquivo de configuração
 
@@ -108,7 +111,7 @@ Caso você queira modificar o comportamento padrão de algumas partes como por e
 
 #### Rotas e controllers
 
-Essa biblioteca possui rotas internas para login e logout e o respectivo controller fornecendo uma solução pronta para muitas aplicações.
+Essa biblioteca possui rotas internas para **login**, **logout** e **loginas** e o respectivo controller fornecendo uma solução pronta para muitas aplicações.
 
 Caso sua aplicação necessite de um processo mais complexo, você pode desabilitar com `routes=false`. Nesse caso, não é necessário usar a migration que modifica a tabela users. 
 
@@ -137,6 +140,8 @@ Ou listar todos usuários com uma dada permissão:
 Como as permissões são gates, eles podem ser usados diretamente no blade com a diretiva `@can` ou em qualquer parte do sistema da forma usual.
 
 ## Informações para desenvolvedores(as):
+
+### Senhaunica-faker
 
 Em ambiente de desenvolvimento, ao invés de usar a autenticação por senha única, é possivel utilizar a biblioteca [senhaunica-faker](https://github.com/uspdev/senhaunica-faker). Essa biblioteca simula o servidor de autenticação retornando dados fake para a aplicação.
 

@@ -3,20 +3,31 @@
 namespace Uspdev\SenhaunicaSocialite\Http\Controllers;
 
 use App\Models\User;
-use Auth;
-use Socialite;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
+use Uspdev\Replicado\Pessoa;
 
 class SenhaunicaController extends Controller
 {
-    public function redirectToProvider()
+    /**
+     * Redireciona o login para o provider senhaunica
+     *
+     * Retorna para a url indicada ou para a página atual (referer).
+     */
+    public function redirectToProvider(Request $request)
     {
-        return Socialite::driver('senhaunica')->redirect();
+        $request->validate([
+            'redirect' => 'nullable|string',
+        ]);
+        // guardando para onde vai retornar
+        $request->session()->push(config('senhaunica.session_key') . '.redirect', $request->redirect ?? $request->headers->get('referer'));
+
+        return \Socialite::driver('senhaunica')->redirect();
     }
 
-    public function handleProviderCallback()
+    public function handleProviderCallback(Request $request)
     {
-        $userSenhaUnica = Socialite::driver('senhaunica')->user();
+        $userSenhaUnica = \Socialite::driver('senhaunica')->user();
         $user = User::firstOrNew(['codpes' => $userSenhaUnica->codpes]);
 
         if (config('senhaunica.permission')) {
@@ -54,15 +65,48 @@ class SenhaunicaController extends Controller
         $user->email = $userSenhaUnica->email;
         $user->name = $userSenhaUnica->nompes;
         $user->save();
-        Auth::login($user, true);
-        return redirect('/');
+        \Auth::login($user, true);
+
+        return redirect($request->session()->pull(config('senhaunica.session_key') . '.redirect', '/')[0]);
     }
 
     public function logout()
     {
-        Auth::logout();
+        \Auth::logout();
         session()->invalidate();
         session()->regenerateToken();
         return redirect('/');
+    }
+
+    /**
+     * Assume identidade de outra pessoa
+     */
+    public function loginAs(Request $request)
+    {
+        $this->authorize('admin');
+        $request->validate(['codpes' => 'required|integer']);
+
+        $user = User::where('codpes', $request->codpes)->first();
+
+        if (is_null($user)) {
+            if (!class_exists('Uspdev\\Replicado\\Pessoa')) {
+                $error = ['codpes' => 'Usuário não existe na base local'];
+                return redirect()->back()->withErrors($error)->withInput();
+            }
+
+            if ($pessoa = Pessoa::dump($request->codpes)) {
+                $user = new User;
+                $user->codpes = $request->codpes;
+                $user->name = $pessoa['nompesttd'];
+                $user->email = Pessoa::retornarEmailUsp($request->codpes);
+                $user->save();
+            } else {
+                $error = ['codpes' => 'Usuário não existe na base da USP'];
+                return redirect()->back()->withErrors($error)->withInput();
+            }
+        }
+
+        \Auth::login($user, true);
+        return redirect()->back();
     }
 }
