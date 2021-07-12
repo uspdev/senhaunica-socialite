@@ -5,6 +5,7 @@ namespace Uspdev\SenhaunicaSocialite\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
+use Uspdev\Replicado\Pessoa;
 
 class SenhaunicaController extends Controller
 {
@@ -83,11 +84,29 @@ class SenhaunicaController extends Controller
     public function loginAs(Request $request)
     {
         $this->authorize('admin');
-        $request->validate([
-            'codpes' => 'required|numeric|exists:App\Models\User,codpes',
-        ]);
+        $request->validate(['codpes' => 'required|integer']);
 
-        \Auth::login(User::where('codpes', $request->codpes)->first());
+        $user = User::where('codpes', $request->codpes)->first();
+
+        if (is_null($user)) {
+            if (!class_exists('Uspdev\\Replicado\\Pessoa')) {
+                $error = ['codpes' => 'Usuário não existe na base local'];
+                return redirect()->back()->withErrors($error)->withInput();
+            }
+
+            if ($pessoa = Pessoa::dump($request->codpes)) {
+                $user = new User;
+                $user->codpes = $request->codpes;
+                $user->name = $pessoa['nompesttd'];
+                $user->email = Pessoa::retornarEmailUsp($request->codpes);
+                $user->save();
+            } else {
+                $error = ['codpes' => 'Usuário não existe na base da USP'];
+                return redirect()->back()->withErrors($error)->withInput();
+            }
+        }
+
+        \Auth::login($user, true);
         return redirect()->back();
     }
 }
