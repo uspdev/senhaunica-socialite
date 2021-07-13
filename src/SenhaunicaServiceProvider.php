@@ -25,16 +25,26 @@ class SenhaunicaServiceProvider extends ServiceProvider
 
     public function boot()
     {
-
         // registra rotas se habilitado no config
         if (config('senhaunica.routes')) {
             $this->registerRoutes();
         }
 
+        // Views
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'senhaunica');
+
         if ($this->app->runningInConsole()) {
+            // exporta views
+            // php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="views"
+            $this->publishes([
+                __DIR__ . '/../resources/views' => base_path('resources/views/vendor/senhaunica'),
+            ], 'views');
+
             // exportar configuracao
             // php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="config"
-            $this->publishes([__DIR__ . '/../config/config.php' => config_path('senhaunica.php')], 'config');
+            $this->publishes([
+                __DIR__ . '/../config/config.php' => config_path('senhaunica.php'),
+            ], 'config');
 
             // Export the migration
             // php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"

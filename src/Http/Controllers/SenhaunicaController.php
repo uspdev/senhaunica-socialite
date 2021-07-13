@@ -107,6 +107,11 @@ class SenhaunicaController extends Controller
         }
 
         \Auth::login($user, true);
-        return redirect()->back();
+        return redirect('/');
+    }
+
+    public function loginAsForm() {
+        $this->authorize('admin');
+        return view('senhaunica::loginas-form');
     }
 }
