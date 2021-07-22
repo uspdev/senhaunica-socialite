@@ -53,6 +53,13 @@ class SenhaunicaServiceProvider extends ServiceProvider
             ], 'migrations');
         }
 
+        // Adicionando users no menu
+        \UspTheme::addMenu('senhaunica-socialite', [
+            'text' => '<i class="fas fa-users-cog"></i> Users',
+            'url' => 'users',
+            'can' => 'admin',
+        ]);
+
     }
 
     protected function getMigrationFilename()
