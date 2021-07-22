@@ -38,6 +38,7 @@ As migrations modificam a tabela `users` e criam as tabelas de autorização.
 Em `App/Models/User.php`, dentro da classe `User` incluir a seguinte linha:
 
     use \Spatie\Permission\Traits\HasRoles;
+    use \Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica;
 
 #### Cadastre o `callback_id`
 
@@ -93,6 +94,7 @@ Para usar a autorização, é necessário:
 * Incluir a trait no model do user
 
         use \Spatie\Permission\Traits\HasRoles;
+        use \Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica;
 
 * publicar e migrar as tabelas correspondentes:
 
@@ -111,11 +113,20 @@ Caso você queira modificar o comportamento padrão de algumas partes como por e
 
 #### Rotas e controllers
 
-Essa biblioteca possui rotas internas para **login**, **logout** e **loginas** e o respectivo controller fornecendo uma solução pronta para muitas aplicações.
+Essa biblioteca possui rotas internas para **login**, **logout**, **users** e **loginas** e o respectivo controller fornecendo uma solução pronta para muitas aplicações.
 
 Caso sua aplicação necessite de um processo mais complexo, você pode desabilitar com `routes=false`. Nesse caso, não é necessário usar a migration que modifica a tabela users. 
 
 Mas você deve implementar sua solução de rotas e controller para gerenciar os logins e logouts usando senha única ou não.
+
+#### Menu na aplicação
+
+No `config/laravel-usp-theme.php`, coloque ou reposicione a chave `senhaunica-socialite` para mostrar o menu. Ele será visível somente para `admin`.
+
+
+    [
+        'key' => 'senhaunica-socialite',
+    ],
 
 #### Autorização
 
@@ -138,6 +149,10 @@ Ou listar todos usuários com uma dada permissão:
     $users = User::permission('admin')->get();
 
 Como as permissões são gates, eles podem ser usados diretamente no blade com a diretiva `@can` ou em qualquer parte do sistema da forma usual.
+
+### Gerenciamento das Permissões dos Usuários
+
+Por padrão, a rota /users estará disponível para os admins. Nela é possível gerenciar as permissões dos usuários, incluindo gerentes e admins, desde que não estejam no `.env`.
 
 ## Informações para desenvolvedores(as):
 

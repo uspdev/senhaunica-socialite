@@ -19,5 +19,14 @@ class AuthServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return in_array('admin', $user->getPermissionNames()->toArray()) ? true : null;
         });
+
+        if (class_exists('\UspTheme')) {
+            \UspTheme::addMenu('senhaunica-socialite', [
+                'text' => '<i class="fas fa-users-cog"></i> Users',
+                'url' => config('senhaunica.userRoutes'),
+                'can' => 'admin',
+            ]);
+        }
+
     }
 }

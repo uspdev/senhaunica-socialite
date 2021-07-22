@@ -2,9 +2,9 @@
 
 @section('content')
 
-  <h3>Senhaunica-socialite <i class="fas fa-angle-right"></i> Login as</h3>
+  <h4>Senhaunica-socialite <i class="fas fa-angle-right"></i> Login as</h4>
   <br>
-  <form class="" method="POST" action="loginas">
+  <form class="" method="POST" action="{{ route('SenhaunicaLoginAs') }}">
     @csrf
     <div class="form-group row">
       <label for="codpes" class="col-auto col-form-label text-md-right">Número Usp</label>
