@@ -114,6 +114,7 @@ trait HasSenhaunica
                 return 'Usuário não existe na base da USP';
             }
 
+            $user = new User;
             $user->codpes = $codpes;
             $user->name = $pessoa['nompesttd'];
             $user->email = Pessoa::email($codpes);
