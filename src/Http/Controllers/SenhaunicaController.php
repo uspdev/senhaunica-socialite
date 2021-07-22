@@ -4,8 +4,6 @@ namespace Uspdev\SenhaunicaSocialite\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Permission;
-use Uspdev\Replicado\Pessoa;
 
 class SenhaunicaController extends Controller
 {
@@ -30,41 +28,16 @@ class SenhaunicaController extends Controller
         $userSenhaUnica = \Socialite::driver('senhaunica')->user();
         $user = User::firstOrNew(['codpes' => $userSenhaUnica->codpes]);
 
-        if (config('senhaunica.permission')) {
-            // garantindo que as permissions existam
-            $permissions = ['admin', 'gerente', 'user'];
-            foreach ($permissions as $permission) {
-                Permission::findOrCreate($permission);
-            }
-
-            // vamos verificar no config se o usuário é admin
-            if (in_array($userSenhaUnica->codpes, config('senhaunica.admins'))) {
-                $user->givePermissionTo('admin');
-            } else {
-                // vamos revogar o acesso se dropPermissions
-                if (config('senhaunica.dropPermissions')) {
-                    $user->revokePermissionTo('admin');
-                }
-            }
-
-            // vamos verificar no config se o usuário é gerente
-            if (in_array($userSenhaUnica->codpes, config('senhaunica.gerentes'))) {
-                $user->givePermissionTo('gerente');
-            } else {
-                if (config('senhaunica.dropPermissions')) {
-                    $user->revokePermissionTo('gerente');
-                }
-            }
-
-            // default
-            $user->givePermissionTo('user');
-        }
-
         // bind dos dados retornados
         $user->codpes = $userSenhaUnica->codpes;
         $user->email = $userSenhaUnica->email;
         $user->name = $userSenhaUnica->nompes;
         $user->save();
+
+        if ($this->missingTrait()) {
+            return view('senhaunica::unavailable');
+        }
+        $user->setDefaultPermission();
         \Auth::login($user, true);
 
         return redirect($request->session()->pull(config('senhaunica.session_key') . '.redirect', '/')[0]);
@@ -79,39 +52,15 @@ class SenhaunicaController extends Controller
     }
 
     /**
-     * Assume identidade de outra pessoa
+     * Verifica se a trait foi carregada no model User da aplicação final
+     * Se nao foi carregado nem o login vai funcionar.
      */
-    public function loginAs(Request $request)
+    protected function missingTrait()
     {
-        $this->authorize('admin');
-        $request->validate(['codpes' => 'required|integer']);
-
-        $user = User::where('codpes', $request->codpes)->first();
-
-        if (is_null($user)) {
-            if (!class_exists('Uspdev\\Replicado\\Pessoa')) {
-                $error = ['codpes' => 'Usuário não existe na base local'];
-                return redirect()->back()->withErrors($error)->withInput();
-            }
-
-            if ($pessoa = Pessoa::dump($request->codpes)) {
-                $user = new User;
-                $user->codpes = $request->codpes;
-                $user->name = $pessoa['nompesttd'];
-                $user->email = Pessoa::retornarEmailUsp($request->codpes);
-                $user->save();
-            } else {
-                $error = ['codpes' => 'Usuário não existe na base da USP'];
-                return redirect()->back()->withErrors($error)->withInput();
-            }
+        if (in_array('Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica', array_keys((new \ReflectionClass('\App\Models\User'))->getTraits()))) {
+            return false;
+        } else {
+            return true;
         }
-
-        \Auth::login($user, true);
-        return redirect('/');
-    }
-
-    public function loginAsForm() {
-        $this->authorize('admin');
-        return view('senhaunica::loginas-form');
     }
 }
