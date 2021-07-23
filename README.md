@@ -1,19 +1,21 @@
 ## Provider para utilização de senha única USP no Laravel
 
-Biblioteca que permite integrar sua aplicação laravel com a autenticação centralizada da USP utilizando a senha única. 
+Biblioteca que permite integrar sua aplicação laravel com a autenticação centralizada da USP utilizando a senha única.
 
 Como funcionalidades adicionais, além da comunicação com o servidor de autenticação, ele também fornece:
-* as rotas e controllers necessários para efetuar o login e logout da aplicação;
-* um sistema mínimo de autorização em três níveis (permission) para a aplicação;
-* uma rota `/loginas` quer permite assumir identidade de outra pessoa.
 
-> OBS.: Os recursos adicionais podem ser desativados caso não deseje utilizar. 
+- as rotas e controllers necessários para efetuar o login e logout da aplicação;
+- um sistema mínimo de autorização em três níveis (permission) para a aplicação;
+- uma rota `/loginas` quer permite assumir identidade de outra pessoa.
+
+> OBS.: Os recursos adicionais podem ser desativados caso não deseje utilizar.
 
 Vídeos sobre a utilização desta biblioteca:
 
 - [1.x](https://youtu.be/jLFM2AUFJgw)
 - [2.x](https://www.youtube.com/watch?v=t6Zf3nK-oIo)
 - [3.x] ...
+- [4.x] ...
 
 Dependências em PHP, além das default do laravel:
 
@@ -49,7 +51,7 @@ A url é o que está cadastrado no `APP_URL` mais `/callback`, exemplo: `http://
 
 #### Coloque variáveis no .env e .env.example da sua aplicação
 
-    # SENHAUNICA-SOCIALITE
+    # SENHAUNICA-SOCIALITE ######################################
     # https://github.com/uspdev/senhaunica-socialite
     SENHAUNICA_KEY=fflch_sti
     SENHAUNICA_SECRET=sua_super_chave_segura
@@ -58,6 +60,9 @@ A url é o que está cadastrado no `APP_URL` mais `/callback`, exemplo: `http://
     # URL do servidor oauth no ambiente de dev (default: no)
     #SENHAUNICA_DEV="https://dev.uspdigital.usp.br/wsusuario/oauth"
 
+    # URL do servidor oauth para uso com senhaunica-faker
+    #SENHAUNICA_DEV="http://127.0.0.1:3141/wsusuario/oauth"
+
     # Habilite para salvar o retorno em storage/app/debug/oauth/ (default: false)
     #SENHAUNICA_DEBUG=true
 
@@ -65,23 +70,29 @@ A url é o que está cadastrado no `APP_URL` mais `/callback`, exemplo: `http://
     #SENHAUNICA_ADMINS=11111,22222,33333
     #SENHAUNICA_GERENTES=4444,5555,6666
 
+    # Se os logins forem limitados a usuários cadastrados (onlyLocalUsers=true),
+    # pode ser útil cadastrá-los aqui.
+    #SENHAUNICA_USERS=777,888
+
     # Se true, os privilégios especiais serão revogados ao remover da lista (default: false)
     #SENHAUNICA_DROP_PERMISSIONS=true
 
+    # SENHAUNICA-SOCIALITE ######################################
+
 ### Atualizando à partir da versão 2
 
-A atualização para versão 3 exije alguns ajustes no código.
+A atualização para versão 4 exije alguns ajustes no código.
 
 Primeiramente atualize o `composer.json` para usar a nova versão e rode `composer update`.
 
-    "uspdev/senhaunica-socialite": "^3.0"
+    "uspdev/senhaunica-socialite": "^4.0"
 
 Deve-se desfazer/verificar **pelo menos** os seguintes arquivos:
 
 - `app/Providers/EventServiceProvider.php`, remover as linhas que chamam o SenhaunicaSocialite
 - `config/services.php`, remover a seção senhaunica
 
-Por padrão a versão 3 incorpora autorização e rotas/controller internos. Se for conveniente, esses recursos podem ser desabilitados por meio do `config/senhaunica.php`. Se optar por utilizar esses recursos, verifique/ajuste os seguintes arquivos:
+Por padrão a versão 4 incorpora autorização e rotas/controller internos. Se for conveniente, esses recursos podem ser desabilitados por meio do `config/senhaunica.php`. Se optar por utilizar esses recursos, verifique/ajuste os seguintes arquivos:
 
 - `routes/web.php`, remover as rotas login, callback e logout
 - `App/Http/Controllers/Auth/LoginController.php`, apagar o arquivo
@@ -91,12 +102,12 @@ A tabela `users` deve possuir a coluna `codpes`. Se for o caso, publique a migra
 
 Para usar a autorização, é necessário:
 
-* Incluir a trait no model do user
+- Incluir a trait no model do user
 
         use \Spatie\Permission\Traits\HasRoles;
         use \Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica;
 
-* publicar e migrar as tabelas correspondentes:
+- publicar e migrar as tabelas correspondentes:
 
         php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
         php artisan migrate
@@ -111,11 +122,27 @@ Caso você queira modificar o comportamento padrão de algumas partes como por e
 
     php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="config"
 
+- **permission** (padrão true)
+
+  As permissões internas de três níveis serão utilizadas por meio da biblioteca `spatie-permissions`. Com isso, os gates `admin`, `gerentes` e `user` estarão disponíveis.
+
+- **onlyLocalUsers** (padrão false)
+
+  Por padrão, qualquer usuário com senha única poderá fazer login. Mudando para true, a biblioteca permitirá somente o login de pessoas que já estão na base de dados local ou que estejam na lista de codpes do `.env`.
+
+- **destroyUser** (padrão false)
+
+  Se true a interface interna de gerenciamento permitirá a remoção de usuários da base local. Use com cuidado caso outras tabelas dependa/tenham relacionamento com `users`.
+
+- **dropPermissions** (padrão false)
+
+  Os usuários de sua aplicação podem ser gerenciados totalmente pelo `.env` se `true`. Quer dizer que se o codpes estiver listado em gerentes ou admins ele terá esse privilégio, caso contrário terá privilégio de usuário comum.
+
 #### Rotas e controllers
 
 Essa biblioteca possui rotas internas para **login**, **logout**, **users** e **loginas** e o respectivo controller fornecendo uma solução pronta para muitas aplicações.
 
-Caso sua aplicação necessite de um processo mais complexo, você pode desabilitar com `routes=false`. Nesse caso, não é necessário usar a migration que modifica a tabela users. 
+Caso sua aplicação necessite de um processo mais complexo, você pode desabilitar com `routes=false`. Nesse caso, não é necessário usar a migration que modifica a tabela users.
 
 Mas você deve implementar sua solução de rotas e controller para gerenciar os logins e logouts usando senha única ou não.
 
@@ -123,20 +150,19 @@ Mas você deve implementar sua solução de rotas e controller para gerenciar os
 
 No `config/laravel-usp-theme.php`, coloque ou reposicione a chave `senhaunica-socialite` para mostrar o menu. Ele será visível somente para `admin`.
 
-
     [
         'key' => 'senhaunica-socialite',
     ],
 
 #### Autorização
 
-Se você desabilitar as permissões `permission=false` não é necessário usar a migration do `spatie/laravel-permission`. 
+Se você desabilitar as permissões `permission=false` não é necessário usar a migration do `spatie/laravel-permission`.
 
 ## Configuração da biblioteca laravel-permission
 
-A biblioteca [laravel-permission](https://github.com/spatie/laravel-permission/) vem habilitada por padrão. Ela é poderosa, flexível e bem estabelecida pela comunidade laravel no quesito grupos e permissões. 
+A biblioteca [laravel-permission](https://github.com/spatie/laravel-permission/) vem habilitada por padrão. Ela é poderosa, flexível e bem estabelecida pela comunidade laravel no quesito grupos e permissões.
 
-Os números USP inseridos em SENHAUNICA_ADMINS e SENHAUNICA_GERENTES recebem as permissões **admin** e **gerente** respectivamente. Todos os usuários por padrão recebem a permissão **user**. Essas permissões são automaticamente `Gates`, assim não é necessário definí-las em _AuthServiceProvider_.
+Os números USP inseridos em SENHAUNICA*ADMINS e SENHAUNICA_GERENTES recebem as permissões **admin** e **gerente** respectivamente. Todos os usuários por padrão recebem a permissão **user**. Essas permissões são automaticamente `Gates`, assim não é necessário definí-las em \_AuthServiceProvider*.
 
 OBS.: Os **admins** são SUPER-ADMINS, ou seja eles possuem acesso em todos os gates.
 
