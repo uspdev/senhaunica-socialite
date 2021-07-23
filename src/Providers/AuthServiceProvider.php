@@ -20,14 +20,6 @@ class AuthServiceProvider extends ServiceProvider
             return in_array('admin', $user->getPermissionNames()->toArray()) ? true : null;
         });
 
-        // carregando users no menu, se disponível
-        if (class_exists('\UspTheme')) {
-            \UspTheme::addMenu('senhaunica-socialite', [
-                'text' => '<i class="fas fa-users-cog"></i> Users',
-                'url' => config('senhaunica.userRoutes'),
-                'can' => 'admin',
-            ]);
-        }
 
     }
 }
