@@ -12,7 +12,6 @@ use Uspdev\Replicado\Pessoa;
  */
 trait HasSenhaunica
 {
-
     # utilizado para a listagem de usuários
     public $columns = [
         ['key' => 'codpes', 'text' => 'Nro USP'],
@@ -46,6 +45,7 @@ trait HasSenhaunica
 
     /**
      * Verifica a existencia do arquivo json referente ao login da senhaunica
+     * 
      * O arquivo será guardado se senhaunica_debug = true
      */
     public function hasSenhaunicaJson()
@@ -56,7 +56,7 @@ trait HasSenhaunica
     }
 
     /**
-     * Se permission=true, seta as permissões para o usuário
+     * Seta as permissões para o usuário (permission = true)
      */
     public function setDefaultPermission()
     {
@@ -92,10 +92,12 @@ trait HasSenhaunica
     }
 
     /**
-     * Procura usuário na base local ou no replicado
+     * Cria e retorna usuário na base local ou no replicado
+     *
+     * Se nbão conseguiu encontrar/criar o usuário retorna mensagem de erro correspondente.
      *
      * @param $codpes
-     * @return $user - objeto usuário
+     * @return User | String
      */
     public static function findOrCreateFromReplicado($codpes)
     {
@@ -103,7 +105,7 @@ trait HasSenhaunica
 
         if (is_null($user)) {
 
-            if (!class_exists('Uspdev\\Replicado\\Pessoa')) {
+            if (!hasReplicado()) {
                 // se não houver replicado vamos retornar erro
                 return 'Usuário não existe na base local';
             }
@@ -117,9 +119,37 @@ trait HasSenhaunica
             $user = new User;
             $user->codpes = $codpes;
             $user->name = $pessoa['nompesttd'];
-            $user->email = Pessoa::email($codpes);
+            $email = Pessoa::email($codpes);
+            // nem sempre o email está disponível
+            $user->email = empty($email) ? 'semEmail_' . $codpes . '@usp.br' : $email;
             $user->save();
         }
         return $user;
+    }
+
+    /**
+     * Retorna usuário local correspondente ao codpes.
+     *
+     * Se necessário, cria a partir do replicado somente se listado no .env
+     *
+     * @param $codpes
+     * @return User | Bool
+     */
+    public static function newLocalUser($codpes)
+    {
+        if ($user = User::where('codpes', $codpes)->first()) {
+            return $user;
+        }
+
+        // vamos verificar no config se o usuário está no .env
+        if (
+            in_array($codpes, config('senhaunica.admins')) ||
+            in_array($codpes, config('senhaunica.gerentes')) ||
+            in_array($codpes, config('senhaunica.users'))
+        ) {
+            return SELF::findOrCreateFromReplicado($codpes);
+        }
+
+        return false;
     }
 }
