@@ -35,12 +35,22 @@
       </span>
     @endif
 
+    @if (!config('senhaunica.onlyLocalUsers'))
+      <span class="badge badge-warning" data-toggle="tooltip" title="Somente usuários locais">
+        Local User
+      </span>
+    @else
+      <span class="badge badge-secondary" data-toggle="tooltip" title="Qualquer usuário pode logar">
+        <s>Local User</s>
+      </span>
+    @endif
+
     @if (config('senhaunica.destroyUser'))
-      <span class="badge badge-warning" data-toggle="tooltip" title="Remover habilitado">
+      <span class="badge badge-warning" data-toggle="tooltip" title="Remover usuário habilitado">
         destroy
       </span>
     @else
-      <span class="badge badge-secondary" data-toggle="tooltip" title="Remover indisponível">
+      <span class="badge badge-secondary" data-toggle="tooltip" title="Remover usuário indisponível">
         <s>destroy</s>
       </span>
     @endif
