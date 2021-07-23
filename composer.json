@@ -21,7 +21,10 @@
     "autoload": {
         "psr-4": {
             "Uspdev\\SenhaunicaSocialite\\": "src/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "extra": {
         "laravel": {
