@@ -52,14 +52,6 @@ class SenhaunicaServiceProvider extends ServiceProvider
                 __DIR__ . '/../database/migrations/update_senhaunica_users_table.php.stub' => $this->getMigrationFilename(),
             ], 'migrations');
         }
-
-        // Adicionando users no menu
-        \UspTheme::addMenu('senhaunica-socialite', [
-            'text' => '<i class="fas fa-users-cog"></i> Users',
-            'url' => 'users',
-            'can' => 'admin',
-        ]);
-
     }
 
     protected function getMigrationFilename()
