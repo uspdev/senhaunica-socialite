@@ -33,7 +33,7 @@ class UserController extends Controller
         return redirect('/');
     }
 
-    public function users()
+    public function index()
     {
         $this->authorize('admin');
 
@@ -44,6 +44,43 @@ class UserController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $this->authorize('admin');
+
+        $request->validate([
+            'codpes' => 'required|integer',
+            'level' => 'required|in:admin,gerente,user',
+        ]);
+
+        $user = User::findOrCreateFromReplicado($request->codpes);
+        if (!($user instanceof \App\Models\User)) {
+            return redirect()->back()->withErrors(['codpes' => $user])->withInput();
+        }
+        $user->setDefaultPermission();
+        $user->givePermissionTo($request->level);
+
+        return back();
+    }
+
+    /**
+     *  Remove usuário da base local
+     */
+    public function destroy(Request $request, User $user)
+    {
+        $this->authorize('admin');
+
+        if (config('senhaunica.destroyUser')) {
+            $user->delete();
+            return back();
+        } else {
+            return back()->withErrors('Remover usuário desabilitado no config!');
+        }
+    }
+
+    /**
+     * Grava/atualiza as permissões do usuário
+     */
     public function updatePermission(Request $request, $id)
     {
         $this->authorize('admin');
@@ -60,6 +97,12 @@ class UserController extends Controller
         return back();
     }
 
+    /**
+     * Retorna o json formatado para ser incluído no modal
+     * 
+     * @param $id
+     * @return String
+     */
     public function getJsonModalContent($id)
     {
         $this->authorize('admin');
@@ -73,6 +116,35 @@ class UserController extends Controller
                 'date' => date('d/m/Y H:i:s', Storage::lastModified('debug/oauth/' . $user->codpes . '.json')),
             ]);
         }
+    }
+
+    /**
+     * Busca para ajax do select2 de adicionar pessoas
+     */
+    public function find(Request $request)
+    {
+        $this->authorize('admin');
+
+        if (!$request->term) {
+            return [];
+        }
+
+        $results = [];
+        if (hasReplicado()) {
+            $pessoas = Pessoa::procurarPorNome($request->term);
+            // limitando a resposta em 50 elementos
+            $pessoas = array_slice($pessoas, 0, 50);
+
+            // formatando para select2
+            foreach ($pessoas as $pessoa) {
+                $results[] = [
+                    'text' => $pessoa['codpes'] . ' ' . $pessoa['nompesttd'],
+                    'id' => $pessoa['codpes'],
+                ];
+            }
+        }
+
+        return response(compact('results'));
     }
 
 }
