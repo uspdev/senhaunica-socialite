@@ -35,7 +35,7 @@
       </span>
     @endif
 
-    @if (!config('senhaunica.onlyLocalUsers'))
+    @if (config('senhaunica.onlyLocalUsers'))
       <span class="badge badge-warning" data-toggle="tooltip" title="Somente usuários locais">
         Local User
       </span>
