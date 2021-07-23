@@ -17,6 +17,11 @@ class SenhaunicaController extends Controller
         $request->validate([
             'redirect' => 'nullable|string',
         ]);
+
+        if ($request->msg == 'noLocalUser') {
+            return view('senhaunica::unavailable', ['reason' => 'noLocalUser']);
+        }
+        
         // guardando para onde vai retornar
         $request->session()->push(config('senhaunica.session_key') . '.redirect', $request->redirect ?? $request->headers->get('referer'));
 
@@ -26,7 +31,18 @@ class SenhaunicaController extends Controller
     public function handleProviderCallback(Request $request)
     {
         $userSenhaUnica = \Socialite::driver('senhaunica')->user();
-        $user = User::firstOrNew(['codpes' => $userSenhaUnica->codpes]);
+
+        // se onlyLocalUsers = true, não vamos permitir usuários não cadastrados de logar
+        if (config('senhaunica.onlyLocalUsers')) {
+            $user = User::newLocalUser($userSenhaUnica->codpes);
+            if (!$user) {
+                session()->invalidate();
+                session()->regenerateToken();
+                return redirect('/login?msg=noLocalUser');
+            }
+        } else {
+            $user = User::firstOrNew(['codpes' => $userSenhaUnica->codpes]);
+        }
 
         // bind dos dados retornados
         $user->codpes = $userSenhaUnica->codpes;
@@ -34,13 +50,19 @@ class SenhaunicaController extends Controller
         $user->name = $userSenhaUnica->nompes;
         $user->save();
 
+        // Vamos retornar uma tela amigável caso não tenha sido configurado a trait
         if ($this->missingTrait()) {
             return view('senhaunica::unavailable');
         }
+
         $user->setDefaultPermission();
         \Auth::login($user, true);
 
-        return redirect($request->session()->pull(config('senhaunica.session_key') . '.redirect', '/')[0]);
+        $redirect = $request->session()->pull(config('senhaunica.session_key') . '.redirect', '/')[0];
+        if (strpos($redirect, 'login') !== false) {
+            $redirect = '/';
+        } 
+        return redirect($redirect);
     }
 
     public function logout()
