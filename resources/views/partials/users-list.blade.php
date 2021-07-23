@@ -20,11 +20,14 @@
       @foreach ($users->first()->columns as $column)
         <th>{{ $column['text'] }}</th>
       @endforeach
+      @if (config('senhaunica.destroyUser'))
+        <th class="px-1">Remover</th>
+      @endif
+      <th class="px-1">Json</th>
       <th class="px-1">
         <span class="d-xs-inline d-sm-none">Assumir identidade</span> {{-- aparecerá somente em mobile --}}
         <span class="d-none d-sm-inline">Ident.</span> {{-- aparecerá nas demais telas --}}
       </th>
-      <th class="px-1">Json</th>
       @if (config('senhaunica.permission'))
         <th>Permissões</th>
       @endif
@@ -36,11 +39,16 @@
         @foreach ($user->columns as $column)
           <td>{{ $user->{$column['key']} }}</td>
         @endforeach
-        <td class="col-button">
-          @include('senhaunica::partials.assumir-identidade-btn')
-        </td>
+        @if (config('senhaunica.destroyUser'))
+          <td class="col-button">
+          @include('senhaunica::partials.destroy-user-btn')
+          </td>
+        @endif
         <td class="col-button">
           @include('senhaunica::partials.show-json-btn')
+        </td>
+        <td class="col-button">
+          @include('senhaunica::partials.assumir-identidade-btn')
         </td>
         @if (config('senhaunica.permission'))
           <td class="col-permission">
@@ -88,17 +96,15 @@
   @parent
 
   <script>
-
-      var openJsonModal = function(id) {
-        // alert('ok')
-        var url = '{{ route('getJsonModalContent', ['id' => '_id_']) }}'
-        url = url.replace('_id_', id)
-        $('#jsonModal .modal-content').html('');
-        $('#jsonModal .modal-content').load(url);
-        $('#jsonModal').modal()
-        return false;
-      }
-
+    var openJsonModal = function(id) {
+      // alert('ok')
+      var url = '{{ route('getJsonModalContent', ['id' => '_id_']) }}'
+      url = url.replace('_id_', id)
+      $('#jsonModal .modal-content').html('');
+      $('#jsonModal .modal-content').load(url);
+      $('#jsonModal').modal()
+      return false;
+    }
   </script>
   <div class="modal fade" id="jsonModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-scrollable modal-lg">
