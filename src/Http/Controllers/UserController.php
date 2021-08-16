@@ -24,10 +24,28 @@ class UserController extends Controller
         $this->authorize('admin');
         $request->validate(['codpes' => 'required|integer']);
 
+        session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
+
         $user = User::findOrCreateFromReplicado($request->codpes);
         if (!($user instanceof \App\Models\User)) {
             return redirect()->back()->withErrors(['codpes' => $user])->withInput();
         }
+        $user->setDefaultPermission();
+        \Auth::login($user, true);
+        return redirect('/');
+    }
+
+    /**
+     * Se está com identidade de outro, permite retornar à sua
+     */
+    public function undoLoginAs()
+    {
+        $this->authorize('user');
+        $codpes = session()->pull(config('senhaunica.session_key') . '.undo_loginas');
+        if (!$codpes) {
+            return redirect()->back()->withErrors(['codpes' => 'Undo indisponível']);
+        }
+        $user = User::where('codpes', $codpes)->first();
         $user->setDefaultPermission();
         \Auth::login($user, true);
         return redirect('/');
@@ -99,7 +117,7 @@ class UserController extends Controller
 
     /**
      * Retorna o json formatado para ser incluído no modal
-     * 
+     *
      * @param $id
      * @return String
      */
@@ -131,16 +149,28 @@ class UserController extends Controller
 
         $results = [];
         if (hasReplicado()) {
-            $pessoas = Pessoa::procurarPorNome($request->term);
-            // limitando a resposta em 50 elementos
-            $pessoas = array_slice($pessoas, 0, 50);
 
-            // formatando para select2
-            foreach ($pessoas as $pessoa) {
+            if (is_numeric($request->term)) {
+                // procura por codpes
+                $pessoa = Pessoa::dump($request->term);
                 $results[] = [
                     'text' => $pessoa['codpes'] . ' ' . $pessoa['nompesttd'],
                     'id' => $pessoa['codpes'],
                 ];
+            } else {
+                // procura por nome, usando fonético e somente ativos
+                $pessoas = Pessoa::procurarPorNome($request->term);
+                
+                // limitando a resposta em 50 elementos
+                $pessoas = array_slice($pessoas, 0, 50);
+
+                // formatando para select2
+                foreach ($pessoas as $pessoa) {
+                    $results[] = [
+                        'text' => $pessoa['codpes'] . ' ' . $pessoa['nompesttd'],
+                        'id' => $pessoa['codpes'],
+                    ];
+                }
             }
         }
 

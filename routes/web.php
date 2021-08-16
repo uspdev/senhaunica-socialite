@@ -10,6 +10,7 @@ Route::post('logout', [SenhaunicaController::class, 'logout']);
 
 Route::get('loginas', [UserController::class, 'loginAsForm']);
 Route::post('loginas', [UserController::class, 'loginAs'])->name('SenhaunicaLoginAs');
+Route::get('undologinas', [UserController::class, 'undoLoginAs'])->name('SenhaunicaUndoLoginAs');
 
 Route::get(config('senhaunica.userRoutes'), [UserController::class, 'users']);
 Route::get(config('senhaunica.userRoutes') . '/find', [UserController::class, 'find'])->name('senhaunicaFindUsers');
