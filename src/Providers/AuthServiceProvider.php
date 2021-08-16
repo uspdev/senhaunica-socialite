@@ -14,12 +14,10 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Implicitly grant "Super Admin" role all permissions
+        // Implicitly check admin permission
         // This works in the app by using gate-related functions like auth()->user->can() and @can()
         Gate::before(function ($user, $ability) {
-            return in_array('admin', $user->getPermissionNames()->toArray()) ? true : null;
+            return $user->hasPermissionTo('admin') ? true : null;
         });
-
-
     }
 }
