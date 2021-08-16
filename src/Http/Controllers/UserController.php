@@ -5,6 +5,7 @@ namespace Uspdev\SenhaunicaSocialite\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Uspdev\Replicado\Pessoa;
 
 class UserController extends Controller
@@ -12,7 +13,6 @@ class UserController extends Controller
     public function loginAsForm()
     {
         $this->authorize('admin');
-
         return view('senhaunica::loginas');
     }
 
@@ -69,6 +69,7 @@ class UserController extends Controller
         $request->validate([
             'codpes' => 'required|integer',
             'level' => 'required|in:admin,gerente,user',
+            'loginas' => ['nullable', Rule::in([1])],
         ]);
 
         $user = User::findOrCreateFromReplicado($request->codpes);
@@ -77,6 +78,13 @@ class UserController extends Controller
         }
         $user->setDefaultPermission();
         $user->givePermissionTo($request->level);
+
+        // vamos assumir identidade também ?
+        if ($request->loginas) {
+            session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
+            \Auth::login($user, true);
+            return redirect('/');
+        }
 
         return back();
     }
@@ -160,7 +168,7 @@ class UserController extends Controller
             } else {
                 // procura por nome, usando fonético e somente ativos
                 $pessoas = Pessoa::procurarPorNome($request->term);
-                
+
                 // limitando a resposta em 50 elementos
                 $pessoas = array_slice($pessoas, 0, 50);
 

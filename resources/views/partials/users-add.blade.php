@@ -1,5 +1,5 @@
 <button class="btn btn-sm btn-outline-primary senhaunicaUseraddBtn" @if (!hasReplicado()) disabled title="Necessário Replicado para adicionar usuários" @endif>
-  <i class="fas fa-plus"></i> Adicionar
+  <i class="fas fa-plus"></i> Adicionar/Assumir
 </button>
 
 <div class="modal fade" id="senhaunica-socialite-adicionar-pessoas-modal" tabindex="-1">
@@ -37,11 +37,15 @@
               </div>
             </div>
 
-            <div class="float-right">
-              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-sm btn-primary">Salvar</button>
+            <div>
+              <button type="submit" class="btn btn-sm btn-warning" name="loginas" value="1">
+                Assumir identidade
+              </button>
+              <div class="float-right">
+                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-sm btn-primary">Salvar</button>
+              </div>
             </div>
-
 
           </form>
         </div>
