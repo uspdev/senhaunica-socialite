@@ -3,11 +3,18 @@
 return [
     // para rotas internas
     'routes' => true, // usa rotas e controller internos
-    'prefix' => '', // coloque um prefixo em caso de colisão de rotas (login, callback, logout e users).
-    'userRoutes' => 'users', // define as rotas para o gerenciador de usuários interno, dentro de prefix
+
+    // coloque um prefixo em caso de colisão de rotas
+    // para todas as rotas internas da biblioteca (login, loginas, callback, logout e users).
+    'prefix' => '',
+
     'middleware' => ['web'], // you probably want to include 'web' here
     'session_key' => 'senhaunica-socialite', // chave da sessão. Troque em caso de colisão com outra variável de sessão.
     'template' => 'laravel-usp-theme::master', // template a ser estendido para as views internas
+
+    // define as rotas para o gerenciador de usuários interno, dentro de prefix
+    // se vazio, desabilita a rota de gerenciamento de usuários interna
+    'userRoutes' => 'users',
 
     // usa as permissoes internas, padrão para v4.
     // Se false, não usará permission ao efetuar login
