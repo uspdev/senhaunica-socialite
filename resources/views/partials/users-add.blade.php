@@ -14,7 +14,7 @@
       <div class="modal-body">
 
         <div class="">
-          <form class="" method="POST" action="{{ route('users.store') }}" data-ajax="{{ config('senhaunica.userRoutes') }}/find">
+          <form class="" method="POST" action="{{ route('users.store') }}" data-ajax="{{ route('SenhaunicaFindUsers') }}">
             @csrf
             <div class="row mb-3">
               <div class="col-md-8">
