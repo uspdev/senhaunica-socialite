@@ -26,17 +26,30 @@ class EventServiceProvider extends ServiceProvider
         Event::listen(function (UspThemeParseKey $event) {
             if ($event->item['key'] == 'senhaunica-socialite') {
                 if (session(config('senhaunica.session_key') . '.undo_loginas')) {
+                    // está em outra identidade. Vamos mostrar o botão para retornar
                     $event->item = [
-                        'text' => '<span class="text-danger"><i class="fas fa-undo"></i> Undo Loginas</span>',
+                        'text' => '<i class="fas fa-undo text-danger"></i>',
                         'url' => route('SenhaunicaUndoLoginAs'),
+                        'title' => 'Undo Loginas',
                         'can' => 'user',
                     ];
                 } else {
-                    $event->item = [
-                        'text' => '<i class="fas fa-users-cog"></i> Users',
-                        'url' => config('senhaunica.userRoutes'),
+                    if (config('senhaunica.userRoutes')) {
+                        // se ativo a rota users vamos mostrar o botão
+                        $itens[] = [
+                            'text' => '<i class="fas fa-users-cog text-danger"></i>',
+                            'url' => config('senhaunica.userRoutes'),
+                            'can' => 'admin',
+                        ];
+                    }
+                    // mostrando o botão de loginas
+                    $itens[] = [
+                        'text' => '<i class="fas fa-user-secret text-danger"></i>',
+                        'title' => 'Assumir identidade',
+                        'url' => route('SenhaunicaLoginAsForm'),
                         'can' => 'admin',
                     ];
+                    $event->item = $itens;
                 }
             }
             return $event->item;
