@@ -8,12 +8,14 @@ Route::get('login', [SenhaunicaController::class, 'redirectToProvider']);
 Route::get('callback', [SenhaunicaController::class, 'handleProviderCallback']);
 Route::post('logout', [SenhaunicaController::class, 'logout']);
 
-Route::get('loginas', [UserController::class, 'loginAsForm']);
+Route::get('loginas', [UserController::class, 'loginAsForm'])->name('SenhaunicaLoginAsForm');
 Route::post('loginas', [UserController::class, 'loginAs'])->name('SenhaunicaLoginAs');
 Route::get('undologinas', [UserController::class, 'undoLoginAs'])->name('SenhaunicaUndoLoginAs');
 
-Route::get(config('senhaunica.userRoutes'), [UserController::class, 'users']);
-Route::get(config('senhaunica.userRoutes') . '/find', [UserController::class, 'find'])->name('senhaunicaFindUsers');
-Route::get(config('senhaunica.userRoutes') . '/{id}/jsonModalContent', [UserController::class, 'getJsonModalContent'])->name('getJsonModalContent');
-Route::post(config('senhaunica.userRoutes') . '/{id}/updatePermission', [UserController::class, 'updatePermission'])->name('SenhaunicaUpdatePermission');
-Route::resource(config('senhaunica.userRoutes'), UserController::class);
+if (config('senhaunica.userRoutes')) {
+// Route::get(config('senhaunica.userRoutes'), [UserController::class, 'users']);
+    Route::get(config('senhaunica.userRoutes') . '/find', [UserController::class, 'find'])->name('SenhaunicaFindUsers');
+    Route::get(config('senhaunica.userRoutes') . '/{id}/jsonModalContent', [UserController::class, 'getJsonModalContent'])->name('SenhaunicaGetJsonModalContent');
+    Route::post(config('senhaunica.userRoutes') . '/{id}/updatePermission', [UserController::class, 'updatePermission'])->name('SenhaunicaUpdatePermission');
+    Route::resource(config('senhaunica.userRoutes'), UserController::class);
+}

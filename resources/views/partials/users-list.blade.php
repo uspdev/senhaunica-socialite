@@ -98,7 +98,7 @@
   <script>
     var openJsonModal = function(id) {
       // alert('ok')
-      var url = '{{ route('getJsonModalContent', ['id' => '_id_']) }}'
+      var url = '{{ route('SenhaunicaGetJsonModalContent', ['id' => '_id_']) }}'
       url = url.replace('_id_', id)
       $('#jsonModal .modal-content').html('');
       $('#jsonModal .modal-content').load(url);
