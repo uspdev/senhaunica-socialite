@@ -21,7 +21,7 @@ class SenhaunicaController extends Controller
         if ($request->msg == 'noLocalUser') {
             return view('senhaunica::unavailable', ['reason' => 'noLocalUser']);
         }
-        
+
         // guardando para onde vai retornar
         $redirect = $request->redirect ?? $request->headers->get('referer') ?? '/';
         $request->session()->push(config('senhaunica.session_key') . '.redirect', $redirect);
@@ -47,7 +47,7 @@ class SenhaunicaController extends Controller
 
         // bind dos dados retornados
         $user->codpes = $userSenhaUnica->codpes;
-        $user->email = $userSenhaUnica->email;
+        $user->email = $userSenhaUnica->email ?? $userSenhaUnica->emailUsp ?? $userSenhaUnica->emailAlternativo ?? 'invalido' . $user->codpes . '@usp.br';
         $user->name = $userSenhaUnica->nompes;
         $user->save();
 
@@ -62,7 +62,7 @@ class SenhaunicaController extends Controller
         $redirect = $request->session()->pull(config('senhaunica.session_key') . '.redirect', '/')[0];
         if (strpos($redirect, 'login') !== false) {
             $redirect = '/';
-        } 
+        }
         return redirect($redirect);
     }
 
