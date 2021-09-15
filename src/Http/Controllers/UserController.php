@@ -13,7 +13,9 @@ class UserController extends Controller
     public function loginAsForm()
     {
         $this->authorize('admin');
-        \UspTheme::activeUrl(route('SenhaunicaLoginAsForm'));
+        if (hasUspTheme()) {
+            \UspTheme::activeUrl(route('SenhaunicaLoginAsForm'));
+        }
         return view('senhaunica::loginas');
     }
 
@@ -55,9 +57,9 @@ class UserController extends Controller
     public function index()
     {
         $this->authorize('admin');
-
-        \UspTheme::activeUrl('users');
-
+        if (hasUspTheme()) {
+            \UspTheme::activeUrl('users');
+        }
         return view('senhaunica::users', [
             'users' => User::all(),
         ]);

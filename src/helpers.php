@@ -10,3 +10,14 @@ if (!function_exists('hasReplicado')) {
         return \class_exists('Uspdev\\Replicado\\Pessoa') ? true : false;
     }
 }
+
+if (!function_exists('hasUspTheme')) {
+
+    /** 
+     * verifica se replicado está disponível
+     */
+    function hasUspTheme()
+    {
+        return \class_exists('Uspdev\\Replicado\\UspTheme') ? true : false;
+    }
+}
