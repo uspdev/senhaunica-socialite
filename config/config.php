@@ -10,7 +10,7 @@ return [
 
     'middleware' => ['web'], // you probably want to include 'web' here
     'session_key' => 'senhaunica-socialite', // chave da sessão. Troque em caso de colisão com outra variável de sessão.
-    'template' => 'laravel-usp-theme::master', // template a ser estendido para as views internas
+    'template' => 'laravel-usp-theme::master', // template a ser estendido para as views internas, deve possuir a section "content"
 
     // define as rotas para o gerenciador de usuários interno, dentro de prefix
     // se vazio, desabilita a rota de gerenciamento de usuários interna
