@@ -18,6 +18,6 @@ if (!function_exists('hasUspTheme')) {
      */
     function hasUspTheme()
     {
-        return \class_exists('Uspdev\\Replicado\\UspTheme') ? true : false;
+        return \class_exists('Uspdev\\UspTheme\\UspTheme') ? true : false;
     }
 }
