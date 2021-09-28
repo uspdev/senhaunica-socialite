@@ -1,12 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Uspdev\SenhaunicaSocialite\Http\Controllers\SenhaunicaController;
 use Uspdev\SenhaunicaSocialite\Http\Controllers\UserController;
 
-Route::get('login', [SenhaunicaController::class, 'redirectToProvider']);
+Route::get('login', [SenhaunicaController::class, 'redirectToProvider'])->name('login');
 Route::get('callback', [SenhaunicaController::class, 'handleProviderCallback']);
-Route::post('logout', [SenhaunicaController::class, 'logout']);
+Route::post('logout', [SenhaunicaController::class, 'logout'])->name('logout');
 
 Route::get('loginas', [UserController::class, 'loginAsForm'])->name('SenhaunicaLoginAsForm');
 Route::post('loginas', [UserController::class, 'loginAs'])->name('SenhaunicaLoginAs');
