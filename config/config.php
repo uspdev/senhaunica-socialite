@@ -26,6 +26,10 @@ return [
     // se true, habilita botão para remover usuário (destroy)
     'destroyUser' => false,
 
+    // view para editar campo de usuário personalizado
+    // é passado $user para a view
+    'customUserField' => ['view'=>'', 'label'=>'', 'width'=>''],
+
     // se true, revoga as permissões do usuario se não estiver no env.
     // quer dizer que as permissões serão gerenciadas todas a partir do env da aplicação.
     'dropPermissions' => env('SENHAUNICA_DROP_PERMISSIONS', false),
