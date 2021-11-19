@@ -20,6 +20,9 @@
       @foreach ($users->first()->columns as $column)
         <th>{{ $column['text'] }}</th>
       @endforeach
+      @if (config('senhaunica.customUserField.view'))
+        <th style="width: {{ config('senhaunica.customUserField.width') }}">{{ config('senhaunica.customUserField.label') }}</th>
+      @endif
       @if (config('senhaunica.destroyUser'))
         <th class="px-1">Remover</th>
       @endif
@@ -39,9 +42,12 @@
         @foreach ($user->columns as $column)
           <td>{{ $user->{$column['key']} }}</td>
         @endforeach
+        @if (config('senhaunica.customUserField.view'))
+          <td class="">@include(config('senhaunica.customUserField.view'))</td>
+        @endif
         @if (config('senhaunica.destroyUser'))
           <td class="col-button">
-          @include('senhaunica::partials.destroy-user-btn')
+            @include('senhaunica::partials.destroy-user-btn')
           </td>
         @endif
         <td class="col-button">
@@ -92,24 +98,4 @@
 
 @endsection
 
-@section('javascripts_bottom')
-  @parent
-
-  <script>
-    var openJsonModal = function(id) {
-      // alert('ok')
-      var url = '{{ route('SenhaunicaGetJsonModalContent', ['id' => '_id_']) }}'
-      url = url.replace('_id_', id)
-      $('#jsonModal .modal-content').html('');
-      $('#jsonModal .modal-content').load(url);
-      $('#jsonModal').modal()
-      return false;
-    }
-  </script>
-  <div class="modal fade" id="jsonModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-scrollable modal-lg">
-      <div class="modal-content">
-      </div>
-    </div>
-  </div>
-@endsection
+@yield('bottom_senhaunica_users')
