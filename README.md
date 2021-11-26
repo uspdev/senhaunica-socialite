@@ -162,7 +162,7 @@ Essa interface permite adicionar e remover usuários, ajustar as permissões (ad
 
 A partir da **versão 4.2**, é possivel adicionar uma coluna personalizada. Veja a documentação sobre [customUserField](docs/customUserField.md).
 
-A partir da **versão 4.3** está disponível componente select para procurar pessoas. Veja documentação sobre [componentes](docs/compoentes.md).
+A partir da **versão 4.3** está disponível componente select para procurar pessoas. Veja documentação sobre [componentes](docs/componentes.md).
 
 ## Configuração da biblioteca laravel-permission
 
