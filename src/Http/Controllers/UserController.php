@@ -152,13 +152,14 @@ class UserController extends Controller
      */
     public function find(Request $request)
     {
-        $this->authorize('admin');
+        $this->authorize(config('senhaunica.findUsersGate'));
 
         if (!$request->term) {
-            return [];
+            return response([]);
         }
 
         $results = [];
+
         if (hasReplicado()) {
 
             if (is_numeric($request->term)) {
@@ -174,6 +175,8 @@ class UserController extends Controller
 
                 // limitando a resposta em 50 elementos
                 $pessoas = array_slice($pessoas, 0, 50);
+
+                $pessoas = collect($pessoas)->unique()->sortBy('nompesttd');
 
                 // formatando para select2
                 foreach ($pessoas as $pessoa) {
