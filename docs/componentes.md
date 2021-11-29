@@ -43,7 +43,7 @@ gerará o seguinte html:
     <div class="form-group ">
         <div class="input-group">
             <div class="input-group-prepend">
-                <div class="input-group-text">Responsável</div>
+                <div class="input-group-text">Usuário</div>
             </div>
             <select id="select-1220437" name="codpes" class="form-control " autocomplete="off">
                 <option>Digite o nome ou número USP..</option>
