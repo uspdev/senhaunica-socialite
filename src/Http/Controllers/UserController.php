@@ -95,12 +95,12 @@ class UserController extends Controller
     /**
      *  Remove usuário da base local
      */
-    public function destroy(Request $request, User $user)
+    public function destroy(Request $request, int $user_id)
     {
         $this->authorize('admin');
 
         if (config('senhaunica.destroyUser')) {
-            $user->delete();
+            User::find($user_id)->delete();
             return back();
         } else {
             return back()->withErrors('Remover usuário desabilitado no config!');
