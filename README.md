@@ -39,9 +39,11 @@ As migrations modificam a tabela `users` e criam as tabelas de autorização.
 
 Em `App/Models/User.php`, dentro da classe `User` incluir as seguintes linhas:
 
-    use \Spatie\Permission\Traits\HasRoles;
-    use \Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica;
-
+    class User extends Authenticatable
+    {
+        use \Spatie\Permission\Traits\HasRoles;
+        use \Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica;
+        ...
 #### Cadastre o `callback_id`
 
 A url é o que está cadastrado no `APP_URL` mais `/callback`, exemplo: `http://localhost:8000/callback`
