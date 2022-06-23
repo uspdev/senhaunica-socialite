@@ -12,12 +12,16 @@ use Uspdev\Replicado\Pessoa;
  */
 trait HasSenhaunica
 {
-    # utilizado para a listagem de usuários
-    public $columns = [
-        ['key' => 'codpes', 'text' => 'Nro USP'],
-        ['key' => 'name', 'text' => 'Nome'],
-        ['key' => 'email', 'text' => 'E-mail'],
-    ];
+
+    # utilizado para a listagem de usuários e na busca
+    public static function getColumns()
+    {
+        return [
+            ['key' => 'codpes', 'text' => 'Nro USP'],
+            ['key' => 'name', 'text' => 'Nome'],
+            ['key' => 'email', 'text' => 'E-mail'],
+        ];
+    }
 
     /**
      * Retorna as permissões para menu do gerenciamento de usuários
@@ -45,7 +49,7 @@ trait HasSenhaunica
 
     /**
      * Verifica a existencia do arquivo json referente ao login da senhaunica
-     * 
+     *
      * O arquivo será guardado se senhaunica_debug = true
      */
     public function hasSenhaunicaJson()
