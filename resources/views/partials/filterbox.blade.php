@@ -1,11 +1,20 @@
-<div class="input-group col-6 col-sm-4 col-md-2">
-    <input class="form-control form-control-sm" type="text" id="dt-search" placeholder="Filtrar...">
-    <div class="input-group-append">
+<form method="GET" action="{{ route('SenhaunicaSearchUsers') }}">
+  @csrf
+  <div class="input-group col-6 col-sm-4 col-md-12">
+    <div class="input-group-prepend">
         <button class="btn btn-outline-secondary btn-sm" id="dt-search-clear">
             <i class="fas fa-times"></i>
         </button>
     </div>
-</div>
+    <input class="form-control form-control-sm" type="text" name="filter"
+      placeholder="Filtrar..." id="dt-search" value="{{ $search['filter'] ?? '' }}">
+    <div class="input-group-append">
+        <button class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+  </div>
+</form>
 
 @section('javascripts_bottom')
 @parent
@@ -13,12 +22,6 @@
     $(document).ready(function() {
 
         $('#dt-search').focus();
-
-        // vamos filtrar à medida que digita
-        $('#dt-search').keyup(function() {
-            oTable.search($(this).val()).draw()
-            $('.datatable-counter').html(oTable.page.info().recordsDisplay)
-        })
 
         // vamos limpar o filtro de busca
         $('#dt-search-clear').on('click', function() {

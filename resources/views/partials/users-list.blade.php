@@ -14,10 +14,10 @@
   </style>
 @endsection
 
-<table id="senhaunica-datatables" class="table table-bordered table-hover table-sm">
+<table class="table table-bordered table-hover table-sm mt-3">
   <thead>
     <tr>
-      @foreach ($users->first()->columns as $column)
+      @foreach ($columns as $column)
         <th>{{ $column['text'] }}</th>
       @endforeach
       @if (config('senhaunica.customUserField.view'))
@@ -37,9 +37,9 @@
     </tr>
   </thead>
   <tbody>
-    @foreach ($users as $user)
+    @forelse ($users as $user)
       <tr class="data-row">
-        @foreach ($user->columns as $column)
+        @foreach ($columns as $column)
           <td>{{ $user->{$column['key']} }}</td>
         @endforeach
         @if (config('senhaunica.customUserField.view'))
@@ -69,9 +69,19 @@
           </td>
         @endif
       </tr>
-    @endforeach
+    @empty
+      <tr class="data-row">
+        <td colspan="7" class="text-center">Nenhum registro encontrado</td>
+      </tr>
+    @endforelse
   </tbody>
 </table>
+@if(isset($search))
+  {{ $users->appends($search)->links() }}
+@else
+  {{ $users->links() }}
+@endif
+
 
 @section('javascripts_bottom')
   @parent
@@ -82,17 +92,6 @@
         placement: 'auto'
       })
 
-      oTable = $('#senhaunica-datatables').DataTable({
-        dom: 't',
-        paginate: false,
-        responsive: true,
-        order: [1, 'asc'],
-        "columnDefs": [{ // desativa nas colunas de botões
-          'targets': [3, 4],
-          'searchable': false,
-          'sortable': false
-        }],
-      })
     })
   </script>
 

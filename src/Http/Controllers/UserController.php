@@ -61,7 +61,8 @@ class UserController extends Controller
             \UspTheme::activeUrl('users');
         }
         return view('senhaunica::users', [
-            'users' => User::all(),
+            'users' => User::orderBy('name')->paginate(),
+            'columns' => User::getColumns(),
         ]);
     }
 
@@ -189,6 +190,25 @@ class UserController extends Controller
         }
 
         return response(compact('results'));
+    }
+
+    public function search(Request $request)
+    {
+        $this->authorize('admin');
+        if (empty($request->filter)) {
+            return redirect()->route('senhaunica-users.index');
+        }
+
+        $users = User::query();
+        foreach (User::getColumns() as $column) {
+            $users->orWhere($column['key'], 'LIKE', '%' . $request->filter. '%');
+        }
+
+        return view('senhaunica::users', [
+            'users' => $users->orderBy('name')->paginate(),
+            'search' => $request->except('_token'),
+            'columns' => User::getColumns(),
+        ]);
     }
 
 }
