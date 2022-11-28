@@ -24,7 +24,7 @@ class EventServiceProvider extends ServiceProvider
         parent::boot();
 
         Event::listen(function (UspThemeParseKey $event) {
-            if ($event->item['key'] == 'senhaunica-socialite') {
+            if (isset($event->item['key']) && $event->item['key'] == 'senhaunica-socialite') {
                 if (session(config('senhaunica.session_key') . '.undo_loginas')) {
                     // está em outra identidade. Vamos mostrar o botão para retornar
                     $event->item = [
