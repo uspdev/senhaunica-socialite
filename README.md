@@ -53,33 +53,34 @@ A url é o que está cadastrado no `APP_URL` mais `/callback`, exemplo: `http://
 
 #### Coloque variáveis no .env e .env.example da sua aplicação
 
-    # SENHAUNICA-SOCIALITE ######################################
-    # https://github.com/uspdev/senhaunica-socialite
-    SENHAUNICA_KEY=fflch_sti
-    SENHAUNICA_SECRET=sua_super_chave_segura
-    SENHAUNICA_CALLBACK_ID=85
+```sh
+# SENHAUNICA-SOCIALITE ######################################
+# https://github.com/uspdev/senhaunica-socialite
 
-    # URL do servidor oauth no ambiente de dev (default: no)
-    #SENHAUNICA_DEV="https://dev.uspdigital.usp.br/wsusuario/oauth"
+SENHAUNICA_KEY=fflch_sti
+SENHAUNICA_SECRET=sua_super_chave_segura
+SENHAUNICA_CALLBACK_ID=85
 
-    # URL do servidor oauth para uso com senhaunica-faker
-    #SENHAUNICA_DEV="http://127.0.0.1:3141/wsusuario/oauth"
+# URL do servidor oauth no ambiente de dev (default=no)
+#SENHAUNICA_DEV="https://dev.uspdigital.usp.br/wsusuario/oauth"
 
-    # Esses usuários terão privilégios especiais
-    #SENHAUNICA_ADMINS=11111,22222,33333
-    #SENHAUNICA_GERENTES=4444,5555,6666
+# URL do servidor oauth para uso com senhaunica-faker
+#SENHAUNICA_DEV="http://127.0.0.1:3141/wsusuario/oauth"
 
-    # Se os logins forem limitados a usuários cadastrados (onlyLocalUsers=true),
-    # pode ser útil cadastrá-los aqui.
-    #SENHAUNICA_USERS=777,888
+# Esses usuários terão privilégios especiais
+#SENHAUNICA_ADMINS=11111,22222,33333
+#SENHAUNICA_GERENTES=4444,5555,6666
 
-    # Se true, os privilégios especiais serão revogados ao remover da lista (default: false)
-    #SENHAUNICA_DROP_PERMISSIONS=true
+# Se os logins forem limitados a usuários cadastrados (onlyLocalUsers=true),
+# pode ser útil cadastrá-los aqui.
+#SENHAUNICA_USERS=777,888
 
-    # Habilite para salvar o retorno em storage/app/debug/oauth/ (default: false)
-    #SENHAUNICA_DEBUG=true
+# Se true, os privilégios especiais serão revogados ao remover da lista (default=false)
+#SENHAUNICA_DROP_PERMISSIONS=
 
-    # SENHAUNICA-SOCIALITE ######################################
+# Habilite para salvar o retorno em storage/app/debug/oauth/ (default=false)
+#SENHAUNICA_DEBUG=
+```
 
 ### Atualizando à partir da versão 2
 
