@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Permission;
 use Uspdev\Replicado\Pessoa;
 
 class UserController extends Controller
@@ -81,7 +82,9 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['codpes' => $user])->withInput();
         }
         $user->setDefaultPermission();
-        $user->givePermissionTo($request->level);
+        $user->givePermissionTo(
+            Permission::where('name', $request->level)->first()
+        );
 
         // vamos assumir identidade também ?
         if ($request->loginas) {
@@ -122,7 +125,9 @@ class UserController extends Controller
         # vamos definir a nova permissão e remover todas as outras
         $user = User::find($id);
         $user->revokePermissionTo(['user', 'gerente', 'admin']);
-        $user->givePermissionTo([$request->level]);
+        $user->givePermissionTo(
+            Permission::where('name', $request->level)->first()
+        );
 
         return back();
     }
@@ -201,7 +206,7 @@ class UserController extends Controller
 
         $users = User::query();
         foreach (User::getColumns() as $column) {
-            $users->orWhere($column['key'], 'LIKE', '%' . $request->filter. '%');
+            $users->orWhere($column['key'], 'LIKE', '%' . $request->filter . '%');
         }
 
         return view('senhaunica::users', [

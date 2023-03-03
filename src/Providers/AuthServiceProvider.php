@@ -17,7 +17,7 @@ class AuthServiceProvider extends ServiceProvider
         // Implicitly check admin permission
         // This works in the app by using gate-related functions like auth()->user->can() and @can()
         Gate::before(function ($user, $ability) {
-            return $user->hasPermissionTo('admin') ? true : null;
+            return $user->hasPermissionTo('admin', 'web') ? true : null;
         });
     }
 }

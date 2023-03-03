@@ -12,6 +12,7 @@ class SenhaunicaServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/services.php', 'services');
+        $this->mergeConfigFrom(__DIR__ . '/../config/auth.guards.php', 'auth.guards');
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'senhaunica');
 
         // registra eventos

@@ -20,6 +20,9 @@
       @foreach ($columns as $column)
         <th>{{ $column['text'] }}</th>
       @endforeach
+
+      <th>Permissões</th>
+
       @if (config('senhaunica.customUserField.view'))
         <th style="width: {{ config('senhaunica.customUserField.width') }}">{{ config('senhaunica.customUserField.label') }}</th>
       @endif
@@ -42,6 +45,9 @@
         @foreach ($columns as $column)
           <td>{{ $user->{$column['key']} }}</td>
         @endforeach
+
+        <td>{{ $user->categorias() }}</td>
+
         @if (config('senhaunica.customUserField.view'))
           <td class="">@include(config('senhaunica.customUserField.view'))</td>
         @endif

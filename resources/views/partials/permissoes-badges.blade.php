@@ -6,7 +6,7 @@
     @endif
   </span>
 @endif
-@if ($user->can('gerente') && $user->cannot('admin'))
+@if ($user->hasPermissionTo('gerente', 'web') && $user->cannot('admin'))
   <span class="badge badge-warning">
     gerente
     @if (in_array($user->codpes, config('senhaunica.gerentes')))
@@ -14,7 +14,7 @@
     @endif
   </span>
 @endif
-@if ($user->can('user') && $user->cannot('admin') && $user->cannot('gerente'))
+@if ($user->hasPermissionTo('user', 'web') && $user->cannot('admin') && $user->cannot('gerente'))
   <span class="badge badge-success">
     usuário
   </span>

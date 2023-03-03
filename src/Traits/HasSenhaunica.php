@@ -24,13 +24,44 @@ trait HasSenhaunica
     }
 
     /**
+     * Retorna os nomes das permissões, menos os do guard=web
+     */
+    public function categorias()
+    {
+        $permissions = $this->getAllPermissions();
+        $ret = '';
+        foreach ($permissions as $p) {
+            if ($p->guard_name != 'web') {
+                $ret .= $p->guard_name . '/' . $p->name . ",";
+            }
+        }
+        return substr($ret, 0, -1);
+    }
+
+    /**
+     * Lista toda as permissoes formatadas em html
+     *
+     * Temporário até criar uma solução melhor
+     */
+    public static function listarTodasPermissoes()
+    {
+        $ret = '';
+        foreach (Permission::all() as $p) {
+            $ret .= $p->guard_name . '/' . $p->name . "<br>\n";
+        }
+        return $ret;
+    }
+
+    /**
      * Retorna as permissões para menu do gerenciamento de usuários
      */
     public function getPermissionsToChange()
     {
-        $noAdmin = config('senhaunica.dropPermissions') || $this->hasPermissionTo('admin') ? 'disabled' : '';
-        $noGerente = config('senhaunica.dropPermissions') || $this->hasPermissionTo('gerente') ? 'disabled' : '';
-        $noUser = !$this->hasAnyPermission(['admin', 'gerente']) ? 'disabled' : '';
+        $ap = Permission::where('name', 'admin')->first();
+        $gp = Permission::where('name', 'gerente')->first();
+        $noAdmin = config('senhaunica.dropPermissions') || $this->hasPermissionTo('admin', 'web') ? 'disabled' : '';
+        $noGerente = config('senhaunica.dropPermissions') || $this->hasPermissionTo('gerente', 'web') ? 'disabled' : '';
+        $noUser = !$this->hasAnyPermission([$ap, $gp]) ? 'disabled' : '';
 
         return [
             ['value' => 'admin', 'text' => 'Admin', 'disabled' => $noAdmin],
@@ -66,33 +97,106 @@ trait HasSenhaunica
     {
         if (config('senhaunica.permission')) {
             // garantindo que as permissions existam
-            $permissions = ['admin', 'gerente', 'user'];
+            $permissions = ['admin', 'supergerente', 'gerente', 'poweruser', 'user'];
             foreach ($permissions as $permission) {
-                Permission::findOrCreate($permission);
+                Permission::findOrCreate($permission, 'web');
             }
 
+            $adminPermission = Permission::where('name', 'admin')->first();
+            $gerentePermission = Permission::where('name', 'gerente')->first();
+            $userPermission = Permission::where('name', 'user')->first();
             // vamos verificar no config se o usuário é admin
             if (in_array($this->codpes, config('senhaunica.admins'))) {
-                $this->givePermissionTo('admin');
+                $this->givePermissionTo($adminPermission);
             } else {
                 // vamos revogar o acesso se dropPermissions
                 if (config('senhaunica.dropPermissions')) {
-                    $this->revokePermissionTo('admin');
+                    $this->revokePermissionTo($adminPermission);
                 }
             }
 
             // vamos verificar no config se o usuário é gerente
             if (in_array($this->codpes, config('senhaunica.gerentes'))) {
-                $this->givePermissionTo('gerente');
+                $this->givePermissionTo($gerentePermission);
             } else {
                 if (config('senhaunica.dropPermissions')) {
-                    $this->revokePermissionTo('gerente');
+                    $this->revokePermissionTo($gerentePermission);
                 }
             }
 
             // default
-            $this->givePermissionTo('user');
+            $this->givePermissionTo($userPermission);
         }
+    }
+
+    /**
+     * Seta as permissões referentes aos vínculos da pessoa
+     */
+    public function SetVinculosPermission($vinculos)
+    {
+        // garantindo que as permissions existam
+        $permissions = [
+            ['guard_name' => 'senhaunica', 'name' => 'Servidor'],
+            ['guard_name' => 'senhaunica', 'name' => 'Docente'],
+            ['guard_name' => 'senhaunica', 'name' => 'Estagiario'],
+            ['guard_name' => 'senhaunica', 'name' => 'Alunogr'],
+            ['guard_name' => 'senhaunica', 'name' => 'Alunopos'],
+            ['guard_name' => 'senhaunica', 'name' => 'Alunoceu'],
+            ['guard_name' => 'senhaunica', 'name' => 'Alunoead'],
+            ['guard_name' => 'senhaunica', 'name' => 'Alunopd'],
+            ['guard_name' => 'senhaunica', 'name' => 'ServidorUsp'],
+            ['guard_name' => 'senhaunica', 'name' => 'DocenteUsp'],
+            ['guard_name' => 'senhaunica', 'name' => 'EstagiarioUsp'],
+            ['guard_name' => 'senhaunica', 'name' => 'AlunogrUsp'],
+            ['guard_name' => 'senhaunica', 'name' => 'AlunoposUsp'],
+            ['guard_name' => 'senhaunica', 'name' => 'AlunoceuUsp'],
+            ['guard_name' => 'senhaunica', 'name' => 'AlunoeadUsp'],
+            ['guard_name' => 'senhaunica', 'name' => 'AlunopdUsp'],
+            ['guard_name' => 'senhaunica', 'name' => 'Outros'],
+        ];
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate($permission);
+        }
+
+        $permissions = [];
+        foreach ($vinculos as $vinculo) {
+            // outra unidade está como outros por enquanto
+            if ($vinculo['codigoUnidade'] != config('replicado.codundclg')) {
+                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Outros')->first();
+                continue;
+            }
+            //docente
+            if ($vinculo['tipoFuncao'] == 'Docente') {
+                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Docente')->first();
+                continue;
+            }
+            //servidor não docente
+            if ($vinculo['tipoVinculo'] == 'SERVIDOR' && $vinculo['tipoFuncao'] != 'Docente') {
+                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Servidor')->first();
+                continue;
+            }
+
+            //Alunopd
+            if ($vinculo['tipoVinculo'] == 'ALUNOPD') {
+                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Alunopd')->first();
+            }
+            //Alunogr
+            if ($vinculo['tipoVinculo'] == 'ALUNOGR') {
+                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Alunogr')->first();
+            }
+            //Alunopos
+            if ($vinculo['tipoVinculo'] == 'ALUNOPOS') {
+                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Alunopos')->first();
+            }
+        }
+
+        if (empty($permissions)) {
+            $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Outros')->first();
+        }
+
+        // o sync revoga as permissions não listadas. Seria bom se pudesse especificar somente o guard senhaunica
+        $this->syncPermissions($permissions);
+        // $this->givePermissionTo($permissions);
     }
 
     /**
