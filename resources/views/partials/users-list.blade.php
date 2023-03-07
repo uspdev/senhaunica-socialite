@@ -10,7 +10,6 @@
       width: 30px;
       text-align: center;
     }
-
   </style>
 @endsection
 
@@ -21,10 +20,13 @@
         <th>{{ $column['text'] }}</th>
       @endforeach
 
-      <th>Permissões</th>
+      @if (config('senhaunica.permission'))
+        <th colspan="2">Permissões</th>
+      @endif
 
       @if (config('senhaunica.customUserField.view'))
-        <th style="width: {{ config('senhaunica.customUserField.width') }}">{{ config('senhaunica.customUserField.label') }}</th>
+        <th style="width: {{ config('senhaunica.customUserField.width') }}">
+          {{ config('senhaunica.customUserField.label') }}</th>
       @endif
       @if (config('senhaunica.destroyUser'))
         <th class="px-1">Remover</th>
@@ -34,9 +36,7 @@
         <span class="d-xs-inline d-sm-none">Assumir identidade</span> {{-- aparecerá somente em mobile --}}
         <span class="d-none d-sm-inline">Ident.</span> {{-- aparecerá nas demais telas --}}
       </th>
-      @if (config('senhaunica.permission'))
-        <th>Permissões</th>
-      @endif
+
     </tr>
   </thead>
   <tbody>
@@ -46,7 +46,21 @@
           <td>{{ $user->{$column['key']} }}</td>
         @endforeach
 
-        <td>{{ $user->categorias() }}</td>
+        @if (config('senhaunica.permission'))
+          <td>
+            @include('senhaunica::partials.users-permission-modal')
+          </td>
+          <td class="col-permission">
+            <div class="clearfix">
+              <div class="float-left">
+                @include('senhaunica::partials.permissoes-badges')
+              </div>
+              <div class="float-right">
+                @includewhen(!config('senhaunica.dropPermissions'), 'senhaunica::partials.permissoes-menu')
+              </div>
+            </div>
+          </td>
+        @endif
 
         @if (config('senhaunica.customUserField.view'))
           <td class="">@include(config('senhaunica.customUserField.view'))</td>
@@ -62,18 +76,7 @@
         <td class="col-button">
           @include('senhaunica::partials.assumir-identidade-btn')
         </td>
-        @if (config('senhaunica.permission'))
-          <td class="col-permission">
-            <div class="clearfix">
-              <div class="float-left">
-                @include('senhaunica::partials.permissoes-badges')
-              </div>
-              <div class="float-right">
-                @includewhen(!config('senhaunica.dropPermissions'),'senhaunica::partials.permissoes-menu')
-              </div>
-            </div>
-          </td>
-        @endif
+
       </tr>
     @empty
       <tr class="data-row">
@@ -82,7 +85,7 @@
     @endforelse
   </tbody>
 </table>
-@if(isset($search))
+@if (isset($search))
   {{ $users->appends($search)->links() }}
 @else
   {{ $users->links() }}
@@ -100,7 +103,6 @@
 
     })
   </script>
-
 @endsection
 
 @yield('bottom_senhaunica_users')

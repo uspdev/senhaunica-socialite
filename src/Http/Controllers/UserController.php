@@ -96,6 +96,17 @@ class UserController extends Controller
         return back();
     }
 
+    public function show($id)
+    {
+        $user = User::with('permissions')->find($id);
+        return $user;
+    }
+
+    public static function listarPermissoesAplicacao() {
+        $permissions = Permission::where('guard_name','app')->get();
+        return $permissions;
+    }
+
     /**
      *  Remove usuário da base local
      */

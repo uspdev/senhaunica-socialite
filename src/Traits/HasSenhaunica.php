@@ -3,9 +3,10 @@
 namespace Uspdev\SenhaunicaSocialite\Traits;
 
 use App\Models\User;
+use Uspdev\Replicado\Pessoa;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
-use Uspdev\Replicado\Pessoa;
 
 /**
  * Depende de spatie/laravel-permissions
@@ -31,11 +32,13 @@ trait HasSenhaunica
         $permissions = $this->getAllPermissions();
         $ret = '';
         foreach ($permissions as $p) {
-            if ($p->guard_name != 'web') {
-                $ret .= $p->guard_name . '/' . $p->name . ",";
+            if ($p->guard_name == 'web') {
+                $ret .= $p->name . ", ";
+            } else {
+                $ret .= $p->guard_name . '/' . $p->name . ", ";
             }
         }
-        return substr($ret, 0, -1);
+        return substr($ret, 0, -2);
     }
 
     /**
@@ -48,6 +51,10 @@ trait HasSenhaunica
         $ret = '';
         foreach (Permission::all() as $p) {
             $ret .= $p->guard_name . '/' . $p->name . "<br>\n";
+        }
+        $gates = array_keys(Gate::abilities());
+        foreach ($gates as $g) {
+            $ret .= $g . "<br>\n";
         }
         return $ret;
     }
