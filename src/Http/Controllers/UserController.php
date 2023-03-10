@@ -34,7 +34,7 @@ class UserController extends Controller
         if (!($user instanceof \App\Models\User)) {
             return redirect()->back()->withErrors(['codpes' => $user])->withInput();
         }
-        $user->setDefaultPermission();
+        // $user->setDefaultPermission();
         \Auth::login($user, true);
         return redirect('/');
     }
@@ -50,7 +50,7 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['codpes' => 'Undo indisponível']);
         }
         $user = User::where('codpes', $codpes)->first();
-        $user->setDefaultPermission();
+        // $user->setDefaultPermission();
         \Auth::login($user, true);
         return redirect('/');
     }
