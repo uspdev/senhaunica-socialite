@@ -9,23 +9,22 @@
       <div class="modal-header">
         <h5 class="modal-title" id="modalLabel">
           Premissões de <span class="font-weight-bold name"></span>
-          Não está salvando nada ainda
         </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <form class="" method="POST" action="{{ route(config('senhaunica.userRoutes') . '.store') }}"
-          data-ajax="{{ route('SenhaunicaFindUsers') }}">
+        <form class="" method="POST" action="">
           @csrf
+          @method('PUT')
           <div class="row">
             <div class="col-md-6">
               <div class="font-weight-bold mb-2">
                 Permissões da aplicação<br>
-                Criar checkbox com a lista se disponível
               </div>
               <div class="permissao-app ml-2">
+                {{-- este conteúdo será substituído pelo JS --}}
                 Sem permissões disponíveis
               </div>
             </div>
@@ -37,8 +36,8 @@
                 </div>
                 <div class="ml-2">
                   <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                    <label class="btn btn-outline-success active">
-                      <input type="radio" name="level" value="user" autocomplete="off" checked> Usuário
+                    <label class="btn btn-outline-success">
+                      <input type="radio" name="level" value="user" autocomplete="off"> Usuário
                     </label>
                     <label class="btn btn-outline-success">
                       <input type="radio" name="level" value="gerente" autocomplete="off"> Gerente
@@ -53,7 +52,9 @@
                 <div class="font-weight-bold my-2">
                   Permissões senhaunica
                 </div>
-                <div class="permissoes-senhaunica ml-2"> </div>
+                <div class="permissoes-senhaunica ml-2">
+                  {{-- este conteúdo será substituído pelo JS --}}
+                </div>
               </div>
             </div>
 
@@ -80,31 +81,52 @@
 
       $('.senhaunicaUserPermissionBtn').unbind().on('click', function() {
 
+        var route = $(this).data('route')
+        // pega do servidor as permissões do app
         var permissaoApp = '';
+        var checkbox =
+          '<div class="form-check"><label class="form-check-label"><input type="checkbox" class="form-check-input" name="permission_app[]" value="permName">permName</label></div>'
         $.get("{{ route('senhaunica.listarPermissoesAplicacao') }}", function(permissions) {
           console.log(permissions)
           permissions.forEach(function(permission) {
-            permissaoApp += permission.name + ', '
+            permissaoApp += checkbox.replace(/permName/g, permission.name)
           })
           if (permissaoApp) {
             senhaunicaUserPermission
               .find('.permissao-app')
-              .html(permissaoApp.substring(0, permissaoApp.length - 2))
+              .html(permissaoApp)
           }
         })
 
-        $.get($(this).data('route'), function(user) {
+        // pega do servidor dados do model User, incluindo permissões
+        $.get(route, function(user) {
           var userPermissionString = '';
           console.log(user)
+
           user.permissions.forEach(function(permission) {
+            // formatando permissões do senhaunica
             if (permission.guard_name == 'senhaunica') {
               userPermissionString += permission.name + ', '
             }
+
+            if(permission.name == 'admin' && permission.guard_name == 'web') {
+                senhaunicaUserPermission.find('input[value="admin"]').attr('checked', true)
+            }
+
+            if (permission.guard_name == 'app') {
+                senhaunicaUserPermission.find('input[value="'+permission.name+'"]').attr('checked', true)
+            }
+
           })
           senhaunicaUserPermission
             .find('.permissoes-senhaunica')
             .html(userPermissionString.substring(0, userPermissionString.length - 2))
 
+          // preenchendo form para hierárquicas
+
+
+          senhaunicaUserPermission.find('form').attr('action', route)
+          console.log(route)
           senhaunicaUserPermission.find('.name').html(user.name)
           senhaunicaUserPermission.modal();
 

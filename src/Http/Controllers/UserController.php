@@ -102,8 +102,47 @@ class UserController extends Controller
         return $user;
     }
 
-    public static function listarPermissoesAplicacao() {
-        $permissions = Permission::where('guard_name','app')->get();
+    public function update(Request $request, $user_id)
+    {
+        $this->authorize('admin');
+
+        $request->validate([
+            'level' => 'required|in:admin,gerente,user',
+            'permission_app' => 'nullable',
+        ]);
+
+        $user = User::find($user_id);
+        if (!($user instanceof \App\Models\User)) {
+            return redirect()->back()->withErrors(['codpes' => $user])->withInput();
+        }
+
+        $permissions = [];
+        // removendo as permissões de app
+        foreach ($user->permissions as $p) {
+            // mantendo as permissões de senhaunica e removendo as demais
+            if ($p->guard_name == 'senhaunica') {
+                $permissions[] = $p;
+            }
+        }
+
+        // adicionando permissoes de app se existirem
+        if ($request->permission_app) {
+            foreach ($request->permission_app as $pName) {
+                $permissions[] = Permission::where('guard_name', 'app')->where('name', $pName)->first();
+            }
+        }
+
+        // adicionando permissão hierarquica. Tem de testar se não for do env
+        $permissions[] = Permission::where('name', $request->level)->first();
+
+        $user->syncPermissions($permissions);
+
+        return back();
+    }
+
+    public static function listarPermissoesAplicacao()
+    {
+        $permissions = Permission::where('guard_name', 'app')->get();
         return $permissions;
     }
 
