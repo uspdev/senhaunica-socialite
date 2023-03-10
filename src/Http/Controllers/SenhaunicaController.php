@@ -56,12 +56,12 @@ class SenhaunicaController extends Controller
             return view('senhaunica::unavailable');
         }
 
-        // primeiro esse por causa do syncPermissions. TODO: melhorar
-        $user->setVinculosPermission($userSenhaUnica->vinculo);
-        $user->setDefaultPermission(); //admin, gerente, etc
         \Auth::login($user, true);
-
         //TODO: devemos gerar um log dos logins/logouts
+
+        if (config('senhaunica.permission')) {
+            $user->aplicarPermissoes($userSenhaUnica);
+        }
 
         $redirect = $request->session()->pull(config('senhaunica.session_key') . '.redirect', '/')[0];
         if (strpos($redirect, 'login') !== false) {

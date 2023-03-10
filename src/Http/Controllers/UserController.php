@@ -64,9 +64,13 @@ class UserController extends Controller
         return view('senhaunica::users', [
             'users' => User::orderBy('name')->paginate(),
             'columns' => User::getColumns(),
+            'permissoesAplicacao' => Permission::where('guard_name', 'app')->get(),
         ]);
     }
 
+    /**
+     * Cria novo registro
+     */
     public function store(Request $request)
     {
         $this->authorize('admin');
@@ -81,9 +85,9 @@ class UserController extends Controller
         if (!($user instanceof \App\Models\User)) {
             return redirect()->back()->withErrors(['codpes' => $user])->withInput();
         }
-        $user->setDefaultPermission();
+
         $user->givePermissionTo(
-            Permission::where('name', $request->level)->first()
+            Permission::where('guard_name', 'web')->where('name', 'user')->first()
         );
 
         // vamos assumir identidade também ?
@@ -99,7 +103,7 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::with('permissions')->find($id);
-        return $user;
+        return $user->append('env');
     }
 
     public function update(Request $request, $user_id)
@@ -107,7 +111,7 @@ class UserController extends Controller
         $this->authorize('admin');
 
         $request->validate([
-            'level' => 'required|in:admin,gerente,user',
+            'level' => 'nullable|in:admin,gerente,user',
             'permission_app' => 'nullable',
         ]);
 
@@ -133,7 +137,11 @@ class UserController extends Controller
         }
 
         // adicionando permissão hierarquica. Tem de testar se não for do env
-        $permissions[] = Permission::where('name', $request->level)->first();
+        if ($user->env) {
+            $permissions = array_merge($permissions, $user->listarPermissoesHierarquicas());
+        } else {
+            $permissions[] = Permission::where('name', $request->level)->first();
+        }
 
         $user->syncPermissions($permissions);
 
@@ -159,27 +167,6 @@ class UserController extends Controller
         } else {
             return back()->withErrors('Remover usuário desabilitado no config!');
         }
-    }
-
-    /**
-     * Grava/atualiza as permissões do usuário
-     */
-    public function updatePermission(Request $request, $id)
-    {
-        $this->authorize('admin');
-
-        $request->validate([
-            'level' => 'required|in:admin,gerente,user',
-        ]);
-
-        # vamos definir a nova permissão e remover todas as outras
-        $user = User::find($id);
-        $user->revokePermissionTo(['user', 'gerente', 'admin']);
-        $user->givePermissionTo(
-            Permission::where('name', $request->level)->first()
-        );
-
-        return back();
     }
 
     /**

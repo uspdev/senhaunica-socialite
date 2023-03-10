@@ -21,7 +21,7 @@
       @endforeach
 
       @if (config('senhaunica.permission'))
-        <th colspan="2">Permissões</th>
+        <th>Permissões</th>
       @endif
 
       @if (config('senhaunica.customUserField.view'))
@@ -50,7 +50,7 @@
           <td>
             @include('senhaunica::partials.users-permission-modal')
           </td>
-          <td class="col-permission">
+          {{-- <td class="col-permission">
             <div class="clearfix">
               <div class="float-left">
                 @include('senhaunica::partials.permissoes-badges')
@@ -59,7 +59,7 @@
                 @includewhen(!config('senhaunica.dropPermissions'), 'senhaunica::partials.permissoes-menu')
               </div>
             </div>
-          </td>
+          </td> --}}
         @endif
 
         @if (config('senhaunica.customUserField.view'))

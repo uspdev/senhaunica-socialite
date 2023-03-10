@@ -3,10 +3,10 @@
 namespace Uspdev\SenhaunicaSocialite\Traits;
 
 use App\Models\User;
-use Uspdev\Replicado\Pessoa;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
+use Uspdev\Replicado\Pessoa;
 
 /**
  * Depende de spatie/laravel-permissions
@@ -25,6 +25,28 @@ trait HasSenhaunica
     }
 
     /**
+     * Define se as permissões do usuário são gerenciadas pelo env
+     *
+     * true = gerenciado pelo env
+     *
+     * @return Bool
+     */
+    public function getEnvAttribute()
+    {
+        if (in_array($this->codpes, config('senhaunica.admins'))) {
+            return 'admin';
+        }
+        if (in_array($this->codpes, config('senhaunica.gerentes'))) {
+            return 'gerente';
+        }
+        if (in_array($this->codpes, config('senhaunica.users'))) {
+            return 'user';
+        }
+        return false;
+
+    }
+
+    /**
      * Retorna os nomes das permissões, menos os do guard=web
      */
     public function categorias()
@@ -33,7 +55,7 @@ trait HasSenhaunica
         $ret = '';
         foreach ($permissions as $p) {
             if ($p->guard_name == 'web') {
-                $ret .= $p->name . ", ";
+                // $ret .= $p->name . ", ";
             } else {
                 $ret .= $p->guard_name . '/' . $p->name . ", ";
             }
@@ -77,13 +99,13 @@ trait HasSenhaunica
         ];
     }
 
-    /**
-     * Verifica se o usuário consta de admins ou gerentes do env
-     */
-    public function isManagedByEnv()
-    {
-        return (in_array($this->codpes, config('senhaunica.admins')) || in_array($this->codpes, config('senhaunica.gerentes')));
-    }
+    // /**
+    //  * Verifica se o usuário consta de admins ou gerentes do env
+    //  */
+    // public function isManagedByEnv()
+    // {
+    //     return (in_array($this->codpes, config('senhaunica.admins')) || in_array($this->codpes, config('senhaunica.gerentes')));
+    // }
 
     /**
      * Verifica a existencia do arquivo json referente ao login da senhaunica
@@ -100,71 +122,56 @@ trait HasSenhaunica
     /**
      * Seta as permissões para o usuário (permission = true)
      */
-    public function setDefaultPermission()
+    public function aplicarPermissoes($userSenhaUnica)
     {
-        if (config('senhaunica.permission')) {
-            // garantindo que as permissions existam
-            $permissions = ['admin', 'supergerente', 'gerente', 'poweruser', 'user'];
-            foreach ($permissions as $permission) {
-                Permission::findOrCreate($permission, 'web');
-            }
+        $this->criarPermissoesPadrao();
 
-            $adminPermission = Permission::where('name', 'admin')->first();
-            $gerentePermission = Permission::where('name', 'gerente')->first();
-            $userPermission = Permission::where('name', 'user')->first();
-            // vamos verificar no config se o usuário é admin
-            if (in_array($this->codpes, config('senhaunica.admins'))) {
-                $this->givePermissionTo($adminPermission);
-            } else {
-                // vamos revogar o acesso se dropPermissions
-                if (config('senhaunica.dropPermissions')) {
-                    $this->revokePermissionTo($adminPermission);
-                }
-            }
+        $permissions = array_merge(
+            $this->listarPermissoesHierarquicas(),
+            $this->listarPermissoesApp(),
+            $this->listarPermissoesVinculo($userSenhaUnica->vinculo)
+        );
 
-            // vamos verificar no config se o usuário é gerente
-            if (in_array($this->codpes, config('senhaunica.gerentes'))) {
-                $this->givePermissionTo($gerentePermission);
-            } else {
-                if (config('senhaunica.dropPermissions')) {
-                    $this->revokePermissionTo($gerentePermission);
-                }
-            }
+        // o sync revoga as permissions não listadas
+        $this->syncPermissions($permissions);
+    }
 
-            // default
-            $this->givePermissionTo($userPermission);
+    public function listarPermissoesHierarquicas()
+    {
+        $adminPermission = Permission::where('name', 'admin')->first();
+        $gerentePermission = Permission::where('name', 'gerente')->first();
+        $userPermission = Permission::where('name', 'user')->first();
+
+        if (config('senhaunica.dropPermissions')) {
+            $permissions = [];
+        } else {
+            $permissions = $this->permissions->where('guard_name', 'web')->all();
         }
+
+        if (in_array($this->codpes, config('senhaunica.admins'))) {
+            // vamos verificar no config se o usuário é admin
+            $permissions[] = $adminPermission;
+        } elseif (in_array($this->codpes, config('senhaunica.gerentes'))) {
+            // vamos verificar no config se o usuário é gerente
+            $permissions[] = $gerentePermission;
+        } else {
+            // default
+            $permissions[] = $userPermission;
+        }
+
+        return $permissions;
+    }
+
+    public function listarPermissoesApp()
+    {
+        return $this->permissions->where('guard_name', 'app')->all();
     }
 
     /**
      * Seta as permissões referentes aos vínculos da pessoa
      */
-    public function SetVinculosPermission($vinculos)
+    public function listarPermissoesVinculo($vinculos)
     {
-        // garantindo que as permissions existam
-        $permissions = [
-            ['guard_name' => 'senhaunica', 'name' => 'Servidor'],
-            ['guard_name' => 'senhaunica', 'name' => 'Docente'],
-            ['guard_name' => 'senhaunica', 'name' => 'Estagiario'],
-            ['guard_name' => 'senhaunica', 'name' => 'Alunogr'],
-            ['guard_name' => 'senhaunica', 'name' => 'Alunopos'],
-            ['guard_name' => 'senhaunica', 'name' => 'Alunoceu'],
-            ['guard_name' => 'senhaunica', 'name' => 'Alunoead'],
-            ['guard_name' => 'senhaunica', 'name' => 'Alunopd'],
-            ['guard_name' => 'senhaunica', 'name' => 'ServidorUsp'],
-            ['guard_name' => 'senhaunica', 'name' => 'DocenteUsp'],
-            ['guard_name' => 'senhaunica', 'name' => 'EstagiarioUsp'],
-            ['guard_name' => 'senhaunica', 'name' => 'AlunogrUsp'],
-            ['guard_name' => 'senhaunica', 'name' => 'AlunoposUsp'],
-            ['guard_name' => 'senhaunica', 'name' => 'AlunoceuUsp'],
-            ['guard_name' => 'senhaunica', 'name' => 'AlunoeadUsp'],
-            ['guard_name' => 'senhaunica', 'name' => 'AlunopdUsp'],
-            ['guard_name' => 'senhaunica', 'name' => 'Outros'],
-        ];
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate($permission);
-        }
-
         $permissions = [];
         foreach ($vinculos as $vinculo) {
             // outra unidade está como outros por enquanto
@@ -201,9 +208,50 @@ trait HasSenhaunica
             $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Outros')->first();
         }
 
-        // o sync revoga as permissions não listadas. Seria bom se pudesse especificar somente o guard senhaunica
-        $this->syncPermissions($permissions);
-        // $this->givePermissionTo($permissions);
+        return $permissions;
+    }
+
+    /**
+     * Garante que as permissões existam
+     */
+    public static function criarPermissoesPadrao()
+    {
+        // hierarquicas
+        $permissions = [
+            'admin',
+            'supergerente',
+            'gerente',
+            'poweruser',
+            'user',
+        ];
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission, 'web');
+        }
+
+        // vinculos
+        $permissions = [
+            'Servidor',
+            'Docente',
+            'Estagiario',
+            'Alunogr',
+            'Alunopos',
+            'Alunoceu',
+            'Alunoead',
+            'Alunopd',
+            'ServidorUsp',
+            'DocenteUsp',
+            'EstagiarioUsp',
+            'AlunogrUsp',
+            'AlunoposUsp',
+            'AlunoceuUsp',
+            'AlunoeadUsp',
+            'AlunopdUsp',
+            'Outros',
+        ];
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission, 'senhaunica');
+        }
+
     }
 
     /**

@@ -1,5 +1,6 @@
 <button data-user-id="{{ $user->id }}" data-route="{{ route('senhaunica-users.show', $user->id) }}"
   class="btn btn-sm btn-outline-primary senhaunicaUserPermissionBtn">
+  @include('senhaunica::partials.permissoes-badges')
   {{ $user->categorias() }}
 </button>
 
@@ -24,8 +25,17 @@
                 Permissões da aplicação<br>
               </div>
               <div class="permissao-app ml-2">
-                {{-- este conteúdo será substituído pelo JS --}}
-                Sem permissões disponíveis
+                @forelse ($permissoesAplicacao as $p)
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input type="checkbox" class="form-check-input" name="permission_app[]"
+                        value="{{ $p->name }}">
+                      {{ $p->name }}
+                    </label>
+                  </div>
+                @empty
+                  Sem permissões disponíveis
+                @endforelse
               </div>
             </div>
             <div class="col-md-6">
@@ -34,7 +44,7 @@
                 <div class="font-weight-bold mb-2">
                   Permissões hierárquicas
                 </div>
-                <div class="ml-2">
+                <div class="ml-2 permissao-hierarquica">
                   <div class="btn-group btn-group-toggle" data-toggle="buttons">
                     <label class="btn btn-outline-success">
                       <input type="radio" name="level" value="user" autocomplete="off"> Usuário
@@ -50,9 +60,9 @@
               </div>
               <div class="">
                 <div class="font-weight-bold my-2">
-                  Permissões senhaunica
+                  Permissões de vínculo
                 </div>
-                <div class="permissoes-senhaunica ml-2">
+                <div class="permissoes-vinculo ml-2">
                   {{-- este conteúdo será substituído pelo JS --}}
                 </div>
               </div>
@@ -82,80 +92,51 @@
       $('.senhaunicaUserPermissionBtn').unbind().on('click', function() {
 
         var route = $(this).data('route')
-        // pega do servidor as permissões do app
-        var permissaoApp = '';
-        var checkbox =
-          '<div class="form-check"><label class="form-check-label"><input type="checkbox" class="form-check-input" name="permission_app[]" value="permName">permName</label></div>'
-        $.get("{{ route('senhaunica.listarPermissoesAplicacao') }}", function(permissions) {
-          console.log(permissions)
-          permissions.forEach(function(permission) {
-            permissaoApp += checkbox.replace(/permName/g, permission.name)
-          })
-          if (permissaoApp) {
-            senhaunicaUserPermission
-              .find('.permissao-app')
-              .html(permissaoApp)
-          }
-        })
 
         // pega do servidor dados do model User, incluindo permissões
         $.get(route, function(user) {
-          var userPermissionString = '';
+          var userPermissionString = ''
           console.log(user)
+          // limpando os checkbox
+          senhaunicaUserPermission.find('.permissao-app').find('input').attr('checked', false)
 
           user.permissions.forEach(function(permission) {
-            // formatando permissões do senhaunica
+            // formatando string com permissões de vinculo
             if (permission.guard_name == 'senhaunica') {
               userPermissionString += permission.name + ', '
             }
 
-            if(permission.name == 'admin' && permission.guard_name == 'web') {
-                senhaunicaUserPermission.find('input[value="admin"]').attr('checked', true)
+            // permissoes hierarquicas
+            if (permission.guard_name == 'web') {
+              if (user.env) {
+                senhaunicaUserPermission.find('.permissao-hierarquica').html(
+                    '<span class="badge"></span>'+user.env + ' (env)</span>')
+              } else {
+                senhaunicaUserPermission.find('input[value=' + permission.name + ']').click()
+              }
             }
+            //tem de ajustar aqui para pegar o mais alto
 
+            // permissoes do app: ticando o checkbox
             if (permission.guard_name == 'app') {
-                senhaunicaUserPermission.find('input[value="'+permission.name+'"]').attr('checked', true)
+              senhaunicaUserPermission
+                .find('input[value="' + permission.name + '"]').attr('checked', true)
             }
 
           })
-          senhaunicaUserPermission
-            .find('.permissoes-senhaunica')
+          //mostrando a string das permissoes-vinculo
+          senhaunicaUserPermission.find('.permissoes-vinculo')
             .html(userPermissionString.substring(0, userPermissionString.length - 2))
 
-          // preenchendo form para hierárquicas
-
-
+          // setando o action com a rota correta
           senhaunicaUserPermission.find('form').attr('action', route)
-          console.log(route)
+          // colocando o nome no topo do modal
           senhaunicaUserPermission.find('.name').html(user.name)
+          // ativando modal
           senhaunicaUserPermission.modal();
 
         })
-
-        // console.log(userId)
       })
-
-
-
-      // coloca o focus no select2
-      // https://stackoverflow.com/questions/25882999/set-focus-to-search-text-field-when-we-click-on-select-2-drop-down
-      //   $(document).on('select2:open', () => {
-      //     document.querySelector('.select2-search__field').focus();
-      //   });
-
-      //   $oSelect2.select2({
-      //     ajax: {
-      //       url: dataAjax,
-      //       dataType: 'json',
-      //       delay: 1000
-      //     },
-      //     dropdownParent: senhaunicaUserModal,
-      //     minimumInputLength: 4,
-      //     theme: 'bootstrap4',
-      //     width: 'resolve',
-      //     language: 'pt-BR'
-      //   })
-
     })
   </script>
 @endsection

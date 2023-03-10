@@ -1,4 +1,4 @@
-@if (!$user->isManagedByEnv())
+@if (!$user->env)
   <form method="POST" action="{{ url(config('senhaunica.userRoutes')) }}/{{ $user->id }}">
     @method('DELETE')
     @csrf
