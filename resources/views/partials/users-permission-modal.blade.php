@@ -88,6 +88,7 @@
     $(document).ready(function() {
 
       var senhaunicaUserPermission = $('#senhaunica-users-permission-modal')
+      var hierarquica = senhaunicaUserPermission.find('.permissao-hierarquica').html()
 
       $('.senhaunicaUserPermissionBtn').unbind().on('click', function() {
 
@@ -110,9 +111,11 @@
             if (permission.guard_name == 'web') {
               if (user.env) {
                 senhaunicaUserPermission.find('.permissao-hierarquica').html(
-                    '<span class="badge"></span>'+user.env + ' (env)</span>')
+                  '<span class="badge badge-danger">' + user.env + ' (env)</span>')
+
               } else {
-                senhaunicaUserPermission.find('input[value=' + permission.name + ']').click()
+                senhaunicaUserPermission.find('.permissao-hierarquica').html(hierarquica)
+                senhaunicaUserPermission.find('.permissao-hierarquica input[value=' + permission.name + ']').click()
               }
             }
             //tem de ajustar aqui para pegar o mais alto
