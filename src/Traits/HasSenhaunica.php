@@ -3,7 +3,6 @@
 namespace Uspdev\SenhaunicaSocialite\Traits;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Uspdev\Replicado\Pessoa;
@@ -29,7 +28,7 @@ trait HasSenhaunica
      *
      * true = gerenciado pelo env
      *
-     * @return Bool
+     * @return Bool|String
      */
     public function getEnvAttribute()
     {
@@ -48,6 +47,8 @@ trait HasSenhaunica
 
     /**
      * Retorna os nomes das permissões, menos os do guard=web
+     *
+     * TODO: tem de melhorar aqui
      */
     public function categorias()
     {
@@ -68,43 +69,17 @@ trait HasSenhaunica
      *
      * Temporário até criar uma solução melhor
      */
-    public static function listarTodasPermissoes()
-    {
-        $ret = '';
-        foreach (Permission::all() as $p) {
-            $ret .= $p->guard_name . '/' . $p->name . "<br>\n";
-        }
-        $gates = array_keys(Gate::abilities());
-        foreach ($gates as $g) {
-            $ret .= $g . "<br>\n";
-        }
-        return $ret;
-    }
-
-    /**
-     * Retorna as permissões para menu do gerenciamento de usuários
-     */
-    public function getPermissionsToChange()
-    {
-        $ap = Permission::where('name', 'admin')->first();
-        $gp = Permission::where('name', 'gerente')->first();
-        $noAdmin = config('senhaunica.dropPermissions') || $this->hasPermissionTo('admin', 'web') ? 'disabled' : '';
-        $noGerente = config('senhaunica.dropPermissions') || $this->hasPermissionTo('gerente', 'web') ? 'disabled' : '';
-        $noUser = !$this->hasAnyPermission([$ap, $gp]) ? 'disabled' : '';
-
-        return [
-            ['value' => 'admin', 'text' => 'Admin', 'disabled' => $noAdmin],
-            ['value' => 'gerente', 'text' => 'Gerente', 'disabled' => $noGerente],
-            ['value' => 'user', 'text' => 'Usuário', 'disabled' => $noUser],
-        ];
-    }
-
-    // /**
-    //  * Verifica se o usuário consta de admins ou gerentes do env
-    //  */
-    // public function isManagedByEnv()
+    // public static function listarTodasPermissoes()
     // {
-    //     return (in_array($this->codpes, config('senhaunica.admins')) || in_array($this->codpes, config('senhaunica.gerentes')));
+    //     $ret = '';
+    //     foreach (Permission::all() as $p) {
+    //         $ret .= $p->guard_name . '/' . $p->name . "<br>\n";
+    //     }
+    //     $gates = array_keys(Gate::abilities());
+    //     foreach ($gates as $g) {
+    //         $ret .= $g . "<br>\n";
+    //     }
+    //     return $ret;
     // }
 
     /**
@@ -120,7 +95,7 @@ trait HasSenhaunica
     }
 
     /**
-     * Seta as permissões para o usuário (permission = true)
+     * Seta as permissões para o usuário (permission = true) a partir do oauth
      */
     public function aplicarPermissoes($userSenhaUnica)
     {
@@ -136,6 +111,9 @@ trait HasSenhaunica
         $this->syncPermissions($permissions);
     }
 
+    /**
+     * Lista as permissões hierarquicas
+     */
     public function listarPermissoesHierarquicas()
     {
         $adminPermission = Permission::where('name', 'admin')->first();
@@ -162,13 +140,18 @@ trait HasSenhaunica
         return $permissions;
     }
 
+    /**
+     * Lista as permissões de app
+     */
     public function listarPermissoesApp()
     {
         return $this->permissions->where('guard_name', 'app')->all();
     }
 
     /**
-     * Seta as permissões referentes aos vínculos da pessoa
+     * Lista as permissões referentes aos vínculos da pessoa, extraido do oauth
+     *
+     * @param Array $vinculos
      */
     public function listarPermissoesVinculo($vinculos)
     {
@@ -219,8 +202,9 @@ trait HasSenhaunica
         // hierarquicas
         $permissions = [
             'admin',
-            'supergerente',
-            'gerente',
+            'chief',
+            'manager',
+            'gerente', // == manager, deprecar com o tempo
             'poweruser',
             'user',
         ];
@@ -251,7 +235,6 @@ trait HasSenhaunica
         foreach ($permissions as $permission) {
             Permission::findOrCreate($permission, 'senhaunica');
         }
-
     }
 
     /**
@@ -291,28 +274,21 @@ trait HasSenhaunica
     }
 
     /**
-     * Retorna usuário local correspondente ao codpes.
+     * Verifica se o codpes informado é usuário ou está listado no env.
      *
-     * Se necessário, cria a partir do replicado somente se listado no .env
-     *
-     * @param $codpes
-     * @return User | Bool
+     * @param Int $codpes
+     * @return Bool
      */
-    public static function newLocalUser($codpes)
+    public function verificaUsuarioLocal($codpes)
     {
-        if ($user = User::where('codpes', $codpes)->first()) {
-            return $user;
-        }
-
-        // vamos verificar no config se o usuário está no .env
         if (
+            User::where('codpes', $codpes)->first() ||
             in_array($codpes, config('senhaunica.admins')) ||
             in_array($codpes, config('senhaunica.gerentes')) ||
             in_array($codpes, config('senhaunica.users'))
         ) {
-            return SELF::findOrCreateFromReplicado($codpes);
+            return true;
         }
-
         return false;
     }
 }

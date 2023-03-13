@@ -13,8 +13,6 @@ Route::get('undologinas', [UserController::class, 'undoLoginAs'])->name('Senhaun
 
 if (config('senhaunica.userRoutes')) {
 
-    Route::get(config('senhaunica.userRoutes') . '/listarPermissoesAplicacao', [UserController::class, 'listarPermissoesAplicacao'])->name('senhaunica.listarPermissoesAplicacao');
-
     Route::get(config('senhaunica.userRoutes') . '/find', [UserController::class, 'find'])->name('SenhaunicaFindUsers');
     Route::get(config('senhaunica.userRoutes') . '/search', [UserController::class, 'search'])->name('SenhaunicaSearchUsers');
     Route::get(config('senhaunica.userRoutes') . '/{id}/jsonModalContent', [UserController::class, 'getJsonModalContent'])->name('SenhaunicaGetJsonModalContent');

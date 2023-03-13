@@ -50,16 +50,6 @@
           <td>
             @include('senhaunica::partials.users-permission-modal')
           </td>
-          {{-- <td class="col-permission">
-            <div class="clearfix">
-              <div class="float-left">
-                @include('senhaunica::partials.permissoes-badges')
-              </div>
-              <div class="float-right">
-                @includewhen(!config('senhaunica.dropPermissions'), 'senhaunica::partials.permissoes-menu')
-              </div>
-            </div>
-          </td> --}}
         @endif
 
         @if (config('senhaunica.customUserField.view'))

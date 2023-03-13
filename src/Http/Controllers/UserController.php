@@ -28,13 +28,12 @@ class UserController extends Controller
         $this->authorize('admin');
         $request->validate(['codpes' => 'required|integer']);
 
-        session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
-
         $user = User::findOrCreateFromReplicado($request->codpes);
         if (!($user instanceof \App\Models\User)) {
             return redirect()->back()->withErrors(['codpes' => $user])->withInput();
         }
-        // $user->setDefaultPermission();
+
+        session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
         \Auth::login($user, true);
         return redirect('/');
     }
@@ -50,17 +49,20 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['codpes' => 'Undo indisponível']);
         }
         $user = User::where('codpes', $codpes)->first();
-        // $user->setDefaultPermission();
         \Auth::login($user, true);
         return redirect('/');
     }
 
+    /**
+     * Mostra lista de usuários
+     */
     public function index()
     {
         $this->authorize('admin');
         if (hasUspTheme()) {
-            \UspTheme::activeUrl('users');
+            \UspTheme::activeUrl(config('senhaunica.userRoutes'));
         }
+
         return view('senhaunica::users', [
             'users' => User::orderBy('name')->paginate(),
             'columns' => User::getColumns(),
@@ -69,7 +71,9 @@ class UserController extends Controller
     }
 
     /**
-     * Cria novo registro
+     * Cria novo registro a partir do replicado
+     *
+     * Precisa do replicado pois o usuário vai ser criado manualmente
      */
     public function store(Request $request)
     {
@@ -89,8 +93,9 @@ class UserController extends Controller
         $user->givePermissionTo(
             Permission::where('guard_name', 'web')->where('name', 'user')->first()
         );
+        // aqui precisa dar permissão correspondente aos vínculos ativos
 
-        // vamos assumir identidade também ?
+        // vamos assumir identidade também?
         if ($request->loginas) {
             session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
             \Auth::login($user, true);
@@ -100,18 +105,31 @@ class UserController extends Controller
         return back();
     }
 
+    /**
+     * Mostra os dados de um usuário
+     *
+     * Utilizado no modal de permissions
+     * Inclui informação se usuário é gerenciado pelo env ou não
+     */
     public function show($id)
     {
+        $this->authorize('admin');
+
         $user = User::with('permissions')->find($id);
         return $user->append('env');
     }
 
+    /**
+     * Atualiza as informações de permissão do usuário
+     */
     public function update(Request $request, $user_id)
     {
         $this->authorize('admin');
 
         $request->validate([
+            // permissoes hierarquicas
             'level' => 'nullable|in:admin,gerente,user',
+            //permissoes da aplicacao
             'permission_app' => 'nullable',
         ]);
 
@@ -120,14 +138,8 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['codpes' => $user])->withInput();
         }
 
-        $permissions = [];
-        // removendo as permissões de app
-        foreach ($user->permissions as $p) {
-            // mantendo as permissões de senhaunica e removendo as demais
-            if ($p->guard_name == 'senhaunica') {
-                $permissions[] = $p;
-            }
-        }
+        // mantendo permissões de vinculo
+        $permissions = $user->permissions->where('guard_name', 'senhaunica')->all();
 
         // adicionando permissoes de app se existirem
         if ($request->permission_app) {
@@ -136,22 +148,14 @@ class UserController extends Controller
             }
         }
 
-        // adicionando permissão hierarquica. Tem de testar se não for do env
-        if ($user->env) {
-            $permissions = array_merge($permissions, $user->listarPermissoesHierarquicas());
-        } else {
-            $permissions[] = Permission::where('name', $request->level)->first();
-        }
+        // adicionando permissão hierarquica
+        $permissions[] = ($user->env)
+        ? $user->permissions->where('guard_name', 'web')->first()
+        : Permission::where('name', $request->level)->first();
 
         $user->syncPermissions($permissions);
 
         return back();
-    }
-
-    public static function listarPermissoesAplicacao()
-    {
-        $permissions = Permission::where('guard_name', 'app')->get();
-        return $permissions;
     }
 
     /**
