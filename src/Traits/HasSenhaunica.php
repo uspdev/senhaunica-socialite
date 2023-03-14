@@ -12,6 +12,36 @@ use Uspdev\Replicado\Pessoa;
  */
 trait HasSenhaunica
 {
+    // permissoes hierárquicas
+    public static $permissoesHierarquia = [
+        'admin',
+        'chief',
+        'manager',
+        'gerente', // == manager, deprecar com o tempo (2/2023)
+        'poweruser',
+        'user',
+    ];
+
+    // permissões por vínculo
+    public static $permissoesVinculo = [
+        'Servidor',
+        'Docente',
+        'Estagiario',
+        'Alunogr',
+        'Alunopos',
+        'Alunoceu',
+        'Alunoead',
+        'Alunopd',
+        'ServidorUsp',
+        'DocenteUsp',
+        'EstagiarioUsp',
+        'AlunogrUsp',
+        'AlunoposUsp',
+        'AlunoceuUsp',
+        'AlunoeadUsp',
+        'AlunopdUsp',
+        'Outros',
+    ];
 
     # utilizado para a listagem de usuários e na busca
     public static function getColumns()
@@ -24,7 +54,7 @@ trait HasSenhaunica
     }
 
     /**
-     * Acessor: define se as permissões do usuário são gerenciadas pelo env
+     * Acessor: mostra se as permissões do usuário são gerenciadas pelo env
      *
      * true = gerenciado pelo env
      *
@@ -79,26 +109,11 @@ trait HasSenhaunica
      */
     public function listarPermissoesHierarquicas()
     {
-        $adminPermission = Permission::where('name', 'admin')->first();
-        $gerentePermission = Permission::where('name', 'gerente')->first();
-        $userPermission = Permission::where('name', 'user')->first();
+        $permissions = (config('senhaunica.dropPermissions'))
+        ? []
+        : $this->permissions->where('guard_name', 'web')->all();
 
-        if (config('senhaunica.dropPermissions')) {
-            $permissions = [];
-        } else {
-            $permissions = $this->permissions->where('guard_name', 'web')->all();
-        }
-
-        if (in_array($this->codpes, config('senhaunica.admins'))) {
-            // vamos verificar no config se o usuário é admin
-            $permissions[] = $adminPermission;
-        } elseif (in_array($this->codpes, config('senhaunica.gerentes'))) {
-            // vamos verificar no config se o usuário é gerente
-            $permissions[] = $gerentePermission;
-        } else {
-            // default
-            $permissions[] = $userPermission;
-        }
+        $permissions[] = Permission::where('name', $this->env)->first();
 
         return $permissions;
     }
@@ -116,7 +131,7 @@ trait HasSenhaunica
      *
      * @param Array $vinculos
      */
-    public function listarPermissoesVinculo($vinculos)
+    public static function listarPermissoesVinculo($vinculos)
     {
         $permissions = [];
         foreach ($vinculos as $vinculo) {
@@ -160,42 +175,13 @@ trait HasSenhaunica
     /**
      * Garante que as permissões existam
      */
-    public static function criarPermissoesPadrao()
+    public function criarPermissoesPadrao()
     {
-        // hierarquicas
-        $permissions = [
-            'admin',
-            'chief',
-            'manager',
-            'gerente', // == manager, deprecar com o tempo
-            'poweruser',
-            'user',
-        ];
-        foreach ($permissions as $permission) {
+        foreach (SELF::$permissoesHierarquia as $permission) {
             Permission::findOrCreate($permission, 'web');
         }
-
-        // vinculos
-        $permissions = [
-            'Servidor',
-            'Docente',
-            'Estagiario',
-            'Alunogr',
-            'Alunopos',
-            'Alunoceu',
-            'Alunoead',
-            'Alunopd',
-            'ServidorUsp',
-            'DocenteUsp',
-            'EstagiarioUsp',
-            'AlunogrUsp',
-            'AlunoposUsp',
-            'AlunoceuUsp',
-            'AlunoeadUsp',
-            'AlunopdUsp',
-            'Outros',
-        ];
-        foreach ($permissions as $permission) {
+        $permissions = array_merge(SELF::$permissoesHierarquia, );
+        foreach (SELF::$permissoesVinculo as $permission) {
             Permission::findOrCreate($permission, 'senhaunica');
         }
     }
@@ -233,6 +219,15 @@ trait HasSenhaunica
             $user->email = empty($email) ? 'semEmail_' . $codpes . '@usp.br' : $email;
             $user->save();
         }
+
+        $vinculos = array_map(function ($vinculo) {
+            $vinculo['codigoUnidade'] = $vinculo['codundclg'];
+            $vinculo['tipoFuncao'] = $vinculo['tipvinext'];
+            $vinculo['tipoVinculo'] = $vinculo['tipvin'];
+            return $vinculo;
+        }, Pessoa::listarVinculosAtivos($user->codpes, false));
+        $user->syncPermissions(SELF::listarPermissoesVinculo($vinculos));
+
         return $user;
     }
 
@@ -242,16 +237,13 @@ trait HasSenhaunica
      * @param Int $codpes
      * @return Bool
      */
-    public function verificaUsuarioLocal($codpes)
+    public static function verificaUsuarioLocal($codpes)
     {
-        if (
-            User::where('codpes', $codpes)->first() ||
+        return (User::where('codpes', $codpes)->first() ||
             in_array($codpes, config('senhaunica.admins')) ||
             in_array($codpes, config('senhaunica.gerentes')) ||
-            in_array($codpes, config('senhaunica.users'))
-        ) {
-            return true;
-        }
-        return false;
+            in_array($codpes, config('senhaunica.users')))
+        ? true
+        : false;
     }
 }
