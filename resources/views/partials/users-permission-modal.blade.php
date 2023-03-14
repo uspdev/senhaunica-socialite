@@ -1,7 +1,12 @@
 <button data-user-id="{{ $user->id }}" data-route="{{ route('senhaunica-users.show', $user->id) }}"
-  class="btn btn-sm btn-outline-primary senhaunicaUserPermissionBtn">
-  @include('senhaunica::partials.permissoes-badges')
-  {{ $user->categorias() }}
+  class="btn py-0 senhaunicaUserPermissionBtn">
+  @include('senhaunica::partials.permissoes-badge')
+  @include('senhaunica::partials.permissoes-senhaunica-badge')
+  @foreach ($user->roles->where('guard_name', 'app') as $p)
+    role.{{ $p->name }} |
+  @endforeach
+
+  {{ $user->getAllPermissions()->where('guard_name', 'app')->implode('name', ', ') }}
 </button>
 
 <div class="modal fade" id="senhaunica-users-permission-modal" tabindex="-1">
@@ -20,7 +25,7 @@
           @csrf
           @method('PUT')
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="font-weight-bold mb-2">
                 Permissões da aplicação<br>
               </div>
@@ -38,7 +43,24 @@
                 @endforelse
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
+              <div class="font-weight-bold mb-2">
+                Funções (roles) da aplicação<br>
+              </div>
+              <div class="role-app ml-2">
+                @forelse ($rolesAplicacao as $p)
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input type="checkbox" class="form-check-input" name="role_app[]" value="{{ $p->name }}">
+                      {{ $p->name }}
+                    </label>
+                  </div>
+                @empty
+                  Sem funções (roles) disponíveis
+                @endforelse
+              </div>
+            </div>
+            <div class="col-md-4">
 
               <div class="">
                 <div class="font-weight-bold mb-2">
@@ -100,6 +122,7 @@
           console.log(user)
           // limpando os checkbox
           senhaunicaUserPermission.find('.permissao-app').find('input').attr('checked', false)
+          senhaunicaUserPermission.find('.role-app').find('input').attr('checked', false)
 
           user.permissions.forEach(function(permission) {
             // formatando string com permissões de vinculo
@@ -115,7 +138,8 @@
 
               } else {
                 senhaunicaUserPermission.find('.permissao-hierarquica').html(hierarquica)
-                senhaunicaUserPermission.find('.permissao-hierarquica input[value=' + permission.name + ']').click()
+                senhaunicaUserPermission
+                  .find('.permissao-hierarquica input[value=' + permission.name + ']').click()
               }
             }
             //tem de ajustar aqui para pegar o mais alto
@@ -123,10 +147,18 @@
             // permissoes do app: ticando o checkbox
             if (permission.guard_name == 'app') {
               senhaunicaUserPermission
-                .find('input[value="' + permission.name + '"]').attr('checked', true)
+                .find('.permissao-app input[value="' + permission.name + '"]').attr('checked', true)
             }
-
           })
+
+          user.roles.forEach(function(role) {
+            // roles do app: ticando o checkbox
+            if (role.guard_name == 'app') {
+              senhaunicaUserPermission
+                .find('.role-app input[value="' + role.name + '"]').attr('checked', true)
+            }
+          })
+
           //mostrando a string das permissoes-vinculo
           senhaunicaUserPermission.find('.permissoes-vinculo')
             .html(userPermissionString.substring(0, userPermissionString.length - 2))
@@ -136,7 +168,7 @@
           // colocando o nome no topo do modal
           senhaunicaUserPermission.find('.name').html(user.name)
           // ativando modal
-          senhaunicaUserPermission.modal();
+          senhaunicaUserPermission.modal()
 
         })
       })

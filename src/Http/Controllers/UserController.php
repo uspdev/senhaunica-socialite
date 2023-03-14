@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Uspdev\Replicado\Pessoa;
 
 class UserController extends Controller
@@ -67,6 +68,7 @@ class UserController extends Controller
             'users' => User::orderBy('name')->paginate(),
             'columns' => User::getColumns(),
             'permissoesAplicacao' => Permission::where('guard_name', 'app')->get(),
+            'rolesAplicacao' => Role::where('guard_name', 'app')->get(),
         ]);
     }
 
@@ -115,7 +117,7 @@ class UserController extends Controller
     {
         $this->authorize('admin');
 
-        $user = User::with('permissions')->find($id);
+        $user = User::with('permissions', 'roles')->find($id);
         return $user->append('env');
     }
 
@@ -131,6 +133,7 @@ class UserController extends Controller
             'level' => 'nullable|in:admin,gerente,user',
             //permissoes da aplicacao
             'permission_app' => 'nullable',
+            'role_app' => 'nullable',
         ]);
 
         $user = User::find($user_id);
@@ -140,20 +143,27 @@ class UserController extends Controller
 
         // mantendo permissões de vinculo
         $permissions = $user->permissions->where('guard_name', 'senhaunica')->all();
-
         // adicionando permissoes de app se existirem
         if ($request->permission_app) {
             foreach ($request->permission_app as $pName) {
                 $permissions[] = Permission::where('guard_name', 'app')->where('name', $pName)->first();
             }
         }
-
         // adicionando permissão hierarquica
         $permissions[] = ($user->env)
         ? $user->permissions->where('guard_name', 'web')->first()
         : Permission::where('name', $request->level)->first();
 
         $user->syncPermissions($permissions);
+
+        // adicionando roles de app se existirem
+        $roles = [];
+        if ($request->role_app) {
+            foreach ($request->role_app as $pName) {
+                $roles[] = Role::where('guard_name', 'app')->where('name', $pName)->first();
+            }
+        }
+        $user->syncRoles($roles);
 
         return back();
     }

@@ -24,7 +24,7 @@ trait HasSenhaunica
     }
 
     /**
-     * Define se as permissões do usuário são gerenciadas pelo env
+     * Acessor: define se as permissões do usuário são gerenciadas pelo env
      *
      * true = gerenciado pelo env
      *
@@ -44,43 +44,6 @@ trait HasSenhaunica
         return false;
 
     }
-
-    /**
-     * Retorna os nomes das permissões, menos os do guard=web
-     *
-     * TODO: tem de melhorar aqui
-     */
-    public function categorias()
-    {
-        $permissions = $this->getAllPermissions();
-        $ret = '';
-        foreach ($permissions as $p) {
-            if ($p->guard_name == 'web') {
-                // $ret .= $p->name . ", ";
-            } else {
-                $ret .= $p->guard_name . '/' . $p->name . ", ";
-            }
-        }
-        return substr($ret, 0, -2);
-    }
-
-    /**
-     * Lista toda as permissoes formatadas em html
-     *
-     * Temporário até criar uma solução melhor
-     */
-    // public static function listarTodasPermissoes()
-    // {
-    //     $ret = '';
-    //     foreach (Permission::all() as $p) {
-    //         $ret .= $p->guard_name . '/' . $p->name . "<br>\n";
-    //     }
-    //     $gates = array_keys(Gate::abilities());
-    //     foreach ($gates as $g) {
-    //         $ret .= $g . "<br>\n";
-    //     }
-    //     return $ret;
-    // }
 
     /**
      * Verifica a existencia do arquivo json referente ao login da senhaunica
