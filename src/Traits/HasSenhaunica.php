@@ -134,34 +134,31 @@ trait HasSenhaunica
     public static function listarPermissoesVinculo($vinculos)
     {
         $permissions = [];
+
         foreach ($vinculos as $vinculo) {
-            // outra unidade está como outros por enquanto
-            if ($vinculo['codigoUnidade'] != config('replicado.codundclg')) {
-                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Outros')->first();
-                continue;
-            }
+            // vamos colocar o sufixo se for de outra unidade
+            $sufixo = ($vinculo['codigoUnidade'] == config('senhaunica.codigoUnidade')) ? '' : 'usp';
             //docente
             if ($vinculo['tipoFuncao'] == 'Docente') {
-                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Docente')->first();
+                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Docente' . $sufixo)->first();
                 continue;
             }
-            //servidor não docente
+            //servidor
             if ($vinculo['tipoVinculo'] == 'SERVIDOR' && $vinculo['tipoFuncao'] != 'Docente') {
-                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Servidor')->first();
+                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Servidor' . $sufixo)->first();
                 continue;
             }
-
-            //Alunopd
-            if ($vinculo['tipoVinculo'] == 'ALUNOPD') {
-                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Alunopd')->first();
+            //estagiario
+            if ($vinculo['tipoVinculo'] == 'ESTAGIARIORH') {
+                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Estagiario' . $sufixo)->first();
+                continue;
             }
-            //Alunogr
-            if ($vinculo['tipoVinculo'] == 'ALUNOGR') {
-                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Alunogr')->first();
-            }
-            //Alunopos
-            if ($vinculo['tipoVinculo'] == 'ALUNOPOS') {
-                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Alunopos')->first();
+            //Alunopd, Alunogr, Alunopos
+            $tipvins = ['ALUNOPD', 'ALUNOGR', 'ALUNOPOS'];
+            if (in_array($vinculo['tipoVinculo'], $tipvins)) {
+                $permissions[] = Permission::where('guard_name', 'senhaunica')
+                    ->where('name', ucfirst($vinculo['tipoVinculo']) . $sufixo)
+                    ->first();
             }
         }
 
@@ -218,15 +215,21 @@ trait HasSenhaunica
             // nem sempre o email está disponível
             $user->email = empty($email) ? 'semEmail_' . $codpes . '@usp.br' : $email;
             $user->save();
-        }
 
-        $vinculos = array_map(function ($vinculo) {
-            $vinculo['codigoUnidade'] = $vinculo['codundclg'];
-            $vinculo['tipoFuncao'] = $vinculo['tipvinext'];
-            $vinculo['tipoVinculo'] = $vinculo['tipvin'];
-            return $vinculo;
-        }, Pessoa::listarVinculosAtivos($user->codpes, false));
-        $user->syncPermissions(SELF::listarPermissoesVinculo($vinculos));
+            // atribuindo permissões de vinculo
+            $vinculos = array_map(function ($vinculo) {
+                $vinculo['codigoUnidade'] = $vinculo['codundclg'];
+                $vinculo['tipoFuncao'] = $vinculo['tipvinext'];
+                $vinculo['tipoVinculo'] = $vinculo['tipvin'];
+                return $vinculo;
+            }, Pessoa::listarVinculosAtivos($user->codpes, false));
+            $user->syncPermissions(SELF::listarPermissoesVinculo($vinculos));
+
+            // permissao hierarquica
+            $user->givePermissionTo(
+                Permission::where('guard_name', 'web')->where('name', 'user')->first()
+            );
+        }
 
         return $user;
     }

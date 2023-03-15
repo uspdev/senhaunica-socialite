@@ -64,5 +64,8 @@ return [
     'dev' => env('SENHAUNICA_DEV', 'no'),
     'callback_id' => env('SENHAUNICA_CALLBACK_ID'),
 
+    // codigo da unidade para identificar logins proprios
+    'codigoUnidade' => env('SENHAUNICA_CODIGO_UNIDADE'),
+
     // SENHAUNICA_KEY e SENHAUNICA_SECRET são carregados em services.php da biblioteca
 ];

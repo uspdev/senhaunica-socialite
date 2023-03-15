@@ -80,6 +80,9 @@ SENHAUNICA_CALLBACK_ID=85
 
 # Habilite para salvar o retorno em storage/app/debug/oauth/ (default=false)
 #SENHAUNICA_DEBUG=
+
+# Código da unidade para identificar os logins próprios ou de outras unidades
+SENHAUNICA_CODIGO_UNIDADE=
 ```
 
 ### Atualizando à partir da versão 2

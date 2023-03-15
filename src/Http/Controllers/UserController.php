@@ -92,11 +92,6 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['codpes' => $user])->withInput();
         }
 
-        $user->givePermissionTo(
-            Permission::where('guard_name', 'web')->where('name', 'user')->first()
-        );
-        // aqui precisa dar permissão correspondente aos vínculos ativos
-
         // vamos assumir identidade também?
         if ($request->loginas) {
             session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
