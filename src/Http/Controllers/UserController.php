@@ -68,6 +68,7 @@ class UserController extends Controller
             'users' => User::orderBy('name')->paginate(),
             'columns' => User::getColumns(),
             'permissoesAplicacao' => Permission::where('guard_name', 'app')->get(),
+            'permissoesHierarquica' => Permission::where('guard_name', 'web')->get(),
             'rolesAplicacao' => Role::where('guard_name', 'app')->get(),
         ]);
     }
@@ -83,7 +84,6 @@ class UserController extends Controller
 
         $request->validate([
             'codpes' => 'required|integer',
-            'level' => 'required|in:admin,gerente,user',
             'loginas' => ['nullable', Rule::in([1])],
         ]);
 
@@ -124,10 +124,8 @@ class UserController extends Controller
         $this->authorize('admin');
 
         $request->validate([
-            // permissoes hierarquicas
-            'level' => 'nullable|in:admin,gerente,user',
-            //permissoes da aplicacao
-            'permission_app' => 'nullable',
+            'level' => 'nullable|in:' . implode(',', User::$permissoesHierarquia), // permissoes hierarquicas
+            'permission_app' => 'nullable', //permissoes da aplicacao
             'role_app' => 'nullable',
         ]);
 

@@ -2,11 +2,18 @@
   class="btn py-0 senhaunicaUserPermissionBtn">
   @include('senhaunica::partials.permissoes-badge')
   @include('senhaunica::partials.permissoes-senhaunica-badge')
-  @foreach ($user->roles->where('guard_name', 'app') as $p)
-    role.{{ $p->name }} |
-  @endforeach
 
-  {{ $user->getAllPermissions()->where('guard_name', 'app')->implode('name', ', ') }}
+  @if ($user->roles->where('guard_name', 'app')->all())
+    <span class="badge badge-secondary" title="Funções (roles)">
+      F: {{ $user->roles->where('guard_name', 'app')->implode('name', ', ') }}
+    </span>
+  @endif
+
+  @if ($user->getAllPermissions()->where('guard_name', 'app')->all())
+    <span class="badge badge-info" title="Permissões">
+      P: {{ $user->getAllPermissions()->where('guard_name', 'app')->implode('name', ', ') }}
+    </span>
+  @endif
 </button>
 
 <div class="modal fade" id="senhaunica-users-permission-modal" tabindex="-1">
@@ -26,70 +33,19 @@
           @method('PUT')
           <div class="row">
             <div class="col-md-4">
-              <div class="font-weight-bold mb-2">
-                Permissões da aplicação<br>
-              </div>
-              <div class="permissao-app ml-2">
-                @forelse ($permissoesAplicacao as $p)
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input type="checkbox" class="form-check-input" name="permission_app[]"
-                        value="{{ $p->name }}">
-                      {{ $p->name }}
-                    </label>
-                  </div>
-                @empty
-                  Sem permissões disponíveis
-                @endforelse
-              </div>
+              @include('senhaunica::users.partials.permissoes-aplicacao')
             </div>
             <div class="col-md-4">
-              <div class="font-weight-bold mb-2">
-                Funções (roles) da aplicação<br>
-              </div>
-              <div class="role-app ml-2">
-                @forelse ($rolesAplicacao as $p)
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input type="checkbox" class="form-check-input" name="role_app[]" value="{{ $p->name }}">
-                      {{ $p->name }}
-                    </label>
-                  </div>
-                @empty
-                  Sem funções (roles) disponíveis
-                @endforelse
-              </div>
+              @include('senhaunica::users.partials.roles-aplicacao')
             </div>
             <div class="col-md-4">
-
               <div class="">
-                <div class="font-weight-bold mb-2">
-                  Permissões hierárquicas
-                </div>
-                <div class="ml-2 permissao-hierarquica">
-                  <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                    <label class="btn btn-outline-success">
-                      <input type="radio" name="level" value="user" autocomplete="off"> Usuário
-                    </label>
-                    <label class="btn btn-outline-success">
-                      <input type="radio" name="level" value="gerente" autocomplete="off"> Gerente
-                    </label>
-                    <label class="btn btn-outline-success">
-                      <input type="radio" name="level" value="admin" autocomplete="off"> Admin
-                    </label>
-                  </div>
-                </div>
+                @include('senhaunica::users.partials.permissoes-hierarquica')
               </div>
               <div class="">
-                <div class="font-weight-bold my-2">
-                  Permissões de vínculo
-                </div>
-                <div class="permissoes-vinculo ml-2">
-                  {{-- este conteúdo será substituído pelo JS --}}
-                </div>
+                @include('senhaunica::users.partials.permissoes-vinculo')
               </div>
             </div>
-
           </div>
           <div class="mt-3">
             <div class="float-right">
@@ -135,7 +91,6 @@
               if (user.env) {
                 senhaunicaUserPermission.find('.permissao-hierarquica').html(
                   '<span class="badge badge-danger">' + user.env + ' (env)</span>')
-
               } else {
                 senhaunicaUserPermission.find('.permissao-hierarquica').html(hierarquica)
                 senhaunicaUserPermission

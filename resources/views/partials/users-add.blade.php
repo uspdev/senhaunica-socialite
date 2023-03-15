@@ -1,4 +1,5 @@
-<button class="btn btn-sm btn-outline-primary senhaunicaUseraddBtn" @if (!hasReplicado()) disabled title="Necessário Replicado para adicionar usuários" @endif>
+<button class="btn btn-sm btn-outline-primary senhaunicaUseraddBtn"
+  @if (!hasReplicado()) disabled title="Necessário Replicado para adicionar usuários" @endif>
   <i class="fas fa-plus"></i> Adicionar/Assumir
 </button>
 
@@ -14,27 +15,13 @@
       <div class="modal-body">
 
         <div class="">
-          <form class="" method="POST" action="{{ route(config('senhaunica.userRoutes') . '.store') }}" data-ajax="{{ route('SenhaunicaFindUsers') }}">
+          <form class="" method="POST" action="{{ route(config('senhaunica.userRoutes') . '.store') }}"
+            data-ajax="{{ route('SenhaunicaFindUsers') }}">
             @csrf
-            <div class="row mb-3">
-              <div class="col-md-8">
-                <select name="codpes" class="form-control form-control-sm">
-                  <option>Digite o nome ou codpes..</option>
-                </select>
-              </div>
-              <div class="col-md-4">
-                <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-                  <label class="btn btn-outline-success active">
-                    <input type="radio" name="level" value="user" autocomplete="off" checked> Usuário
-                  </label>
-                  <label class="btn btn-outline-success">
-                    <input type="radio" name="level" value="gerente" autocomplete="off"> Gerente
-                  </label>
-                  <label class="btn btn-outline-success">
-                    <input type="radio" name="level" value="admin" autocomplete="off"> Admin
-                  </label>
-                </div>
-              </div>
+            <div class="mb-3">
+              <select name="codpes" class="form-control form-control-sm">
+                <option>Digite o nome ou codpes..</option>
+              </select>
             </div>
 
             <div>

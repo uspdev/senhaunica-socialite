@@ -72,7 +72,28 @@ trait HasSenhaunica
             return 'user';
         }
         return false;
+    }
 
+    /**
+     * Retorna a permissão hierárquica do usuário
+     */
+    public function getLevelAttribute()
+    {
+        return $this->permissions->where('guard_name', 'web')->pluck('name')->implode('');
+    }
+
+    /**
+     * Retorna a classe do badge da permissão hierárquica do usuário
+     */
+    public function getBadgeLevelAttribute()
+    {
+        switch ($this->permissions->where('guard_name', 'web')->pluck('name')->implode('')) {
+            case 'admin':return 'badge-danger';
+                break;
+            case 'user':return 'badge-success';
+                break;
+            default:return 'badge-warning';
+        }
     }
 
     /**
@@ -177,7 +198,6 @@ trait HasSenhaunica
         foreach (SELF::$permissoesHierarquia as $permission) {
             Permission::findOrCreate($permission, 'web');
         }
-        $permissions = array_merge(SELF::$permissoesHierarquia, );
         foreach (SELF::$permissoesVinculo as $permission) {
             Permission::findOrCreate($permission, 'senhaunica');
         }
@@ -186,7 +206,7 @@ trait HasSenhaunica
     /**
      * Cria e retorna usuário na base local ou no replicado
      *
-     * Se nbão conseguiu encontrar/criar o usuário retorna mensagem de erro correspondente.
+     * Se não conseguiu encontrar/criar o usuário retorna mensagem de erro correspondente.
      *
      * @param $codpes
      * @return User | String

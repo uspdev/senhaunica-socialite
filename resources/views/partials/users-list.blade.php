@@ -48,7 +48,7 @@
 
         @if (config('senhaunica.permission'))
           <td>
-            @include('senhaunica::partials.users-permission-modal')
+            @include('senhaunica::users.partials.permission-modal')
           </td>
         @endif
 
