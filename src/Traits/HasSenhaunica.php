@@ -15,7 +15,7 @@ trait HasSenhaunica
     // permissoes hierárquicas
     public static $permissoesHierarquia = [
         'admin',
-        'chief',
+        'boss',
         'manager',
         'gerente', // == manager, deprecar com o tempo (2/2023)
         'poweruser',
@@ -32,14 +32,14 @@ trait HasSenhaunica
         'Alunoceu',
         'Alunoead',
         'Alunopd',
-        'ServidorUsp',
-        'DocenteUsp',
-        'EstagiarioUsp',
-        'AlunogrUsp',
-        'AlunoposUsp',
-        'AlunoceuUsp',
-        'AlunoeadUsp',
-        'AlunopdUsp',
+        'Servidorusp',
+        'Docenteusp',
+        'Estagiariousp',
+        'Alunogrusp',
+        'Alunoposusp',
+        'Alunoceuusp',
+        'Alunoeadusp',
+        'Alunopdusp',
         'Outros',
     ];
 
