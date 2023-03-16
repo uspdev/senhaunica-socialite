@@ -93,16 +93,18 @@ trait HasSenhaunica
      *
      * Vermelho para admin, verde para user e amarelo para os demais
      *
+     * @param String $level
      * @return String
      */
-    public function getBadgeLevelAttribute()
+    public function labelLevel($level = null)
     {
-        switch ($this->permissions->where('guard_name', 'web')->pluck('name')->implode('')) {
-            case 'admin':return 'badge-danger';
+        $level = $level ?: $this->permissions->where('guard_name', 'web')->pluck('name')->implode('');
+        switch ($level) {
+            case 'admin':return 'danger';
                 break;
-            case 'user':return 'badge-success';
+            case 'user':return 'success';
                 break;
-            default:return 'badge-warning';
+            default:return 'warning';
         }
     }
 
