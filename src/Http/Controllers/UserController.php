@@ -67,8 +67,7 @@ class UserController extends Controller
         return view('senhaunica::users', [
             'users' => User::orderBy('name')->paginate(),
             'columns' => User::getColumns(),
-            'permissoesAplicacao' => Permission::where('guard_name', 'app')->get(),
-            'permissoesHierarquica' => Permission::where('guard_name', 'web')->get(),
+            'permissoesAplicacao' => Permission::where('guard_name', 'app')->orderBy('name')->get(),
             'rolesAplicacao' => Role::where('guard_name', 'app')->get(),
         ]);
     }

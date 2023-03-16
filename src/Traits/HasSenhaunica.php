@@ -76,14 +76,24 @@ trait HasSenhaunica
 
     /**
      * Retorna a permissão hierárquica do usuário
+     *
+     * Deveria retornar apenas 1 nome de permission
+     * mas pode retornar mais por registro repetido erroneamente
+     * Ao alterar o level ele corrige essa condição
+     *
+     * @return String
      */
     public function getLevelAttribute()
     {
-        return $this->permissions->where('guard_name', 'web')->pluck('name')->implode('');
+        return $this->permissions->where('guard_name', 'web')->pluck('name')->implode(',');
     }
 
     /**
      * Retorna a classe do badge da permissão hierárquica do usuário
+     *
+     * Vermelho para admin, verde para user e amarelo para os demais
+     *
+     * @return String
      */
     public function getBadgeLevelAttribute()
     {
