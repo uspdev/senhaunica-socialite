@@ -146,7 +146,7 @@ trait HasSenhaunica
         ? []
         : $this->permissions->where('guard_name', 'web')->all();
 
-        $permissions[] = Permission::where('name', $this->env ?? 'user')->first();
+        $permissions[] = Permission::where('name', $this->env ?: 'user')->first();
 
         return $permissions;
     }
