@@ -186,8 +186,8 @@ trait HasSenhaunica
                 $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Estagiario' . $sufixo)->first();
                 continue;
             }
-            //Alunopd, Alunogr, Alunopos
-            $tipvins = ['ALUNOPD', 'ALUNOGR', 'ALUNOPOS'];
+            //Alunopd, Alunogr, Alunopos, Alunoceu, Alunoead
+            $tipvins = ['ALUNOPD', 'ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD'];
             if (in_array($vinculo['tipoVinculo'], $tipvins)) {
                 $permissions[] = Permission::where('guard_name', 'senhaunica')
                     ->where('name', ucfirst($vinculo['tipoVinculo']) . $sufixo)
