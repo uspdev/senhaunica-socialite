@@ -17,6 +17,7 @@ return [
     // Para views internas da biblioteca (users)
 
     // template a ser estendido. Deve possuir a section "content"
+    // usualmente a aplicação possui layouts.app. Se não possui considere criar.
     'template' => 'laravel-usp-theme::master',
 
     // define as rotas para o gerenciador de usuários interno, dentro de prefix
@@ -47,24 +48,29 @@ return [
 
     // se true, revoga as permissões do usuario se não estiver no env.
     // quer dizer que as permissões serão gerenciadas todas a partir do env da aplicação.
+    // relevante se permission=true
     'dropPermissions' => env('SENHAUNICA_DROP_PERMISSIONS', false),
 
     // cadastre os admins separados por virgula
+    // relevante se permission=true
     'admins' => array_map('trim', explode(',', env('SENHAUNICA_ADMINS', ''))),
 
     // cadastre os gerentes separados por virgula
+    // relevante se permission=true
     'gerentes' => array_map('trim', explode(',', env('SENHAUNICA_GERENTES', ''))),
 
     // se quiser cadastre os usuários comuns autorizados. Relevante se onlyLocalUsers = true
+    // relevante se permission=true
     'users' => array_map('trim', explode(',', env('SENHAUNICA_USERS', ''))),
 
     // se true, ele grava no filesystem o retorno json do servidor oauth
-    'debug' => (bool) env('SENHAUNICA_DEBUG', false),
+    'debug' => (bool) env('SENHAUNICA_DEBUG', true),
 
     'dev' => env('SENHAUNICA_DEV', 'no'),
     'callback_id' => env('SENHAUNICA_CALLBACK_ID'),
 
     // codigo da unidade para identificar logins proprios
+    // relevante se permission=true
     'codigoUnidade' => env('SENHAUNICA_CODIGO_UNIDADE'),
 
     // SENHAUNICA_KEY e SENHAUNICA_SECRET são carregados em services.php da biblioteca
