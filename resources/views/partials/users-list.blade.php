@@ -21,58 +21,52 @@
       @endforeach
 
       @if (config('senhaunica.permission'))
-        <th>Permissões</th>
+        <th colspan="4">Permissões (Hierárquico | Vínculo | Função | Aplicação)</th>
       @endif
 
       @if (config('senhaunica.customUserField.view'))
         <th style="width: {{ config('senhaunica.customUserField.width') }}">
-          {{ config('senhaunica.customUserField.label') }}</th>
+          {{ config('senhaunica.customUserField.label') }}
+        </th>
       @endif
+
       @if (config('senhaunica.destroyUser'))
         <th class="px-1">Remover</th>
       @endif
+
       <th class="px-1">Json</th>
       <th class="px-1">
         <span class="d-xs-inline d-sm-none">Assumir identidade</span> {{-- aparecerá somente em mobile --}}
         <span class="d-none d-sm-inline">Ident.</span> {{-- aparecerá nas demais telas --}}
       </th>
-
     </tr>
   </thead>
   <tbody>
-    @forelse ($users as $user)
+    @foreach ($users as $user)
       <tr class="data-row">
         @foreach ($columns as $column)
           <td>{{ $user->{$column['key']} }}</td>
         @endforeach
 
         @if (config('senhaunica.permission'))
-          <td>
-            @include('senhaunica::users.partials.permission-modal')
-          </td>
+          <td>@include('senhaunica::partials.permissoes-badge')</td>
+          <td>@include('senhaunica::users.partials.permissoes-vinculo-btn')</td>
+          <td>@include('senhaunica::users.partials.permissoes-funcao-btn')</td>
+          <td>@include('senhaunica::users.partials.permissoes-aplicacao-btn')</td>
         @endif
 
         @if (config('senhaunica.customUserField.view'))
-          <td class="">@include(config('senhaunica.customUserField.view'))</td>
+          <td>@include(config('senhaunica.customUserField.view'))</td>
         @endif
-        @if (config('senhaunica.destroyUser'))
-          <td class="col-button">
-            @include('senhaunica::partials.destroy-user-btn')
-          </td>
-        @endif
-        <td class="col-button">
-          @include('senhaunica::partials.show-json-btn')
-        </td>
-        <td class="col-button">
-          @include('senhaunica::partials.assumir-identidade-btn')
-        </td>
 
+        @if (config('senhaunica.destroyUser'))
+          <td class="col-button">@include('senhaunica::partials.destroy-user-btn')</td>
+        @endif
+
+        <td class="col-button">@include('senhaunica::partials.show-json-btn')</td>
+        <td class="col-button">@include('senhaunica::partials.assumir-identidade-btn')</td>
       </tr>
-    @empty
-      <tr class="data-row">
-        <td colspan="7" class="text-center">Nenhum registro encontrado</td>
-      </tr>
-    @endforelse
+    @endforeach
   </tbody>
 </table>
 @if (isset($search))
@@ -81,6 +75,7 @@
   {{ $users->links() }}
 @endif
 
+@include('senhaunica::users.partials.permissoes-modal')
 
 @section('javascripts_bottom')
   @parent

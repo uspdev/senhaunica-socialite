@@ -23,6 +23,7 @@ trait HasSenhaunica
     ];
 
     // permissões por vínculo
+    // veja o método listarPermissoesVinculo() para alterar
     public static $permissoesVinculo = [
         'Servidor',
         'Docente',
@@ -139,6 +140,8 @@ trait HasSenhaunica
 
     /**
      * Lista as permissões hierarquicas
+     *
+     * A logica aqui está confusa. Precisa melhorar
      */
     public function listarPermissoesHierarquicas()
     {
