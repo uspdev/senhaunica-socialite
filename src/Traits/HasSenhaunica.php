@@ -12,18 +12,36 @@ use Uspdev\Replicado\Pessoa;
  */
 trait HasSenhaunica
 {
-    // permissoes hierárquicas
+
+    /** nome do guard de app.
+     * Na verdade devemos usar o guard padrão que é web
+     * dessa forma os gates devem funcionar automaticamente
+     * @var String
+     */
+    public static $appNs = 'web';
+
+    /**
+     * Nome do guard a ser utilizado nas permissões hierárquicas e de vínculo
+     */
+    public static $hierarquiaNs = 'senhaunica';
+    public static $vinculoNs = 'senhaunica';
+
+    /**
+     * Todas as permissoes hierárquicas, do maior para o menor
+     */
     public static $permissoesHierarquia = [
         'admin',
         'boss',
         'manager',
-        'gerente', // == manager, deprecar com o tempo (2/2023)
+        // 'gerente', // == manager, removido (2/2023)
         'poweruser',
         'user',
     ];
 
-    // permissões por vínculo
-    // veja o método listarPermissoesVinculo() para alterar
+    /**
+     * Todas as permissoes de vínculo
+     * veja o método listarPermissoesVinculo() para alterar
+     */
     public static $permissoesVinculo = [
         'Servidor',
         'Docente',
@@ -86,12 +104,16 @@ trait HasSenhaunica
      */
     public function getLevelAttribute()
     {
-        return $this->permissions->where('guard_name', 'web')->pluck('name')->implode(',');
+        return $this->permissions
+            ->where('guard_name', self::$hierarquiaNs)
+            ->whereIn('name', self::$permissoesHierarquia)
+            ->pluck('name')->implode(',');
     }
 
     /**
      * Retorna a classe do badge da permissão hierárquica do usuário
      *
+     * Ou retorna a classe do badge do $level informado
      * Vermelho para admin, verde para user e amarelo para os demais
      *
      * @param String $level
@@ -99,13 +121,19 @@ trait HasSenhaunica
      */
     public function labelLevel($level = null)
     {
-        $level = $level ?: $this->permissions->where('guard_name', 'web')->pluck('name')->implode('');
+        $level = $level ?: $this->permissions->where('guard_name', Self::$hierarquiaNs)
+            ->whereIn('name', Self::$permissoesHierarquia)
+            ->pluck('name')->implode('');
+
         switch ($level) {
-            case 'admin':return 'danger';
+            case 'admin':
+                return 'danger';
                 break;
-            case 'user':return 'success';
+            case 'user':
+                return 'success';
                 break;
-            default:return 'warning';
+            default:
+                return 'warning';
         }
     }
 
@@ -123,6 +151,8 @@ trait HasSenhaunica
 
     /**
      * Seta as permissões para o usuário (permission = true) a partir do oauth
+     *
+     * @param Array $userSenhaUnica Usuário retornado do oauth
      */
     public function aplicarPermissoes($userSenhaUnica)
     {
@@ -147,7 +177,7 @@ trait HasSenhaunica
     {
         $permissions = (config('senhaunica.dropPermissions'))
         ? []
-        : $this->permissions->where('guard_name', 'web')->all();
+        : $this->permissions->where('guard_name', User::$hierarquiaNs)->all();
 
         // se estiver no env vai sobrescrever a existente
         if ($this->env) {
@@ -155,6 +185,7 @@ trait HasSenhaunica
             $permissions[] = Permission::where('name', $this->env)->first();
         }
 
+        // se não tiver nada, vamos retornar a permissão user
         $permissions[] = $permissions ?: Permission::where('name', 'user')->first();
 
         return $permissions;
@@ -165,7 +196,7 @@ trait HasSenhaunica
      */
     public function listarPermissoesApp()
     {
-        return $this->permissions->where('guard_name', 'app')->all();
+        return $this->permissions->where('guard_name', User::$appNs)->all();
     }
 
     /**
@@ -182,30 +213,34 @@ trait HasSenhaunica
             $sufixo = ($vinculo['codigoUnidade'] == config('senhaunica.codigoUnidade')) ? '' : 'usp';
             //docente
             if ($vinculo['tipoFuncao'] == 'Docente') {
-                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Docente' . $sufixo)->first();
+                $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                    ->where('name', 'Docente' . $sufixo)->first();
                 continue;
             }
             //servidor
             if ($vinculo['tipoVinculo'] == 'SERVIDOR' && $vinculo['tipoFuncao'] != 'Docente') {
-                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Servidor' . $sufixo)->first();
+                $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                    ->where('name', 'Servidor' . $sufixo)->first();
                 continue;
             }
             //estagiario
             if ($vinculo['tipoVinculo'] == 'ESTAGIARIORH') {
-                $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Estagiario' . $sufixo)->first();
+                $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                    ->where('name', 'Estagiario' . $sufixo)->first();
                 continue;
             }
             //Alunopd, Alunogr, Alunopos, Alunoceu, Alunoead
             $tipvins = ['ALUNOPD', 'ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD'];
             if (in_array($vinculo['tipoVinculo'], $tipvins)) {
-                $permissions[] = Permission::where('guard_name', 'senhaunica')
+                $permissions[] = Permission::where('guard_name', self::$vinculoNs)
                     ->where('name', ucfirst($vinculo['tipoVinculo']) . $sufixo)
                     ->first();
             }
         }
 
         if (empty($permissions)) {
-            $permissions[] = Permission::where('guard_name', 'senhaunica')->where('name', 'Outros')->first();
+            $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                ->where('name', 'Outros')->first();
         }
 
         return $permissions;
@@ -217,10 +252,10 @@ trait HasSenhaunica
     public function criarPermissoesPadrao()
     {
         foreach (SELF::$permissoesHierarquia as $permission) {
-            Permission::findOrCreate($permission, 'web');
+            Permission::findOrCreate($permission, self::$hierarquiaNs);
         }
         foreach (SELF::$permissoesVinculo as $permission) {
-            Permission::findOrCreate($permission, 'senhaunica');
+            Permission::findOrCreate($permission, self::$vinculoNs);
         }
     }
 
@@ -268,7 +303,7 @@ trait HasSenhaunica
 
             // permissao hierarquica
             $user->givePermissionTo(
-                Permission::where('guard_name', 'web')->where('name', 'user')->first()
+                Permission::where('guard_name', User::$hierarquiaNs)->where('name', 'user')->first()
             );
         }
 

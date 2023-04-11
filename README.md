@@ -25,7 +25,7 @@ php-curl
 ### Histórico
 
 #### 3/2023: versão 4.4
-* gerenciamento de permissões da aplicação no namespace (guard) `app`
+* gerenciamento de permissões da aplicação no guard `web` (padrão)
 * mudando padrão do debug para `true`.
 * criação de permissões de vínculo dos usuários no namespace `senhaunica`
 * (https://youtu.be/1NMLnMuJP1c)

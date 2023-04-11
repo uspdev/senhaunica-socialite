@@ -67,8 +67,8 @@ class UserController extends Controller
         return view('senhaunica::users', [
             'users' => User::orderBy('name')->paginate(),
             'columns' => User::getColumns(),
-            'permissoesAplicacao' => Permission::where('guard_name', 'app')->orderBy('name')->get(),
-            'rolesAplicacao' => Role::where('guard_name', 'app')->get(),
+            'permissoesAplicacao' => Permission::where('guard_name', User::$appNs)->orderBy('name')->get(),
+            'rolesAplicacao' => Role::where('guard_name', User::$appNs)->get(),
         ]);
     }
 
@@ -112,6 +112,10 @@ class UserController extends Controller
         $this->authorize('admin');
 
         $user = User::with('permissions', 'roles')->find($id);
+        $user->permissoesHierarquia = User::$permissoesHierarquia;
+        $user->permissoesVinculo = User::$permissoesVinculo;
+        $user->vinculoNs = User::$vinculoNs;
+        $user->hierarquiaNs = User::$hierarquiaNs;
         return $user->append('env');
     }
 
@@ -134,16 +138,20 @@ class UserController extends Controller
         }
 
         // mantendo permissões de vinculo
-        $permissions = $user->permissions->where('guard_name', 'senhaunica')->all();
+        $permissions = $user->permissions->where('guard_name', User::$vinculoNs)
+            ->whereIn('name', User::$permissoesVinculo)
+            ->all();
+
         // adicionando permissoes de app se existirem
         if ($request->permission_app) {
             foreach ($request->permission_app as $pName) {
-                $permissions[] = Permission::where('guard_name', 'app')->where('name', $pName)->first();
+                $permissions[] = Permission::where('guard_name', User::$appNs)->where('name', $pName)->first();
             }
         }
+
         // adicionando permissão hierarquica
         $permissions[] = ($user->env)
-        ? $user->permissions->where('guard_name', 'web')->first()
+        ? $user->permissions->where('guard_name', User::$hierarquiaNs)->first()
         : Permission::where('name', $request->level)->first();
 
         $user->syncPermissions($permissions);
@@ -152,7 +160,8 @@ class UserController extends Controller
         $roles = [];
         if ($request->role_app) {
             foreach ($request->role_app as $pName) {
-                $roles[] = Role::where('guard_name', 'app')->where('name', $pName)->first();
+                $roles[] = Role::where('guard_name', User::$appNs)
+                    ->where('name', $pName)->first();
             }
         }
         $user->syncRoles($roles);

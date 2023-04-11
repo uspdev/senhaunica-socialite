@@ -72,12 +72,12 @@
 
             user.permissions.forEach(function(permission) {
               // formatando string com permissões de vinculo
-              if (permission.guard_name == 'senhaunica') {
+              if (permission.guard_name == user.vinculoNs && user.permissoesVinculo.includes(permission.name) ) {
                 userPermissionString += permission.name + ', '
               }
 
               // permissoes hierarquicas
-              if (permission.guard_name == 'web') {
+              if (user.permissoesHierarquia.includes(permission.name) && permission.guard_name == '{{ App\Models\User::$hierarquiaNs }}') {
                 if (user.env) {
                   senhaunicaUserPermission.find('.permissao-hierarquica').html(
                     '<span class="badge badge-danger">' + user.env + ' (env)</span>')
@@ -90,7 +90,7 @@
               //tem de ajustar aqui para pegar o mais alto
 
               // permissoes do app: ticando o checkbox
-              if (permission.guard_name == 'app') {
+              if (permission.guard_name == '{{ App\Models\User::$appNs }}') {
                 senhaunicaUserPermission
                   .find('.permissao-app input[value="' + permission.name + '"]').attr('checked', true)
               }
@@ -98,7 +98,7 @@
 
             user.roles.forEach(function(role) {
               // roles do app: ticando o checkbox
-              if (role.guard_name == 'app') {
+              if (role.guard_name == '{{ App\Models\User::$appNs }}') {
                 senhaunicaUserPermission
                   .find('.role-app input[value="' + role.name + '"]').attr('checked', true)
               }
