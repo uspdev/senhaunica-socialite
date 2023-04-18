@@ -99,7 +99,7 @@ SENHAUNICA_CALLBACK_ID=85
 #SENHAUNICA_DROP_PERMISSIONS=
 
 # Código da unidade para identificar os logins próprios ou de outras unidades
-SENHAUNICA_CODIGO_UNIDADE=${REPLICADO_CODUNDCLG}
+SENHAUNICA_CODIGO_UNIDADE=
 
 ```
 
