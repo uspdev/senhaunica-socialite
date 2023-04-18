@@ -23,7 +23,7 @@
                   @include('senhaunica::users.partials.permissoes-modal-aplicacao')
                 </div>
                 <div class="col-md-4">
-                  @include('senhaunica::users.partials.permissoes-roles')
+                  @include('senhaunica::users.partials.permissoes-modal-roles')
                 </div>
                 <div class="col-md-4">
                   <div class="">
