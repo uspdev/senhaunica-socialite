@@ -46,31 +46,42 @@ public function boot()
     $role = Role::firstOrCreate(['name' => 'diretoria']);
     $role->givePermissionTo(['academica', 'financeira', 'administrativa']);
 }
-
 ```
 
-Em `App\Providers\AuthServiceProvider`, crie os gates a serem utilizados na aplicação. Não é necessário criar gates para as Funções (roles).
+Outra forma de criar as permissões é utilizando uma migration para esse fim. Como a função `boot()` é executado em cada requisição, isso pode deixar o sistema um pouco mais lento daí a opção de usar a migration, que cria e garante que as permissões existam no BD.
+
+Para criar uma migration use:
+
+    php artisan make:migration seed_permission_table
+
+No método `up()` do arquivo criado coloque as suas permissions:
 
 ```php
-public function boot()
+
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+...
+
+public function up()
 {
-    Gate::define('graduacao', function ($user) {
-        return $user->hasPermissionTo('graduacao', 'app');
-    });
-    Gate::define('posgraduacao', function ($user) {
-        return $user->hasPermissionTo('posgraduacao', 'app');
-    });
-    Gate::define('academica', function ($user) {
-        return $user->hasPermissionTo('academica', 'app');
-    });
-    Gate::define('financeira', function ($user) {
-        return $user->hasPermissionTo('financeira', 'app');
-    });
-    Gate::define('administrativa', function ($user) {
-        return $user->hasPermissionTo('administrativa', 'app');
-    });
+    // criando algumas permissões a serem utilizadas pela aplicação
+    Permission::firstOrCreate(['name' => 'grad']);
+    Permission::firstOrCreate(['name' => 'posgrad']);
+    Permission::firstOrCreate(['name' => 'academica']);
+    Permission::firstOrCreate(['name' => 'financeira']);
+    Permission::firstOrCreate(['name' => 'administrativa']);
+
+    // criando role e tribuindo permissões a ela
+    $role = Role::firstOrCreate(['name' => 'diretoria']);
+    $role->givePermissionTo(['academica', 'financeira', 'administrativa']);
 }
 ```
+
+E finalmente aplique a migration
+
+    php artisan migrate
+
+Os gates serão criados automaticamente pela biblioteca `spatie/laravel-permission`.
 
 Utilize os gates na sua aplicação, como qualquer outro gate ou via permission:
 
