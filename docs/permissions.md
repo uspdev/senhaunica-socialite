@@ -89,7 +89,7 @@ Utilize os gates na sua aplicação, como qualquer outro gate ou via permission:
 @can('graduacao')
   ...
 @endcan
-@if( Auth::user() && Auth::user()->hasPermissionTo('graduacao')
+@if(Auth::user() && Auth::user()->hasPermissionTo('graduacao'))
   ...
 @endif
 ```
