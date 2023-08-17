@@ -33,31 +33,33 @@ class SenhaunicaController extends Controller
     {
         $userSenhaUnica = \Socialite::driver('senhaunica')->user();
 
+        // Vamos retornar uma tela amigável caso não tenha sido configurado a trait
+        if ($this->missingTrait()) {
+            return view('senhaunica::unavailable');
+        }
+
         // se onlyLocalUsers = true, não vamos permitir usuários não cadastrados de logar
         if (config('senhaunica.onlyLocalUsers')) {
-            $user = User::newLocalUser($userSenhaUnica->codpes);
-            if (!$user) {
+            if (!User::verificaUsuarioLocal($userSenhaUnica->codpes)) {
                 session()->invalidate();
                 session()->regenerateToken();
                 return redirect('/login?msg=noLocalUser');
             }
-        } else {
-            $user = User::firstOrNew(['codpes' => $userSenhaUnica->codpes]);
         }
 
+        $user = User::firstOrNew(['codpes' => $userSenhaUnica->codpes]);
         // bind dos dados retornados
         $user->codpes = $userSenhaUnica->codpes;
         $user->email = $userSenhaUnica->email ?? $userSenhaUnica->emailUsp ?? $userSenhaUnica->emailAlternativo ?? 'invalido' . $user->codpes . '@usp.br';
         $user->name = $userSenhaUnica->nompes;
         $user->save();
 
-        // Vamos retornar uma tela amigável caso não tenha sido configurado a trait
-        if ($this->missingTrait()) {
-            return view('senhaunica::unavailable');
-        }
-
-        $user->setDefaultPermission();
         \Auth::login($user, true);
+        //TODO: devemos gerar um log dos logins/logouts
+
+        if (config('senhaunica.permission')) {
+            $user->aplicarPermissoes($userSenhaUnica);
+        }
 
         $redirect = $request->session()->pull(config('senhaunica.session_key') . '.redirect', '/')[0];
         if (strpos($redirect, 'login') !== false) {

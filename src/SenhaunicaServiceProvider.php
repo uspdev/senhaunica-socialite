@@ -12,6 +12,7 @@ class SenhaunicaServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/services.php', 'services');
+        $this->mergeConfigFromReversed(__DIR__ . '/../config/auth.guards.php', 'auth.guards');
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'senhaunica');
 
         // registra eventos
@@ -20,6 +21,20 @@ class SenhaunicaServiceProvider extends ServiceProvider
         // registra gates
         if (config('senhaunica.permission')) {
             $this->app->register(AuthServiceProvider::class);
+        }
+    }
+
+    /**
+     * Copiado de Illuminate\Support\ServiceProvider mas alterando a ordem do array
+     */
+    public function mergeConfigFromReversed($path, $key)
+    {
+        if (!($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
+            $config = $this->app->make('config');
+
+            $config->set($key, array_merge(
+                $config->get($key, []), require $path
+            ));
         }
     }
 

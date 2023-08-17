@@ -13,6 +13,55 @@ use Uspdev\Replicado\Pessoa;
 trait HasSenhaunica
 {
 
+    /** nome do guard de app.
+     * Na verdade devemos usar o guard padrão que é web
+     * dessa forma os gates devem funcionar automaticamente
+     * @var String
+     */
+    public static $appNs = 'web';
+
+    /**
+     * Nome do guard a ser utilizado nas permissões hierárquicas e de vínculo
+     */
+    public static $hierarquiaNs = 'senhaunica';
+    public static $vinculoNs = 'senhaunica';
+
+    /**
+     * Todas as permissoes hierárquicas, do maior para o menor
+     */
+    public static $permissoesHierarquia = [
+        'admin',
+        'boss',
+        'manager',
+        // 'gerente', // == manager, removido (2/2023)
+        'poweruser',
+        'user',
+    ];
+
+    /**
+     * Todas as permissoes de vínculo
+     * veja o método listarPermissoesVinculo() para alterar
+     */
+    public static $permissoesVinculo = [
+        'Servidor',
+        'Docente',
+        'Estagiario',
+        'Alunogr',
+        'Alunopos',
+        'Alunoceu',
+        'Alunoead',
+        'Alunopd',
+        'Servidorusp',
+        'Docenteusp',
+        'Estagiariousp',
+        'Alunogrusp',
+        'Alunoposusp',
+        'Alunoceuusp',
+        'Alunoeadusp',
+        'Alunopdusp',
+        'Outros',
+    ];
+
     # utilizado para a listagem de usuários e na busca
     public static function getColumns()
     {
@@ -24,27 +73,68 @@ trait HasSenhaunica
     }
 
     /**
-     * Retorna as permissões para menu do gerenciamento de usuários
+     * Acessor: mostra se as permissões do usuário são gerenciadas pelo env
+     *
+     * true = gerenciado pelo env
+     *
+     * @return Bool|String
      */
-    public function getPermissionsToChange()
+    public function getEnvAttribute()
     {
-        $noAdmin = config('senhaunica.dropPermissions') || $this->hasPermissionTo('admin') ? 'disabled' : '';
-        $noGerente = config('senhaunica.dropPermissions') || $this->hasPermissionTo('gerente') ? 'disabled' : '';
-        $noUser = !$this->hasAnyPermission(['admin', 'gerente']) ? 'disabled' : '';
-
-        return [
-            ['value' => 'admin', 'text' => 'Admin', 'disabled' => $noAdmin],
-            ['value' => 'gerente', 'text' => 'Gerente', 'disabled' => $noGerente],
-            ['value' => 'user', 'text' => 'Usuário', 'disabled' => $noUser],
-        ];
+        if (in_array($this->codpes, config('senhaunica.admins'))) {
+            return 'admin';
+        }
+        if (in_array($this->codpes, config('senhaunica.gerentes'))) {
+            return 'gerente';
+        }
+        if (in_array($this->codpes, config('senhaunica.users'))) {
+            return 'user';
+        }
+        return false;
     }
 
     /**
-     * Verifica se o usuário consta de admins ou gerentes do env
+     * Retorna a permissão hierárquica do usuário
+     *
+     * Deveria retornar apenas 1 nome de permission
+     * mas pode retornar mais por registro repetido erroneamente
+     * Ao alterar o level ele corrige essa condição
+     *
+     * @return String
      */
-    public function isManagedByEnv()
+    public function getLevelAttribute()
     {
-        return (in_array($this->codpes, config('senhaunica.admins')) || in_array($this->codpes, config('senhaunica.gerentes')));
+        return $this->permissions
+            ->where('guard_name', self::$hierarquiaNs)
+            ->whereIn('name', self::$permissoesHierarquia)
+            ->pluck('name')->implode(',');
+    }
+
+    /**
+     * Retorna a classe do badge da permissão hierárquica do usuário
+     *
+     * Ou retorna a classe do badge do $level informado
+     * Vermelho para admin, verde para user e amarelo para os demais
+     *
+     * @param String $level
+     * @return String
+     */
+    public function labelLevel($level = null)
+    {
+        $level = $level ?: $this->permissions->where('guard_name', Self::$hierarquiaNs)
+            ->whereIn('name', Self::$permissoesHierarquia)
+            ->pluck('name')->implode('');
+
+        switch ($level) {
+            case 'admin':
+                return 'danger';
+                break;
+            case 'user':
+                return 'success';
+                break;
+            default:
+                return 'warning';
+        }
     }
 
     /**
@@ -60,45 +150,119 @@ trait HasSenhaunica
     }
 
     /**
-     * Seta as permissões para o usuário (permission = true)
+     * Seta as permissões para o usuário (permission = true) a partir do oauth
+     *
+     * @param Array $userSenhaUnica Usuário retornado do oauth
      */
-    public function setDefaultPermission()
+    public function aplicarPermissoes($userSenhaUnica)
     {
-        if (config('senhaunica.permission')) {
-            // garantindo que as permissions existam
-            $permissions = ['admin', 'gerente', 'user'];
-            foreach ($permissions as $permission) {
-                Permission::findOrCreate($permission);
-            }
+        $this->criarPermissoesPadrao();
 
-            // vamos verificar no config se o usuário é admin
-            if (in_array($this->codpes, config('senhaunica.admins'))) {
-                $this->givePermissionTo('admin');
-            } else {
-                // vamos revogar o acesso se dropPermissions
-                if (config('senhaunica.dropPermissions')) {
-                    $this->revokePermissionTo('admin');
-                }
-            }
+        $permissions = array_merge(
+            $this->listarPermissoesHierarquicas(),
+            $this->listarPermissoesApp(),
+            $this->listarPermissoesVinculo($userSenhaUnica->vinculo)
+        );
 
-            // vamos verificar no config se o usuário é gerente
-            if (in_array($this->codpes, config('senhaunica.gerentes'))) {
-                $this->givePermissionTo('gerente');
-            } else {
-                if (config('senhaunica.dropPermissions')) {
-                    $this->revokePermissionTo('gerente');
-                }
-            }
+        // o sync revoga as permissions não listadas
+        $this->syncPermissions($permissions);
+    }
 
-            // default
-            $this->givePermissionTo('user');
+    /**
+     * Lista as permissões hierarquicas
+     *
+     * A logica aqui está confusa. Precisa melhorar
+     */
+    public function listarPermissoesHierarquicas()
+    {
+        $permissions = (config('senhaunica.dropPermissions'))
+        ? []
+        : $this->permissions->where('guard_name', User::$hierarquiaNs)->all();
+
+        // se estiver no env vai sobrescrever a existente
+        if ($this->env) {
+            $permissions = [];
+            $permissions[] = Permission::where('name', $this->env)->first();
+        }
+
+        // se não tiver nada, vamos retornar a permissão user
+        $permissions[] = $permissions ?: Permission::where('name', 'user')->first();
+
+        return $permissions;
+    }
+
+    /**
+     * Lista as permissões de app
+     */
+    public function listarPermissoesApp()
+    {
+        return $this->permissions->where('guard_name', User::$appNs)->all();
+    }
+
+    /**
+     * Lista as permissões referentes aos vínculos da pessoa, extraido do oauth
+     *
+     * @param Array $vinculos
+     */
+    public static function listarPermissoesVinculo($vinculos)
+    {
+        $permissions = [];
+
+        foreach ($vinculos as $vinculo) {
+            // vamos colocar o sufixo se for de outra unidade
+            $sufixo = ($vinculo['codigoUnidade'] == config('senhaunica.codigoUnidade')) ? '' : 'usp';
+            //docente
+            if ($vinculo['tipoFuncao'] == 'Docente') {
+                $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                    ->where('name', 'Docente' . $sufixo)->first();
+                continue;
+            }
+            //servidor
+            if ($vinculo['tipoVinculo'] == 'SERVIDOR' && $vinculo['tipoFuncao'] != 'Docente') {
+                $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                    ->where('name', 'Servidor' . $sufixo)->first();
+                continue;
+            }
+            //estagiario
+            if ($vinculo['tipoVinculo'] == 'ESTAGIARIORH') {
+                $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                    ->where('name', 'Estagiario' . $sufixo)->first();
+                continue;
+            }
+            //Alunopd, Alunogr, Alunopos, Alunoceu, Alunoead
+            $tipvins = ['ALUNOPD', 'ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD'];
+            if (in_array($vinculo['tipoVinculo'], $tipvins)) {
+                $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                    ->where('name', ucfirst($vinculo['tipoVinculo']) . $sufixo)
+                    ->first();
+            }
+        }
+
+        if (empty($permissions)) {
+            $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                ->where('name', 'Outros')->first();
+        }
+
+        return $permissions;
+    }
+
+    /**
+     * Garante que as permissões existam
+     */
+    public function criarPermissoesPadrao()
+    {
+        foreach (SELF::$permissoesHierarquia as $permission) {
+            Permission::findOrCreate($permission, self::$hierarquiaNs);
+        }
+        foreach (SELF::$permissoesVinculo as $permission) {
+            Permission::findOrCreate($permission, self::$vinculoNs);
         }
     }
 
     /**
      * Cria e retorna usuário na base local ou no replicado
      *
-     * Se nbão conseguiu encontrar/criar o usuário retorna mensagem de erro correspondente.
+     * Se não conseguiu encontrar/criar o usuário retorna mensagem de erro correspondente.
      *
      * @param $codpes
      * @return User | String
@@ -127,33 +291,38 @@ trait HasSenhaunica
             // nem sempre o email está disponível
             $user->email = empty($email) ? 'semEmail_' . $codpes . '@usp.br' : $email;
             $user->save();
+
+            // atribuindo permissões de vinculo
+            $vinculos = array_map(function ($vinculo) {
+                $vinculo['codigoUnidade'] = $vinculo['codundclg'];
+                $vinculo['tipoFuncao'] = $vinculo['tipvinext'];
+                $vinculo['tipoVinculo'] = $vinculo['tipvin'];
+                return $vinculo;
+            }, Pessoa::listarVinculosAtivos($user->codpes, false));
+            $user->syncPermissions(SELF::listarPermissoesVinculo($vinculos));
+
+            // permissao hierarquica
+            $user->givePermissionTo(
+                Permission::where('guard_name', User::$hierarquiaNs)->where('name', 'user')->first()
+            );
         }
+
         return $user;
     }
 
     /**
-     * Retorna usuário local correspondente ao codpes.
+     * Verifica se o codpes informado é usuário ou está listado no env.
      *
-     * Se necessário, cria a partir do replicado somente se listado no .env
-     *
-     * @param $codpes
-     * @return User | Bool
+     * @param Int $codpes
+     * @return Bool
      */
-    public static function newLocalUser($codpes)
+    public static function verificaUsuarioLocal($codpes)
     {
-        if ($user = User::where('codpes', $codpes)->first()) {
-            return $user;
-        }
-
-        // vamos verificar no config se o usuário está no .env
-        if (
+        return (User::where('codpes', $codpes)->first() ||
             in_array($codpes, config('senhaunica.admins')) ||
             in_array($codpes, config('senhaunica.gerentes')) ||
-            in_array($codpes, config('senhaunica.users'))
-        ) {
-            return SELF::findOrCreateFromReplicado($codpes);
-        }
-
-        return false;
+            in_array($codpes, config('senhaunica.users')))
+        ? true
+        : false;
     }
 }

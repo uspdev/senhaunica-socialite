@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Uspdev\Replicado\Pessoa;
 
 class UserController extends Controller
@@ -27,13 +29,12 @@ class UserController extends Controller
         $this->authorize('admin');
         $request->validate(['codpes' => 'required|integer']);
 
-        session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
-
         $user = User::findOrCreateFromReplicado($request->codpes);
         if (!($user instanceof \App\Models\User)) {
             return redirect()->back()->withErrors(['codpes' => $user])->withInput();
         }
-        $user->setDefaultPermission();
+
+        session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
         \Auth::login($user, true);
         return redirect('/');
     }
@@ -49,30 +50,39 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['codpes' => 'Undo indisponível']);
         }
         $user = User::where('codpes', $codpes)->first();
-        $user->setDefaultPermission();
         \Auth::login($user, true);
         return redirect('/');
     }
 
+    /**
+     * Mostra lista de usuários
+     */
     public function index()
     {
         $this->authorize('admin');
         if (hasUspTheme()) {
-            \UspTheme::activeUrl('users');
+            \UspTheme::activeUrl(config('senhaunica.userRoutes'));
         }
+
         return view('senhaunica::users', [
             'users' => User::orderBy('name')->paginate(),
             'columns' => User::getColumns(),
+            'permissoesAplicacao' => Permission::where('guard_name', User::$appNs)->orderBy('name')->get(),
+            'rolesAplicacao' => Role::where('guard_name', User::$appNs)->get(),
         ]);
     }
 
+    /**
+     * Cria novo registro a partir do replicado
+     *
+     * Precisa do replicado pois o usuário vai ser criado manualmente
+     */
     public function store(Request $request)
     {
         $this->authorize('admin');
 
         $request->validate([
             'codpes' => 'required|integer',
-            'level' => 'required|in:admin,gerente,user',
             'loginas' => ['nullable', Rule::in([1])],
         ]);
 
@@ -80,15 +90,81 @@ class UserController extends Controller
         if (!($user instanceof \App\Models\User)) {
             return redirect()->back()->withErrors(['codpes' => $user])->withInput();
         }
-        $user->setDefaultPermission();
-        $user->givePermissionTo($request->level);
 
-        // vamos assumir identidade também ?
+        // vamos assumir identidade também?
         if ($request->loginas) {
             session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
             \Auth::login($user, true);
             return redirect('/');
         }
+
+        return back();
+    }
+
+    /**
+     * Mostra os dados de um usuário
+     *
+     * Utilizado no modal de permissions
+     * Inclui informação se usuário é gerenciado pelo env ou não
+     */
+    public function show($id)
+    {
+        $this->authorize('admin');
+
+        $user = User::with('permissions', 'roles')->find($id);
+        $user->permissoesHierarquia = User::$permissoesHierarquia;
+        $user->permissoesVinculo = User::$permissoesVinculo;
+        $user->vinculoNs = User::$vinculoNs;
+        $user->hierarquiaNs = User::$hierarquiaNs;
+        return $user->append('env');
+    }
+
+    /**
+     * Atualiza as informações de permissão do usuário
+     */
+    public function update(Request $request, $user_id)
+    {
+        $this->authorize('admin');
+
+        $request->validate([
+            'level' => 'nullable|in:' . implode(',', User::$permissoesHierarquia), // permissoes hierarquicas
+            'permission_app' => 'nullable', //permissoes da aplicacao
+            'role_app' => 'nullable',
+        ]);
+
+        $user = User::find($user_id);
+        if (!($user instanceof \App\Models\User)) {
+            return redirect()->back()->withErrors(['codpes' => $user])->withInput();
+        }
+
+        // mantendo permissões de vinculo
+        $permissions = $user->permissions->where('guard_name', User::$vinculoNs)
+            ->whereIn('name', User::$permissoesVinculo)
+            ->all();
+
+        // adicionando permissoes de app se existirem
+        if ($request->permission_app) {
+            foreach ($request->permission_app as $pName) {
+                $permissions[] = Permission::where('guard_name', User::$appNs)->where('name', $pName)->first();
+            }
+        }
+
+        // adicionando permissão hierarquica
+        $permissions[] = ($user->env)
+        ? $user->permissions->where('guard_name', User::$hierarquiaNs)->first()
+        : Permission::where('name', $request->level)->first();
+
+        $user->syncPermissions($permissions);
+
+        // adicionando roles de app se existirem
+        $roles = [];
+        if ($request->role_app) {
+            foreach ($request->role_app as $pName) {
+                $roles[] = Role::where('guard_name', User::$appNs)
+                    ->where('name', $pName)->first();
+            }
+        }
+        $user->syncRoles($roles);
 
         return back();
     }
@@ -106,25 +182,6 @@ class UserController extends Controller
         } else {
             return back()->withErrors('Remover usuário desabilitado no config!');
         }
-    }
-
-    /**
-     * Grava/atualiza as permissões do usuário
-     */
-    public function updatePermission(Request $request, $id)
-    {
-        $this->authorize('admin');
-
-        $request->validate([
-            'level' => 'required|in:admin,gerente,user',
-        ]);
-
-        # vamos definir a nova permissão e remover todas as outras
-        $user = User::find($id);
-        $user->revokePermissionTo(['user', 'gerente', 'admin']);
-        $user->givePermissionTo([$request->level]);
-
-        return back();
     }
 
     /**
@@ -201,7 +258,7 @@ class UserController extends Controller
 
         $users = User::query();
         foreach (User::getColumns() as $column) {
-            $users->orWhere($column['key'], 'LIKE', '%' . $request->filter. '%');
+            $users->orWhere($column['key'], 'LIKE', '%' . $request->filter . '%');
         }
 
         return view('senhaunica::users', [
