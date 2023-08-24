@@ -233,7 +233,7 @@ trait HasSenhaunica
             $tipvins = ['ALUNOPD', 'ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD'];
             if (in_array($vinculo['tipoVinculo'], $tipvins)) {
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)
-                    ->where('name', ucfirst($vinculo['tipoVinculo']) . $sufixo)
+                    ->where('name', ucfirst(strtolower($vinculo['tipoVinculo'])) . $sufixo)
                     ->first();
             }
         }
