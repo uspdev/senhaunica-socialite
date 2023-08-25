@@ -29,7 +29,7 @@ Para usar a autorização, é necessário:
 
 - publicar e migrar as tabelas correspondentes:
 
-        php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
+        php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
         php artisan migrate
 
 Confira o `.env` e o `.env.example` se estão de acordo com as recomendações atuais.

@@ -45,7 +45,7 @@ As migrations modificam a tabela `users` e criam as tabelas de autorização.
 
 ```
 php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
-php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations"
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
 php artisan migrate
 ```
 #### Declarar a `trait` do model `User`
@@ -105,5 +105,5 @@ SENHAUNICA_CODIGO_UNIDADE=
 
 ### [Permissões e funções da aplicação](docs/permissions.md)
 ### [Atualizando à partir da versão 2](docs/updating.md)
-### [Arquivo de configuração](docs/configuracao_detales.md)
+### [Arquivo de configuração](docs/configuracao_detalhes.md)
 ### [Informações para desenvolvedores](docs/desenvolvedores.md)
