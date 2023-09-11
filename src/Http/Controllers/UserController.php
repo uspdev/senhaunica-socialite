@@ -265,6 +265,8 @@ class UserController extends Controller
             'users' => $users->orderBy('name')->paginate(),
             'search' => $request->except('_token'),
             'columns' => User::getColumns(),
+            'permissoesAplicacao' => [],
+            'rolesAplicacao' => [],
         ]);
     }
 
