@@ -9,7 +9,7 @@
     <input class="form-control form-control-sm" type="text" name="filter"
       placeholder="Filtrar..." id="dt-search" value="{{ $search['filter'] ?? '' }}">
     <div class="input-group-append">
-        <button class="btn btn-outline-secondary btn-sm">
+        <button class="btn btn-outline-secondary btn-sm" id="dt-search-button">
             <i class="fas fa-search"></i>
         </button>
     </div>
@@ -27,6 +27,12 @@
         $('#dt-search-clear').on('click', function() {
             $('#dt-search').val('').trigger('keyup');
             $('#dt-search').focus();
+        })
+
+        $('#dt-search-button').on('keypress', function(e) {
+            if(e.which === 13) {
+                $('#dt-search-button').click();
+            }
         })
 
     })

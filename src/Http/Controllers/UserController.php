@@ -253,7 +253,7 @@ class UserController extends Controller
     {
         $this->authorize('admin');
         if (empty($request->filter)) {
-            return redirect()->route('senhaunica-users.index');
+            return redirect()->route(config('senhaunica.userRoutes') . '.index');
         }
 
         $users = User::query();
