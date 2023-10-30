@@ -6,7 +6,7 @@
     <div class="form-check">
       <label class="form-check-label">
         <input type="radio" class="form-check-input" name="level" value="{{ $p }}">
-        <span class="text-{{ $user->labelLevel($p) }}">{{ $p }}</span>
+        <span class="text-{{ isset($user) ? $user->labelLevel($p) : "" }}">{{ $p }}</span>
       </label>
     </div>
   @endforeach
