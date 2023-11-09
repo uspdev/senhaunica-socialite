@@ -215,34 +215,62 @@ trait HasSenhaunica
             if ($vinculo['tipoFuncao'] == 'Docente') {
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)
                     ->where('name', 'Docente' . $sufixo)->first();
+                $permissions = array_merge($permissions, self::listarPermissionVinculoSetor($vinculo, 'Docente' . $sufixo));
                 continue;
             }
             //servidor
             if ($vinculo['tipoVinculo'] == 'SERVIDOR' && $vinculo['tipoFuncao'] != 'Docente') {
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)
                     ->where('name', 'Servidor' . $sufixo)->first();
+                $permissions = array_merge($permissions, self::listarPermissionVinculoSetor($vinculo, 'Servidor' . $sufixo));
                 continue;
             }
             //estagiario
             if ($vinculo['tipoVinculo'] == 'ESTAGIARIORH') {
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)
                     ->where('name', 'Estagiario' . $sufixo)->first();
+                $permissions = array_merge($permissions, self::listarPermissionVinculoSetor($vinculo, 'Estagiario' . $sufixo));
                 continue;
             }
             //Alunopd, Alunogr, Alunopos, Alunoceu, Alunoead, Alunoconvenioint
             $tipvins = ['ALUNOPD', 'ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD', 'ALUNOCONVENIOINT'];
             if (in_array($vinculo['tipoVinculo'], $tipvins)) {
+                $permissionName = ucfirst(strtolower($vinculo['tipoVinculo'])) . $sufixo;
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)
-                    ->where('name', ucfirst(strtolower($vinculo['tipoVinculo'])) . $sufixo)
+                    ->where('name', $permissionName)
                     ->first();
+                $permissions = array_merge($permissions, self::listarPermissionVinculoSetor($vinculo, $permissionName));
             }
         }
 
         if (empty($permissions)) {
+            // se nao associou nenhuma permission, vamos atribuir "Outros"
             $permissions[] = Permission::where('guard_name', self::$vinculoNs)
                 ->where('name', 'Outros')->first();
         }
 
+        return $permissions;
+    }
+
+    /**
+     * Retorna as permissões relacionadas ao setor para pessoas ligadas à unidade
+     *
+     * @param $vinculo Vinculo obtido do array de vinculos do oauth
+     * @param $nomeVinculo Nome do vinculo conforme $permissoesVinculo
+     * @return Array
+     */
+    public static function listarPermissionVinculoSetor($vinculo, $nomePermissionVinculo)
+    {
+        if (str_contains($nomePermissionVinculo, 'usp')) {
+            return [];
+        }
+        $permissions = [];
+        if ($vinculo['nomeAbreviadoSetor']) {
+            $setor = strtolower(explode('-', $vinculo['nomeAbreviadoSetor'])[0]); // tira a parte numérica
+            Permission::findOrCreate($nomePermissionVinculo . '.' . $setor, self::$vinculoNs);
+            $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                ->where('name', $nomePermissionVinculo . '.' . $setor)->first();
+        }
         return $permissions;
     }
 
