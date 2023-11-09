@@ -207,7 +207,6 @@ trait HasSenhaunica
     public static function listarPermissoesVinculo($vinculos)
     {
         $permissions = [];
-
         foreach ($vinculos as $vinculo) {
             // vamos colocar o sufixo se for de outra unidade
             $sufixo = ($vinculo['codigoUnidade'] == config('senhaunica.codigoUnidade')) ? '' : 'usp';
@@ -219,7 +218,7 @@ trait HasSenhaunica
                 continue;
             }
             //servidor
-            if ($vinculo['tipoVinculo'] == 'SERVIDOR' && $vinculo['tipoFuncao'] != 'Docente') {
+            if ($vinculo['tipoVinculo'] == 'SERVIDOR' && $vinculo['tipoFuncao'] == 'Servidor') {
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)
                     ->where('name', 'Servidor' . $sufixo)->first();
                 $permissions = array_merge($permissions, self::listarPermissionVinculoSetor($vinculo, 'Servidor' . $sufixo));
@@ -261,12 +260,15 @@ trait HasSenhaunica
      */
     public static function listarPermissionVinculoSetor($vinculo, $nomePermissionVinculo)
     {
+        // dd($vinculo);
         if (str_contains($nomePermissionVinculo, 'usp')) {
             return [];
         }
         $permissions = [];
-        if ($vinculo['nomeAbreviadoSetor']) {
-            $setor = strtolower(explode('-', $vinculo['nomeAbreviadoSetor'])[0]); // tira a parte numérica
+        // se senhaunica é nomeAbreviadoSetor, se replicado é nomabvset
+        if (isset($vinculo['nomeAbreviadoSetor']) || isset($vinculo['nomabvset'])) {
+            $setor = isset($vinculo['nomeAbreviadoSetor']) ? $vinculo['nomeAbreviadoSetor'] : $vinculo['nomabvset'];
+            $setor = strtolower(explode('-', $setor)[0]); // tira a parte numérica
             Permission::findOrCreate($nomePermissionVinculo . '.' . $setor, self::$vinculoNs);
             $permissions[] = Permission::where('guard_name', self::$vinculoNs)
                 ->where('name', $nomePermissionVinculo . '.' . $setor)->first();
