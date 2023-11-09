@@ -72,7 +72,7 @@
 
             user.permissions.forEach(function(permission) {
               // formatando string com permissões de vinculo
-              if (permission.guard_name == user.vinculoNs && user.permissoesVinculo.includes(permission.name) ) {
+              if (permission.guard_name == user.vinculoNs && user.permissoesVinculo.includes(permission.name.split('.')[0]) ) {
                 userPermissionString += permission.name + ', '
               }
 
