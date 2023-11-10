@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Uspdev\Replicado\Pessoa;
+use \Uspdev\Replicado\Posgraduacao;
+use \Uspdev\Replicado\Graduacao;
 
 /**
  * Depende de spatie/laravel-permissions
@@ -161,7 +163,7 @@ trait HasSenhaunica
         $permissions = array_merge(
             $this->listarPermissoesHierarquicas(),
             $this->listarPermissoesApp(),
-            $this->listarPermissoesVinculo($userSenhaUnica->vinculo)
+            $this->listarPermissoesVinculo($userSenhaUnica->vinculo, $userSenhaUnica->codpes)
         );
 
         // o sync revoga as permissions não listadas
@@ -204,10 +206,16 @@ trait HasSenhaunica
      *
      * @param Array $vinculos
      */
-    public static function listarPermissoesVinculo($vinculos)
+    public static function listarPermissoesVinculo($vinculos, $codpes = null)
     {
         $permissions = [];
+
         foreach ($vinculos as $vinculo) {
+
+            if(is_null($codpes)) $codpes = $vinculo['codpes'];
+
+            if (isset($vinculo['tipvinext']) && $vinculo['tipvinext'] == 'Servidor Designado') continue;
+
             // vamos colocar o sufixo se for de outra unidade
             $sufixo = ($vinculo['codigoUnidade'] == config('senhaunica.codigoUnidade')) ? '' : 'usp';
             //docente
@@ -218,7 +226,7 @@ trait HasSenhaunica
                 continue;
             }
             //servidor
-            if ($vinculo['tipoVinculo'] == 'SERVIDOR' && $vinculo['tipoFuncao'] == 'Servidor') {
+            if ($vinculo['tipoVinculo'] == 'SERVIDOR' && $vinculo['tipoFuncao'] != 'Docente') {
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)
                     ->where('name', 'Servidor' . $sufixo)->first();
                 $permissions = array_merge($permissions, self::listarPermissionVinculoSetor($vinculo, 'Servidor' . $sufixo));
@@ -231,14 +239,46 @@ trait HasSenhaunica
                 $permissions = array_merge($permissions, self::listarPermissionVinculoSetor($vinculo, 'Estagiario' . $sufixo));
                 continue;
             }
-            //Alunopd, Alunogr, Alunopos, Alunoceu, Alunoead, Alunoconvenioint
-            $tipvins = ['ALUNOPD', 'ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD', 'ALUNOCONVENIOINT'];
+            //Alunopd, Alunoceu, Alunoead, Alunoconvenioint
+            $tipvins = ['ALUNOPD', 'ALUNOCEU', 'ALUNOEAD', 'ALUNOCONVENIOINT'];
             if (in_array($vinculo['tipoVinculo'], $tipvins)) {
+               
+                $permissionName = ucfirst(strtolower($vinculo['tipoVinculo'])) . $sufixo;
+                $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                    ->where('name', $permissionName)
+                    ->first();                
+            }
+
+            //Alunogr
+            if ($vinculo['tipoVinculo'] == 'ALUNOGR') {
+
                 $permissionName = ucfirst(strtolower($vinculo['tipoVinculo'])) . $sufixo;
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)
                     ->where('name', $permissionName)
                     ->first();
-                $permissions = array_merge($permissions, self::listarPermissionVinculoSetor($vinculo, $permissionName));
+
+                if (hasReplicado()) {
+                    $vinculoAtivo = Graduacao::obterCursoAtivo($codpes);
+                    if($vinculoAtivo) {
+                        $permissions[] = Permission::findOrCreate('Alunogr' . '.' . $vinculoAtivo['codcur'], self::$vinculoNs);
+                    }
+                }
+            }
+
+            //ALUNOPOS
+            if ($vinculo['tipoVinculo'] == 'ALUNOPOS') {
+
+                $permissionName = ucfirst(strtolower($vinculo['tipoVinculo'])) . $sufixo;
+                $permissions[] = Permission::where('guard_name', self::$vinculoNs)
+                    ->where('name', $permissionName)
+                    ->first();
+
+                if (hasReplicado()) {
+                    $vinculoAtivo = Posgraduacao::obterVinculoAtivo($codpes);
+                    if($vinculoAtivo) {
+                        $permissions[] = Permission::findOrCreate('Alunopos' . '.' . $vinculoAtivo['codare'], self::$vinculoNs);
+                    }
+                }
             }
         }
 
@@ -260,7 +300,6 @@ trait HasSenhaunica
      */
     public static function listarPermissionVinculoSetor($vinculo, $nomePermissionVinculo)
     {
-        // dd($vinculo);
         if (str_contains($nomePermissionVinculo, 'usp')) {
             return [];
         }
@@ -269,9 +308,7 @@ trait HasSenhaunica
         if (isset($vinculo['nomeAbreviadoSetor']) || isset($vinculo['nomabvset'])) {
             $setor = isset($vinculo['nomeAbreviadoSetor']) ? $vinculo['nomeAbreviadoSetor'] : $vinculo['nomabvset'];
             $setor = strtolower(explode('-', $setor)[0]); // tira a parte numérica
-            Permission::findOrCreate($nomePermissionVinculo . '.' . $setor, self::$vinculoNs);
-            $permissions[] = Permission::where('guard_name', self::$vinculoNs)
-                ->where('name', $nomePermissionVinculo . '.' . $setor)->first();
+            $permissions[] = Permission::findOrCreate($nomePermissionVinculo . '.' . $setor, self::$vinculoNs);
         }
         return $permissions;
     }
