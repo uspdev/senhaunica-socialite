@@ -2,6 +2,7 @@
 
 namespace Uspdev\SenhaunicaSocialite;
 
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Uspdev\SenhaunicaSocialite\Providers\AuthServiceProvider;
@@ -67,6 +68,9 @@ class SenhaunicaServiceProvider extends ServiceProvider
                 __DIR__ . '/../database/migrations/update_senhaunica_users_table.php.stub' => $this->getMigrationFilename(),
             ], 'migrations');
         }
+
+        // não sei se deve ficar aqui mas assim funciona
+        Paginator::useBootstrap();
     }
 
     protected function getMigrationFilename()

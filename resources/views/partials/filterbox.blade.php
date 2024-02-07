@@ -1,40 +1,19 @@
-<form method="GET" action="{{ route('SenhaunicaSearchUsers') }}">
-  @csrf
+<form method="GET" action="{{ route('senhaunica-users.index') }}">
   <div class="input-group col-6 col-sm-4 col-md-12">
     <div class="input-group-prepend">
-        <button class="btn btn-outline-secondary btn-sm" id="dt-search-clear">
-            <i class="fas fa-times"></i>
-        </button>
+      <a href="{{ route('senhaunica-users.index') }}?filter=__none__&page=1" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-times"></i>
+      </a>
     </div>
-    <input class="form-control form-control-sm" type="text" name="filter"
-      placeholder="Filtrar..." id="dt-search" value="{{ $search['filter'] ?? '' }}">
+    <input class="form-control form-control-sm" type="text" name="filter" placeholder="Filtrar..." id="dt-search"
+      value="{{ $params['filter'] ?? '' }}">
+      <input type="hidden" name="sort" value="{{ $params['sort'] }}">
+      <input type="hidden" name="direction" value="{{ $params['direction'] }}">
+      <input type="hidden" name="page" value="1">
     <div class="input-group-append">
-        <button class="btn btn-outline-secondary btn-sm" id="dt-search-button">
-            <i class="fas fa-search"></i>
-        </button>
+      <button type="submit" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-search"></i>
+      </button>
     </div>
   </div>
 </form>
-
-@section('javascripts_bottom')
-@parent
-<script>
-    $(document).ready(function() {
-
-        $('#dt-search').focus();
-
-        // vamos limpar o filtro de busca
-        $('#dt-search-clear').on('click', function() {
-            $('#dt-search').val('').trigger('keyup');
-            $('#dt-search').focus();
-        })
-
-        $('#dt-search-button').on('keypress', function(e) {
-            if(e.which === 13) {
-                $('#dt-search-button').click();
-            }
-        })
-
-    })
-</script>
-@endsection

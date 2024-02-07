@@ -56,16 +56,61 @@ class UserController extends Controller
 
     /**
      * Mostra lista de usuários
+     *
+     * com paginação e ordenação de colunas
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('admin');
         if (hasUspTheme()) {
             \UspTheme::activeUrl(config('senhaunica.userRoutes'));
         }
 
+        $params = $request->except('_token');
+
+        // vamos guardar em sessão os dados de paginação e filtro para poder retornar no mesmo ponto
+        if (isset($params['filter']) && $params['filter'] == '__none__') {
+            $params['filter'] = '';
+        }
+
+        if (!isset($params['filter'])) {
+            $params['filter'] = session(config('senhaunica.session_key') . '.user.filter', '');
+        }
+
+        if (!isset($params['sort'])) {
+            $params['sort'] = session(config('senhaunica.session_key') . '.user.sort', 'name');
+        }
+        if (!isset($params['direction'])) {
+            $params['direction'] = session(config('senhaunica.session_key') . '.user.direction', 'asc');
+        }
+        if (!isset($params['page'])) {
+            $params['page'] = session(config('senhaunica.session_key') . '.user.page', 1);
+        }
+
+        // persistindo filtro na session
+        session([config('senhaunica.session_key') . '.user.filter' => $params['filter']]);
+        session([config('senhaunica.session_key') . '.user.sort' => $params['sort']]);
+        session([config('senhaunica.session_key') . '.user.direction' => $params['direction']]);
+        session([config('senhaunica.session_key') . '.user.page' => $params['page']]);
+
+        // preparando column sortable para fontawesome sem usar arquivo de config
+        config([
+            'columnsortable.asc_suffix' => '-up',
+            'columnsortable.desc_suffix' => '-down',
+        ]);
+
+        // fará busca nas colunas definidas em getColumns()
+        $users = User::query();
+        foreach (User::getColumns() as $column) {
+            $users->orWhere($column['key'], 'LIKE', '%' . $params['filter'] . '%');
+        }
+
+        $users = $users->sortable([$params['sort'] => $params['direction']]);
+        $users = $users->paginate(null, '*', 'page', $params['page']);
+
         return view('senhaunica::users', [
-            'users' => User::orderBy('name')->paginate(),
+            'users' => $users,
+            'params' => $params,
             'columns' => User::getColumns(),
             'permissoesAplicacao' => Permission::where('guard_name', User::$appNs)->orderBy('name')->get(),
             'rolesAplicacao' => Role::where('guard_name', User::$appNs)->get(),
@@ -248,26 +293,4 @@ class UserController extends Controller
 
         return response(compact('results'));
     }
-
-    public function search(Request $request)
-    {
-        $this->authorize('admin');
-        if (empty($request->filter)) {
-            return redirect()->route('senhaunica-users.index');
-        }
-
-        $users = User::query();
-        foreach (User::getColumns() as $column) {
-            $users->orWhere($column['key'], 'LIKE', '%' . $request->filter . '%');
-        }
-
-        return view('senhaunica::users', [
-            'users' => $users->orderBy('name')->paginate(),
-            'search' => $request->except('_token'),
-            'columns' => User::getColumns(),
-            'permissoesAplicacao' => [],
-            'rolesAplicacao' => [],
-        ]);
-    }
-
 }

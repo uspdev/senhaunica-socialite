@@ -27,10 +27,11 @@ return [
     // se true, habilita botão para remover usuário (destroy)
     'destroyUser' => true,
 
-    // view para editar campo de usuário personalizado
+    // view para editar campo de usuário personalizado. Pode ser mais de uma coluna
+    // 'key' é opcional e se estiver setado permite ordenar por esta coluna, passando o nome da coluna do DB
     // é passado $user para a view
     'customUserField' => [
-        ['view' => '', 'label' => '', 'width' => ''],
+        // ['view' => 'users.partials.include', 'key' => 'db_column', 'label' => 'custom label', 'width' => '100px'],
     ],
 
     // Define o gate para a rota de busca de pessoas
@@ -55,8 +56,9 @@ return [
     // relevante se permission=true
     'admins' => array_map('trim', explode(',', env('SENHAUNICA_ADMINS', ''))),
 
-    // cadastre os gerentes separados por virgula
+    // cadastre os gerentes separados por virgula.
     // relevante se permission=true
+    // Apesar do gate chamar manager, no env ainda mantemos gerente
     'gerentes' => array_map('trim', explode(',', env('SENHAUNICA_GERENTES', ''))),
 
     // se quiser cadastre os usuários comuns autorizados. Relevante se onlyLocalUsers = true

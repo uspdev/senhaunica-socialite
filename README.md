@@ -72,6 +72,7 @@ A url é o que está cadastrado no `APP_URL` mais `/callback`, exemplo: `http://
 # SENHAUNICA-SOCIALITE ######################################
 # https://github.com/uspdev/senhaunica-socialite
 
+# Credenciais/informações do oauth
 SENHAUNICA_KEY=fflch_sti
 SENHAUNICA_SECRET=sua_super_chave_segura
 SENHAUNICA_CALLBACK_ID=85
