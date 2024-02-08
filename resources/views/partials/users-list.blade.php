@@ -17,17 +17,24 @@
   <thead>
     <tr>
       @foreach ($columns as $column)
-        <th>{{ $column['text'] }}</th>
+        <th>@sortablelink($column['key'], $column['text'])</th>
       @endforeach
+
+      @if (!empty(config('senhaunica.customUserField')))
+        @foreach (config('senhaunica.customUserField') as $cuf)
+          <th style="width: {{ $cuf['width'] }}">
+            @if (!empty($cuf['key']))
+              @sortablelink($cuf['key'], $cuf['label'])
+            @else
+              {{ $cuf['label'] }}
+            @endif
+
+          </th>
+        @endforeach
+      @endif
 
       @if (config('senhaunica.permission'))
         <th colspan="4">Permissões (Hierárquico | Vínculo | Função | Aplicação)</th>
-      @endif
-
-      @if (config('senhaunica.customUserField.view'))
-        <th style="width: {{ config('senhaunica.customUserField.width') }}">
-          {{ config('senhaunica.customUserField.label') }}
-        </th>
       @endif
 
       @if (config('senhaunica.destroyUser'))
@@ -48,15 +55,17 @@
           <td>{{ $user->{$column['key']} }}</td>
         @endforeach
 
+        @if (!empty(config('senhaunica.customUserField')))
+          @foreach (config('senhaunica.customUserField') as $cuf)
+            <td>@includeIf($cuf['view'])</td>
+          @endforeach
+        @endif
+
         @if (config('senhaunica.permission'))
           <td>@include('senhaunica::partials.permissoes-badge')</td>
           <td>@include('senhaunica::users.partials.permissoes-vinculo-btn')</td>
           <td>@include('senhaunica::users.partials.permissoes-funcao-btn')</td>
           <td>@include('senhaunica::users.partials.permissoes-aplicacao-btn')</td>
-        @endif
-
-        @if (config('senhaunica.customUserField.view'))
-          <td>@include(config('senhaunica.customUserField.view'))</td>
         @endif
 
         @if (config('senhaunica.destroyUser'))
@@ -69,11 +78,8 @@
     @endforeach
   </tbody>
 </table>
-@if (isset($search))
-  {{ $users->appends($search)->links() }}
-@else
-  {{ $users->links() }}
-@endif
+
+{{ $users->appends($params)->links() }}
 
 @include('senhaunica::users.partials.permissoes-modal')
 

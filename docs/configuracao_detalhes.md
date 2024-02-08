@@ -5,12 +5,16 @@
 Caso você queira modificar o comportamento padrão de algumas partes como por exemplo, desabilitar a autorização ou as rotas internas, publique o arquivo de configuração e ajuste conforme necessário. A publicação é necessária somente se for alterar alguma configuração.
 
 ```sh
-php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="config" --force
 ```
 
 - **permission** (padrão true)
 
-  As permissões internas de três níveis serão utilizadas por meio da biblioteca `spatie-permissions`. Com isso, os gates `admin`, `gerentes` e `user` estarão disponíveis.
+  As permissões internas de três níveis serão utilizadas por meio da biblioteca `spatie-permissions`. Com isso, os gates `admin`, `manager` e `user` estarão disponíveis.
+  
+  A partir da versão 4.4 foram acrecentadas mais 2 permissões hierárquicas, ficando então: `admin`, `boss`, `manager`, `poweruser` e `user`.
+  
+  Atenção: O gate `gerente` foi alterado para `manager`.
 
 - **onlyLocalUsers** (padrão false)
 

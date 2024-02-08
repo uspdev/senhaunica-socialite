@@ -12,9 +12,7 @@ Route::post('loginas', [UserController::class, 'loginAs'])->name('SenhaunicaLogi
 Route::get('undologinas', [UserController::class, 'undoLoginAs'])->name('SenhaunicaUndoLoginAs');
 
 if (config('senhaunica.userRoutes')) {
-
     Route::get(config('senhaunica.userRoutes') . '/find', [UserController::class, 'find'])->name('SenhaunicaFindUsers');
-    Route::get(config('senhaunica.userRoutes') . '/search', [UserController::class, 'search'])->name('SenhaunicaSearchUsers');
     Route::get(config('senhaunica.userRoutes') . '/{id}/jsonModalContent', [UserController::class, 'getJsonModalContent'])->name('SenhaunicaGetJsonModalContent');
     Route::post(config('senhaunica.userRoutes') . '/{id}/updatePermission', [UserController::class, 'updatePermission'])->name('SenhaunicaUpdatePermission');
     Route::resource(config('senhaunica.userRoutes'), UserController::class);

@@ -16,7 +16,8 @@
         "laravel/socialite": "^5.0",
         "socialiteproviders/manager": "^3.4.2 | ^4.0",
         "spatie/laravel-permission": "^4.2 | ^5.0",
-        "doctrine/dbal": "^3.1"
+        "doctrine/dbal": "^3.1",
+        "kyslik/column-sortable" : "^6.5"
     },
     "autoload": {
         "psr-4": {

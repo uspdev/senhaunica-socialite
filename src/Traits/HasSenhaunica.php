@@ -14,6 +14,7 @@ use \Uspdev\Replicado\Graduacao;
  */
 trait HasSenhaunica
 {
+    use \Kyslik\ColumnSortable\Sortable;
 
     /** nome do guard de app.
      * Na verdade devemos usar o guard padrão que é web
@@ -87,7 +88,7 @@ trait HasSenhaunica
             return 'admin';
         }
         if (in_array($this->codpes, config('senhaunica.gerentes'))) {
-            return 'gerente';
+            return 'manager';
         }
         if (in_array($this->codpes, config('senhaunica.users'))) {
             return 'user';
@@ -242,11 +243,10 @@ trait HasSenhaunica
             //Alunopd, Alunoceu, Alunoead, Alunoconvenioint
             $tipvins = ['ALUNOPD', 'ALUNOCEU', 'ALUNOEAD', 'ALUNOCONVENIOINT'];
             if (in_array($vinculo['tipoVinculo'], $tipvins)) {
-               
                 $permissionName = ucfirst(strtolower($vinculo['tipoVinculo'])) . $sufixo;
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)
                     ->where('name', $permissionName)
-                    ->first();                
+                    ->first();
             }
 
             //Alunogr
