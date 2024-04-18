@@ -30,27 +30,9 @@ As permissões são da biblioteca spatie/laravel-permission. Todas as funcionali
 
 ### Exemplo de utilização
 
-Em `App\Providers\AppServiceProvider`, crie as permissões e funções (roles) da aplicação:
+Para criar as permissões e funções (roles) da aplicação é necessário realizar uma migration para que estas sejam criadas e persistam no banco de dados.
 
-```php
-public function boot()
-{
-    // criando algumas permissões a serem utilizadas pela aplicação
-    Permission::firstOrCreate(['name' => 'grad']);
-    Permission::firstOrCreate(['name' => 'posgrad']);
-    Permission::firstOrCreate(['name' => 'academica']);
-    Permission::firstOrCreate(['name' => 'financeira']);
-    Permission::firstOrCreate(['name' => 'administrativa']);
-
-    // criando role e tribuindo permissões a ela
-    $role = Role::firstOrCreate(['name' => 'diretoria']);
-    $role->givePermissionTo(['academica', 'financeira', 'administrativa']);
-}
-```
-
-Outra forma de criar as permissões é utilizando uma migration para esse fim. Como a função `boot()` é executado em cada requisição, isso pode deixar o sistema um pouco mais lento daí a opção de usar a migration, que cria e garante que as permissões existam no BD.
-
-Para criar uma migration use:
+Para criar a migration use:
 
     php artisan make:migration seed_permission_table
 
