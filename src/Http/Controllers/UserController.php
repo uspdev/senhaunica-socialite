@@ -182,9 +182,9 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['codpes' => $user])->withInput();
         }
 
-        // mantendo permissões de vinculo
+        // mantendo todas as permissões do guard senhaunica, exceto as hierárquicas, que vai ser tratado logo abaixo
         $permissions = $user->permissions->where('guard_name', User::$vinculoNs)
-            ->whereIn('name', User::$permissoesVinculo)
+            ->whereNotIn('name', User::$permissoesHierarquia)
             ->all();
 
         // adicionando permissoes de app se existirem
