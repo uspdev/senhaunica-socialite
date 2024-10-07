@@ -35,7 +35,7 @@ return [
     ],
 
     // Define o gate para a rota de busca de pessoas
-    'findUsersGate' => env('SENHAUNICA_FINDUSERSGATE', 'admin'),
+    'findUsersGate' => 'admin',
 
     // fim views internas
     // -----------------------------------------------------
