@@ -33,6 +33,19 @@ php-curl
 
 ### Instalação
 
+#### Declarar a `trait` do model `User`
+
+Antes da instalação, da biblioteca, em `App/Models/User.php`, dentro da classe `User` incluir as seguintes linhas:
+
+```php
+class User extends Authenticatable
+{
+use \Spatie\Permission\Traits\HasRoles;
+use \Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica;
+...
+```
+Proceda com a instalação:
+
 ```
 composer require uspdev/senhaunica-socialite
 ```
@@ -47,17 +60,6 @@ As migrations modificam a tabela `users` e criam as tabelas de autorização.
 php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
 php artisan migrate
-```
-#### Declarar a `trait` do model `User`
-
-Em `App/Models/User.php`, dentro da classe `User` incluir as seguintes linhas:
-
-```php
-class User extends Authenticatable
-{
-use \Spatie\Permission\Traits\HasRoles;
-use \Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica;
-...
 ```
 #### Cadastre o `callback_id`
 
