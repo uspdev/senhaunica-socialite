@@ -39,7 +39,7 @@ class EventServiceProvider extends ServiceProvider
                         $itens[] = [
                             'text' => '<i class="fas fa-users-cog text-danger"></i>',
                             'url' => config('senhaunica.userRoutes'),
-                            'can' => 'admin',
+                            'can' => ($event->item['can'] ?? 'admin'),
                         ];
                     }
                     // mostrando o botão de loginas
@@ -47,7 +47,7 @@ class EventServiceProvider extends ServiceProvider
                         'text' => '<i class="fas fa-user-secret text-danger"></i>',
                         'title' => 'Assumir identidade',
                         'url' => route('SenhaunicaLoginAsForm'),
-                        'can' => 'admin',
+                        'can' => ($event->item['can'] ?? 'admin'),
                     ];
                     $event->item = $itens;
                 }
