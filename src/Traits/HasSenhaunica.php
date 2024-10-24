@@ -159,6 +159,8 @@ trait HasSenhaunica
      */
     public function aplicarPermissoes($userSenhaUnica)
     {
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
         $this->criarPermissoesPadrao();
 
         $permissions = array_merge(
