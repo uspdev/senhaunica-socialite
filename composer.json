@@ -13,11 +13,11 @@
     }],
     "require": {
         "php": "^7 | ^8",
-        "laravel/socialite": "^5.0",
-        "socialiteproviders/manager": "^3.4.2 | ^4.0",
-        "spatie/laravel-permission": "^4.2 | ^5.0 | ^6.0",
-        "doctrine/dbal": "^3.1 | ^4.2.1",
-        "kyslik/column-sortable" : "^6.5"
+        "laravel/socialite": "^5",
+        "socialiteproviders/manager": "^3 | ^4",
+        "spatie/laravel-permission": "^4 | ^5 | ^6",
+        "doctrine/dbal": "^3 | ^4",
+        "kyslik/column-sortable" : "^6 | ^7"
     },
     "autoload": {
         "psr-4": {
