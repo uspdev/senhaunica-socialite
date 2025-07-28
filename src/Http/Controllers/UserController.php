@@ -137,13 +137,13 @@ class UserController extends Controller
         }
 
         // vamos assumir identidade também?
-        if ($request->loginas) {
-            session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
-            \Auth::login($user, true);
-            return redirect('/');
+        if (!config('senhaunica.disableLoginas') && $request->loginas) {
+                session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
+                \Auth::login($user, true);
+                return redirect('/');
         }
 
-        return back();
+        return back()->with('alert-info', 'Usuário criado com sucesso. Você pode editar as permissões dele clicando em alguma permissão!');
     }
 
     /**
@@ -196,8 +196,8 @@ class UserController extends Controller
 
         // adicionando permissão hierarquica
         $permissions[] = ($user->env)
-        ? $user->permissions->where('guard_name', User::$hierarquiaNs)->first()
-        : Permission::where('name', $request->level)->first();
+            ? $user->permissions->where('guard_name', User::$hierarquiaNs)->first()
+            : Permission::where('name', $request->level)->first();
 
         $user->syncPermissions($permissions);
 
@@ -211,7 +211,7 @@ class UserController extends Controller
         }
         $user->syncRoles($roles);
 
-        return back();
+        return back()->with('alert-info', 'Permissões atualizadas com sucesso!');
     }
 
     /**
@@ -223,7 +223,7 @@ class UserController extends Controller
 
         if (config('senhaunica.destroyUser')) {
             User::find($user_id)->delete();
-            return back();
+            return back()->with('alert-info', 'Usuário removido com sucesso!');
         } else {
             return back()->withErrors('Remover usuário desabilitado no config!');
         }

@@ -43,12 +43,14 @@ class EventServiceProvider extends ServiceProvider
                         ];
                     }
                     // mostrando o botão de loginas
-                    $itens[] = [
-                        'text' => '<i class="fas fa-user-secret text-danger"></i>',
-                        'title' => 'Assumir identidade',
-                        'url' => route('SenhaunicaLoginAsForm'),
-                        'can' => ($event->item['can'] ?? 'admin'),
-                    ];
+                    if (!config('senhaunica.disableLoginas')) {
+                        $itens[] = [
+                            'text' => '<i class="fas fa-user-secret text-danger"></i>',
+                            'title' => 'Assumir identidade',
+                            'url' => route('SenhaunicaLoginAsForm'),
+                            'can' => ($event->item['can'] ?? 'admin'),
+                        ];
+                    }
                     $event->item = $itens;
                 }
             }

@@ -42,10 +42,14 @@
       @endif
 
       <th class="px-1">Json</th>
-      <th class="px-1">
-        <span class="d-xs-inline d-sm-none">Assumir identidade</span> {{-- aparecerá somente em mobile --}}
-        <span class="d-none d-sm-inline">Ident.</span> {{-- aparecerá nas demais telas --}}
-      </th>
+
+      @if (!config('senhaunica.disableLoginas'))
+        <th class="px-1">
+          <span class="d-xs-inline d-sm-none">Assumir identidade</span> {{-- aparecerá somente em mobile --}}
+          <span class="d-none d-sm-inline">Ident.</span> {{-- aparecerá nas demais telas --}}
+        </th>
+      @endif
+
     </tr>
   </thead>
   <tbody>
@@ -73,7 +77,10 @@
         @endif
 
         <td class="col-button">@include('senhaunica::partials.show-json-btn')</td>
-        <td class="col-button">@include('senhaunica::partials.assumir-identidade-btn')</td>
+        
+        @if (!config('senhaunica.disableLoginas'))
+          <td class="col-button">@include('senhaunica::partials.assumir-identidade-btn')</td>
+        @endif
       </tr>
     @endforeach
   </tbody>

@@ -24,6 +24,12 @@ php-curl
 
 ### Histórico
 
+#### 7/2025: versão 4.5
+
+* possibilidade de desativar loginas
+* permite multiplos codigos de unidade separados por vírgula
+* permite php 8 e laravel 11
+
 #### 3/2023: versão 4.4
 * gerenciamento de permissões da aplicação no guard `web` (padrão)
 * mudando padrão do debug para `true`.
@@ -105,6 +111,9 @@ SENHAUNICA_CALLBACK_ID=85
 # Ex: se for da unidade aparece Servidor e Servidor.dvfin, onde dvfin é o setor do usuário, caso contrário aparece Servidorusp
 # Pode ser uma lista de códigos separado por vírgula
 SENHAUNICA_CODIGO_UNIDADE=
+
+# Desabilita a funcionalidade assumir identidade (habilitado por padrão)
+SENHAUNICA_DISABLE_LOGINAS=
 
 ```
 
