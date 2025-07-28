@@ -7,9 +7,11 @@ Route::get('login', [SenhaunicaController::class, 'redirectToProvider'])->name('
 Route::get('callback', [SenhaunicaController::class, 'handleProviderCallback']);
 Route::post('logout', [SenhaunicaController::class, 'logout'])->name('logout');
 
-Route::get('loginas', [UserController::class, 'loginAsForm'])->name('SenhaunicaLoginAsForm');
-Route::post('loginas', [UserController::class, 'loginAs'])->name('SenhaunicaLoginAs');
-Route::get('undologinas', [UserController::class, 'undoLoginAs'])->name('SenhaunicaUndoLoginAs');
+if (!config('senhaunica.disableLoginas')) {
+    Route::get('loginas', [UserController::class, 'loginAsForm'])->name('SenhaunicaLoginAsForm');
+    Route::post('loginas', [UserController::class, 'loginAs'])->name('SenhaunicaLoginAs');
+    Route::get('undologinas', [UserController::class, 'undoLoginAs'])->name('SenhaunicaUndoLoginAs');
+}
 
 if (config('senhaunica.userRoutes')) {
     Route::get(config('senhaunica.userRoutes') . '/find', [UserController::class, 'find'])->name('SenhaunicaFindUsers');

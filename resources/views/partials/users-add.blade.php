@@ -1,6 +1,9 @@
 <button class="btn btn-sm btn-outline-primary senhaunicaUseraddBtn"
   @if (!hasReplicado()) disabled title="Necessário Replicado para adicionar usuários" @endif>
-  <i class="fas fa-plus"></i> Adicionar/Assumir
+  <i class="fas fa-plus"></i> Adicionar
+  @if (!config('senhaunica.disableLoginas'))
+    / Assumir
+  @endif
 </button>
 
 <div class="modal fade" id="senhaunica-socialite-adicionar-pessoas-modal" tabindex="-1">
@@ -25,9 +28,13 @@
             </div>
 
             <div>
+              
+              @if (!config('senhaunica.disableLoginas'))
               <button type="submit" class="btn btn-sm btn-warning" name="loginas" value="1">
                 Assumir identidade
               </button>
+              @endif
+
               <div class="float-right">
                 <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancelar</button>
                 <button type="submit" class="btn btn-sm btn-primary">Salvar</button>
