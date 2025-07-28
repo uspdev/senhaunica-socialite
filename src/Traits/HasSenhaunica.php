@@ -220,7 +220,7 @@ trait HasSenhaunica
             if (isset($vinculo['tipvinext']) && $vinculo['tipvinext'] == 'Servidor Designado') continue;
 
             // vamos colocar o sufixo se for de outra unidade
-            $sufixo = ($vinculo['codigoUnidade'] == config('senhaunica.codigoUnidade')) ? '' : 'usp';
+            $sufixo = in_array($vinculo['codigoUnidade'], config('senhaunica.codigoUnidade')) ? '' : 'usp';
             //docente
             if ($vinculo['tipoFuncao'] == 'Docente') {
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)
