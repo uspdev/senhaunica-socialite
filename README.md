@@ -102,6 +102,8 @@ SENHAUNICA_CALLBACK_ID=85
 #SENHAUNICA_DROP_PERMISSIONS=
 
 # Código da unidade para identificar os logins próprios ou de outras unidades
+# Ex: se for da unidade aparece Servidor e Servidor.dvfin, onde dvfin é o setor do usuário, caso contrário aparece Servidorusp
+# Pode ser uma lista de códigos separado por vírgula
 SENHAUNICA_CODIGO_UNIDADE=
 
 ```
