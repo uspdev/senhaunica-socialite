@@ -219,8 +219,16 @@ trait HasSenhaunica
 
             if (isset($vinculo['tipvinext']) && $vinculo['tipvinext'] == 'Servidor Designado') continue;
 
+            // caso a aplicação não tenha atualizado o config vai dar erro de array.
+            // Vamos verificar aqui para manter compatibilidade retroativa durante algum tempo.
+            if (!is_array(config('senhaunica.codigoUnidade'))) {
+                $codigoUnidade = explode(',', config('senhaunica.codigoUnidade', ''));
+            } else {
+                $codigoUnidade = config('senhaunica.codigoUnidade');
+            }
+
             // vamos colocar o sufixo se for de outra unidade
-            $sufixo = in_array($vinculo['codigoUnidade'], config('senhaunica.codigoUnidade')) ? '' : 'usp';
+            $sufixo = in_array($vinculo['codigoUnidade'], $codigoUnidade ) ? '' : 'usp';
             //docente
             if ($vinculo['tipoFuncao'] == 'Docente') {
                 $permissions[] = Permission::where('guard_name', self::$vinculoNs)

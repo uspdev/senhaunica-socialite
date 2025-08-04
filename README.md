@@ -30,6 +30,8 @@ php-curl
 * permite multiplos codigos de unidade separados por vírgula
 * permite php 8 e laravel 11
 
+<b>IMPORTANTE</b>: Esta atualização necessita ajustar o `config/senhaunica.php` e o .env
+
 #### 3/2023: versão 4.4
 * gerenciamento de permissões da aplicação no guard `web` (padrão)
 * mudando padrão do debug para `true`.
