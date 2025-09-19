@@ -54,7 +54,7 @@ class SenhaunicaController extends Controller
         $user->name = $userSenhaUnica->nompes;
         $user->save();
 
-        \Auth::login($user, true);
+        \Auth::login($user, config('senhaunica.rememberSession'));
         //TODO: devemos gerar um log dos logins/logouts
 
         if (config('senhaunica.permission')) {
