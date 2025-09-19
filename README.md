@@ -117,6 +117,10 @@ SENHAUNICA_CODIGO_UNIDADE=
 # Desabilita a funcionalidade assumir identidade (habilitado por padrão)
 SENHAUNICA_DISABLE_LOGINAS=
 
+# Controla se a sessão deve ser persistida (default = true)
+SENHAUNICA_REMEMBER_SESSION=
+
+
 ```
 
 ### [Permissões e funções da aplicação](docs/permissions.md)

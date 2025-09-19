@@ -78,6 +78,10 @@ return [
     
     // desabilita o recurso de loginas
     'disableLoginas' => (bool) env('SENHAUNICA_DISABLE_LOGINAS', false),
+    
+    # Controla se a sessão deve ser persistida ao logar usuário (default = true)
+    'rememberSession' => (bool) env('SENHAUNICA_REMEMBER_SESSION', true),
+
 
     // SENHAUNICA_KEY e SENHAUNICA_SECRET são carregados em services.php da biblioteca
 ];

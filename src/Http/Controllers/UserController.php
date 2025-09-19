@@ -35,7 +35,7 @@ class UserController extends Controller
         }
 
         session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
-        \Auth::login($user, true);
+        \Auth::login($user, config('senhaunica.rememberSession'));
         return redirect('/');
     }
 
@@ -50,7 +50,7 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['codpes' => 'Undo indisponível']);
         }
         $user = User::where('codpes', $codpes)->first();
-        \Auth::login($user, true);
+        \Auth::login($user, config('senhaunica.rememberSession'));
         return redirect('/');
     }
 
@@ -139,7 +139,7 @@ class UserController extends Controller
         // vamos assumir identidade também?
         if (!config('senhaunica.disableLoginas') && $request->loginas) {
                 session()->push(config('senhaunica.session_key') . '.undo_loginas', \Auth::user()->codpes);
-                \Auth::login($user, true);
+                \Auth::login($user, config('senhaunica.rememberSession'));
                 return redirect('/');
         }
 
