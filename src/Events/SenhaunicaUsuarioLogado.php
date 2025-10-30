@@ -20,4 +20,28 @@ class SenhaunicaUsuarioLogado {
         $this->socialiteUser = $socialiteUser;
         $this->provider = $provider;
     }
+    
+    /**
+     * @return \App\Models\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+    
+    /**
+     * @return \Laravel\Socialite\Contracts\User
+     */
+    public function getSocialiteUser()
+    {
+        return $this->socialiteUser;
+    }
+    
+    /**
+     * @return \Uspdev\SenhaunicaSocialite\Events\string
+     */
+    public function getProvider()
+    {
+        return $this->provider;
+    }
 }
