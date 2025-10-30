@@ -4,6 +4,7 @@ namespace Uspdev\SenhaunicaSocialite\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Uspdev\SenhaunicaSocialite\Events\SenhaunicaUsuarioLogado;
 
 class SenhaunicaController extends Controller
 {
@@ -65,6 +66,10 @@ class SenhaunicaController extends Controller
         if (strpos($redirect, 'login') !== false) {
             $redirect = '/';
         }
+        
+        // Dispatch the event
+        event(new SenhaunicaUsuarioLogado($user, $userSenhaUnica, 'senhaunica'));
+        
         return redirect($redirect);
     }
 
