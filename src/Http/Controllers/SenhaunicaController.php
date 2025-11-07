@@ -24,7 +24,7 @@ class SenhaunicaController extends Controller
         }
 
         // guardando para onde vai retornar
-        $redirect = $request->redirect ?? $request->headers->get('referer') ?? '/';
+        $redirect = $request->redirect ?? $request->session()->get('url.intended') ?? '/';
         $request->session()->push(config('senhaunica.session_key') . '.redirect', $redirect);
 
         return \Socialite::driver('senhaunica')->redirect();
