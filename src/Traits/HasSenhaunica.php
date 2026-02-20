@@ -442,4 +442,21 @@ trait HasSenhaunica
 
         return $user;
     }
+
+    public static function findOrUpdateLocalUser($validated)
+    {
+        $user = User::find($validated['id']);
+
+        if ($user) {
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+            if (isset($validated['senha']) && !is_null($validated['password'])) {
+                $user->password = Hash::make($validated['password']);
+            }
+            $user->save();
+        }
+
+        return $user;
+    }
+
 }

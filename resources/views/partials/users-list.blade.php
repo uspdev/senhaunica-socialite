@@ -56,7 +56,21 @@
     @foreach ($users as $user)
       <tr class="data-row">
         @foreach ($columns as $column)
-          <td>{{ $user->{$column['key']} }}</td>
+          <td>
+            @if ($column['key'] === 'name' && $user->local === 1)
+              {{ $user->{$column['key']} }}
+              <button id="getLocalUser"
+                type="button"
+                title="Alteração - Usuário Local"
+                class="btn btn-sm btn-link p-0"
+                data-url="{{ route(config('senhaunica.localUserRoutes') . '.edit', $user->id) }}"
+                data-action="{{ route(config('senhaunica.localUserRoutes') . '.update', $user->id) }}">
+                <i class="fa fa-user-plus" aria-hidden="true"></i>
+              </button>
+            @else
+              {{ $user->{$column['key']} }}
+            @endif
+          </td>
         @endforeach
 
         @if (!empty(config('senhaunica.customUserField')))
@@ -77,7 +91,7 @@
         @endif
 
         <td class="col-button">@include('senhaunica::partials.show-json-btn')</td>
-        
+
         @if (!config('senhaunica.disableLoginas'))
           <td class="col-button">@include('senhaunica::partials.assumir-identidade-btn')</td>
         @endif
@@ -99,7 +113,31 @@
         placement: 'auto'
       })
 
+      $("#getLocalUser").on('click', function(e) {
+        e.preventDefault();
+
+        var senhaunicaUserLocalModal = $('#senhaunica-socialite-editar-local-user-modal');
+        var url = $(this).data('url');
+        var action = $(this).data('action');
+
+        $.ajax({
+          url: url,
+          method: "GET",
+          dataType: 'JSON',
+          success: function(item) {
+            $("#user_name").val(item.name);
+            $("#user_email").val(item.email);
+            $("#user_local_edit").attr('action', action);
+          },
+          complete: function() {
+            senhaunicaUserLocalModal.modal('show');
+          }
+        });
+
+      });
+
     })
+
   </script>
 @endsection
 

@@ -80,4 +80,5 @@
   @include('senhaunica::partials.filterbox')
   @include('senhaunica::partials.users-add')
   @include('senhaunica::partials.local-users-add')
+  @include('senhaunica::partials.local-users-edit')
 </div>

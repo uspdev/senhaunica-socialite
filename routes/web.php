@@ -25,5 +25,5 @@ if (config('senhaunica.userRoutes')) {
 Route::get('loginlocal', [LoginLocalController::class, 'create'])->name('loginlocal');
 if (config('senhaunica.localUserRoutes')) {
     Route::post('loginlocal', [LoginLocalController::class, 'store'])->name('SenhaunicaLocalLoginAs');
-    Route::resource(config('senhaunica.localUserRoutes'), LocalUserController::class)->only(['store']);
+    Route::resource(config('senhaunica.localUserRoutes'), LocalUserController::class)->only(['store', 'edit', 'update']);
 }

@@ -5,7 +5,7 @@ namespace Uspdev\SenhaunicaSocialite\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
-class LocalUserRequest extends FormRequest
+class LocalUserUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +27,11 @@ class LocalUserRequest extends FormRequest
         return [
             'name' => 'required',
             'email' => 'required|email',
+            'senha' => 'boolean',
             'password' => [
-                'required',
+                'required_if:senha,true',
                 'confirmed',
+                'nullable',
                 Password::min(8)
                     ->letters()
                     ->mixedCase()
@@ -45,7 +47,7 @@ class LocalUserRequest extends FormRequest
         return [
             'name.required' => 'O campo nome é obrigatório.',
             'email.required' => 'O campo email é obrigatório.',
-            'password.required' => 'O campo senha é obrigatório.',
+            'password.required_if' => 'O campo senha é obrigatório.',
             'password.min' => 'O campo senha precisa ter pelos menos :min caracteres.',
             'password.letters' => 'Sua senha deve conter pelo menous uma letra.',
             'password.mixed_case' => 'Sua senha deve conter letras maiúsculas e minúsculas.',
