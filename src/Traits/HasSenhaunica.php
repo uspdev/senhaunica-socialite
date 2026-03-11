@@ -8,6 +8,7 @@ use Spatie\Permission\Models\Permission;
 use Uspdev\Replicado\Pessoa;
 use \Uspdev\Replicado\Posgraduacao;
 use \Uspdev\Replicado\Graduacao;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Depende de spatie/laravel-permissions
@@ -402,4 +403,60 @@ trait HasSenhaunica
         ? true
         : false;
     }
+
+    /**
+     * Cria e retorna usuário (sem senha única) na base local
+     *
+     * Se não conseguiu encontrar/criar o usuário retorna mensagem de erro correspondente.
+     *
+     * @param array $validated
+     * @return User | String
+     */
+    public static function findOrCreateLocalUser($validated)
+    {
+        $user = User::where('email', $validated['email'])->first();
+
+        if (is_null($user)) {
+
+            $user = new User;
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+            $user->password = Hash::make($validated['password']);
+            $user->local = true;
+            $user->save();
+
+            // atribuindo permissões de vinculo
+            /* $vinculos = array_map(function ($vinculo) { */
+            /*     $vinculo['codigoUnidade'] = $vinculo['codundclg']; */
+            /*     $vinculo['tipoFuncao'] = $vinculo['tipvinext']; */
+            /*     $vinculo['tipoVinculo'] = $vinculo['tipvin']; */
+            /*     return $vinculo; */
+            /* }, Pessoa::listarVinculosAtivos($user->codpes, false)); */
+            /* $user->syncPermissions(SELF::listarPermissoesVinculo($vinculos)); */
+
+            // permissao hierarquica
+            /* $user->givePermissionTo( */
+            /*     Permission::where('guard_name', User::$hierarquiaNs)->where('name', 'user')->first() */
+            /* ); */
+        }
+
+        return $user;
+    }
+
+    public static function findOrUpdateLocalUser($validated)
+    {
+        $user = User::find($validated['id']);
+
+        if ($user) {
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+            if (isset($validated['senha']) && !is_null($validated['password'])) {
+                $user->password = Hash::make($validated['password']);
+            }
+            $user->save();
+        }
+
+        return $user;
+    }
+
 }

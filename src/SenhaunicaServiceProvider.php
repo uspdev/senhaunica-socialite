@@ -65,7 +65,8 @@ class SenhaunicaServiceProvider extends ServiceProvider
             // Export the migration
             // php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
             $this->publishes([
-                __DIR__ . '/../database/migrations/update_senhaunica_users_table.php.stub' => $this->getMigrationFilename(),
+                __DIR__ . '/../database/migrations/update_senhaunica_users_table.php.stub' => $this->getMigrationFilename('update_senhaunica_users_table.php'),
+                __DIR__ . '/../database/migrations/alter_senhaunica_users_table.php.stub' => $this->getMigrationFilename('alter_senhaunica_users_table.php'),
             ], 'migrations');
         }
 
@@ -73,13 +74,13 @@ class SenhaunicaServiceProvider extends ServiceProvider
         Paginator::useBootstrap();
     }
 
-    protected function getMigrationFilename()
+    protected function getMigrationFilename($filename)
     {
-        $match = glob(database_path('migrations/' . '*_update_senhaunica_users_table.php'));
+        $match = glob(database_path('migrations/' . '*_' . $filename));
         if ($match) {
             return $match[0];
         } else {
-            return database_path('migrations/' . date('Y_m_d_His', time()) . '_update_senhaunica_users_table.php');
+            return database_path('migrations/' . date('Y_m_d_His', time()) . '_' . $filename);
         }
     }
 

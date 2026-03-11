@@ -28,7 +28,7 @@
             </div>
 
             <div>
-              
+
               @if (!config('senhaunica.disableLoginas'))
               <button type="submit" class="btn btn-sm btn-warning" name="loginas" value="1">
                 Assumir identidade

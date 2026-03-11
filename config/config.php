@@ -24,6 +24,9 @@ return [
     // se vazio, desabilita a rota de gerenciamento de usuários interna
     'userRoutes' => 'senhaunica-users',
 
+    // define as rotas para o gerenciador de usuários locais
+    'localUserRoutes' => 'senhaunica-local-users',
+
     // se true, habilita botão para remover usuário (destroy)
     'destroyUser' => true,
 
@@ -75,10 +78,10 @@ return [
     // pode se um ou mais códigos separados por vírgula
     // relevante se permission=true
     'codigoUnidade' => array_map('trim', explode(',', env('SENHAUNICA_CODIGO_UNIDADE', ''))),
-    
+
     // desabilita o recurso de loginas
     'disableLoginas' => (bool) env('SENHAUNICA_DISABLE_LOGINAS', false),
-    
+
     # Controla se a sessão deve ser persistida ao logar usuário (default = true)
     'rememberSession' => (bool) env('SENHAUNICA_REMEMBER_SESSION', true),
 

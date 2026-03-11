@@ -24,6 +24,17 @@ php-curl
 
 ### Histórico
 
+#### 2/2026: versão x.x
+
+* adiciona cadastro de usuário local
+* rota para login do usuário local é `loginlocal'
+* publique e rode a migration, ela modifica a tabela `users`, criando campo para identificação do usuário local
+
+```
+php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServiceProvider" --tag="migrations"
+php artisan migrate
+```
+
 #### 7/2025: versão 4.5
 
 * possibilidade de desativar loginas
