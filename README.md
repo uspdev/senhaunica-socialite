@@ -61,6 +61,8 @@ class User extends Authenticatable
 {
 use \Spatie\Permission\Traits\HasRoles;
 use \Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica;
+
+protected $guard_name = 'senhaunica';
 ...
 ```
 Proceda com a instalação:
