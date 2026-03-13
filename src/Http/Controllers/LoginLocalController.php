@@ -26,6 +26,11 @@ class LoginLocalController extends Controller
             ]);
         }
 
+        $user = Auth::user();
+        if (config('senhaunica.permission')) {
+            $user->aplicarPermissoes($userSenhaUnica);
+        }
+        
         request()->session()->regenerate();
 
         return redirect('/');
