@@ -25,11 +25,6 @@ class LoginLocalController extends Controller
                 'email' => 'Desculpe, as credenciais não são válidas.'
             ]);
         }
-
-        $user = Auth::user();
-        if (config('senhaunica.permission')) {
-            $user->aplicarPermissoes($userSenhaUnica);
-        }
         
         request()->session()->regenerate();
 
