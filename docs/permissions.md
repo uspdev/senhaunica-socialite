@@ -4,9 +4,25 @@
 
 ### Permissões da biblioteca
 
+#### Permissões Hierárquicas
+
 Inicialmente o `senhaunica-socialite` permitiu atribuir níveis hierárquicos aos usuários: admin, gerente e user. Com isso, foi possível criar gates baseados nessas permissões para controlar a autorização a determinados recursos. A partir da versão 4.4, novos níveis foram criados ficando: `admin`, `boss`, `manager`, `poweruser` e `user`. O gerente foi removido e você deve adequar a aplicação para `manager`.
 
-Com o objetivo de expandir o gerenciamento das autorizações, a partir da versão 4.4, também foi implementado permissões por vínculo do usuário. Nesse sentido, além das autorizações hierárquicas agora a biblioteca registra permissions correspondentes ao vínculo recebido pelo **oauth**. Então, um servidor não docente receberá a permission `Servidor`, um servidor docente receberá a permission `Docente`, um aluno de graduação receberá `Alunogr` e assim por diante. Caso o docente seja de outra unidade receberá a permission `Docenteusp`. O mesmo é valido para outros vínculos de pessoas de unidades que não a sua.
+#### Permissões de Vínculo
+
+Com o objetivo de expandir o gerenciamento das autorizações, a partir da versão 4.4, também foi implementado permissões por **vínculo do usuário** (recebido do OAuth da USP). Nesse sentido, além das autorizações hierárquicas, agora a biblioteca registra permissions correspondentes ao vínculo de cada pessoa.
+
+**Exemplos de vínculos:**
+
+- Um servidor não docente receberá a permission `Servidor`
+- Um servidor docente receberá a permission `Docente`
+- Um aluno de graduação receberá `Alunogr`
+- E assim por diante...
+
+**Diferenciação por unidade:**
+
+- Se a pessoa é da mesma unidade da aplicação: recebe o vínculo normal (ex: `Docente`)
+- Se a pessoa é de outra unidade: recebe o vínculo com sufixo `usp` (ex: `Docenteusp`)
 
 Para verificar um vínculo, a biblioteca cria gates `senhaunica.servidor`, `senhaunica.docente`, e assim por diante. Para utilizar na aplicação pode-se:
 
@@ -22,7 +38,16 @@ Ao adicionar um usuário manualmente, as permissões correspondentes também ser
 
 ### Permissões da aplicação
 
-Outra funcionalidade incluída é o gerenciamento de Permissões e Funções (roles) da aplicação (guard `web`). Na tela de permissões, a atribuição/revogação das permissões é simples - ticando ou não os checkbox correspondentes.
+Além das permissões automáticas do OAuth (guard `senhaunica`), a biblioteca também oferece gerenciamento de **Permissões e Funções (roles) customizadas da sua aplicação** (guard `web`).
+
+**Diferença:**
+
+- **Guard `senhaunica`**: Permissões vêm automaticamente do OAuth (hierarquia + vínculo)
+- **Guard `web`**: Permissões que você cria manualmente para sua aplicação
+
+#### Atribuindo Permissions ao Usuário
+
+Na interface de usuários do `uspdev/senhaunica-socialite` (rota `/senhaunica-users`), será possível atribuir cada permissão ou função aos usuários através dos checkboxes.
 
 ![tela permissões](/docs/permissoes.png)
 
@@ -30,7 +55,7 @@ As permissões são da biblioteca spatie/laravel-permission. Todas as funcionali
 
 ### Exemplo de utilização
 
-Para criar as permissões e funções (roles) da aplicação é necessário realizar uma migration para que estas sejam criadas e persistam no banco de dados.
+Para criar as permissões e funções (roles) **customizadas da sua aplicação** é necessário realizar uma migration para que estas sejam criadas e persistam no banco de dados. Essas serão criadas no guard `web`.
 
 Para criar a migration use:
 
@@ -65,18 +90,49 @@ E finalmente aplique a migration
 
 Os gates serão criados automaticamente pela biblioteca `spatie/laravel-permission`.
 
+#### Usando no Blade (Exemplos)
+
+**Permissões da biblioteca (guard `senhaunica`):**
+
+```blade
+@can('manager')
+  {{-- Manager ou acima (admin, boss, manager) --}}
+@endcan
+
+@can('senhaunica.docente')
+  {{-- Verificar se é docente --}}
+@endcan
+```
+
+**Permissões da aplicação (guard `web`):**
+
+```blade
+@can('academica')
+  {{-- Verificar permission customizada --}}
+@endcan
+
+@role('diretoria')
+  {{-- Verificar se tem role customizada --}}
+@endrole
+```
+
+#### Verificando no Controller
+
 Utilize os gates na sua aplicação, como qualquer outro gate ou via permission:
 
 ```php
-@can('graduacao')
+// Verificar hierarquia (guard senhaunica)
+$this->authorize('manager');
+
+// Verificar permissão customizada (guard web)
+if (Auth::user() && Auth::user()->hasPermissionTo('academica')) {
+    // usuário tem a permissão
+}
+
+// Ou de forma mais simples
+@can('academica')
   ...
 @endcan
-@if(Auth::user() && Auth::user()->hasPermissionTo('graduacao'))
-  ...
-@endif
 ```
-
-Na interface de usuários do `uspdev/senhaunica-socialite` será possível atribuir cada permissão ou função aos usuários.
-
 
 [Voltar para README.md](../README.md)
