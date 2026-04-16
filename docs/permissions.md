@@ -4,7 +4,7 @@
 
 ### Permissões da biblioteca
 
-#### Permissões Hierárquicas
+#### Permissões hierárquicas
 
 Inicialmente o `senhaunica-socialite` permitiu atribuir níveis hierárquicos aos usuários: admin, gerente e user. Com isso, foi possível criar gates baseados nessas permissões para controlar a autorização a determinados recursos. A partir da versão 4.4, novos níveis foram criados ficando: `admin`, `boss`, `manager`, `poweruser` e `user`. O gerente foi removido e você deve adequar a aplicação para `manager`.
 
@@ -45,7 +45,7 @@ Além das permissões automáticas do OAuth (guard `senhaunica`), a biblioteca t
 - **Guard `senhaunica`**: Permissões vêm automaticamente do OAuth (hierarquia + vínculo)
 - **Guard `web`**: Permissões que você cria manualmente para sua aplicação
 
-#### Atribuindo Permissions ao Usuário
+#### Atribuindo permissions ao usuário
 
 Na interface de usuários do `uspdev/senhaunica-socialite` (rota `/senhaunica-users`), será possível atribuir cada permissão ou função aos usuários através dos checkboxes.
 
@@ -53,7 +53,7 @@ Na interface de usuários do `uspdev/senhaunica-socialite` (rota `/senhaunica-us
 
 As permissões são da biblioteca spatie/laravel-permission. Todas as funcionalidades da biblioteca estão disponíveis para uso.
 
-### Exemplo de utilização
+#### Exemplo de utilização
 
 Para criar as permissões e funções (roles) **customizadas da sua aplicação** é necessário realizar uma migration para que estas sejam criadas e persistam no banco de dados. Essas serão criadas no guard `web`.
 
@@ -90,7 +90,23 @@ E finalmente aplique a migration
 
 Os gates serão criados automaticamente pela biblioteca `spatie/laravel-permission`.
 
-#### Usando no Blade (Exemplos)
+#### Gates customizados da aplicação
+
+Além das permissions automáticas e customizadas, a aplicação pode definir gates específicos para regras de negócio.
+
+Exemplo:
+
+```php
+Gate::define('graduacaoEpos', function ($user) {
+    return $user->can('admin')
+        || $user->hasAnyRole(['graduacao', 'posgraduacao'])
+        || $user->canAny([
+            'senhaunica.docente',
+        ]);
+});
+```
+
+##### Usando no Blade (exemplos)
 
 **Permissões da biblioteca (guard `senhaunica`):**
 
@@ -116,7 +132,7 @@ Os gates serão criados automaticamente pela biblioteca `spatie/laravel-permissi
 @endrole
 ```
 
-#### Verificando no Controller
+##### Verificando no controller
 
 Utilize os gates na sua aplicação, como qualquer outro gate ou via permission:
 
