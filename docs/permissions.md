@@ -110,7 +110,7 @@ Gate::define('acesso_academico', function ($user) {
 
 ```blade
 @can('manager')
-  {{-- Manager ou acima (admin, boss, manager) --}}
+  {{-- Verifica acesso ao nível manager --}}
 @endcan
 
 @can('senhaunica.docente')
