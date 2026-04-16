@@ -97,12 +97,10 @@ Além das permissions automáticas e customizadas, a aplicação pode definir ga
 Exemplo:
 
 ```php
-Gate::define('graduacaoEpos', function ($user) {
+Gate::define('acesso_academico', function ($user) {
     return $user->can('admin')
-        || $user->hasAnyRole(['graduacao', 'posgraduacao'])
-        || $user->canAny([
-            'senhaunica.docente',
-        ]);
+        || $user->hasAnyRole(['graduacao', 'posgrad'])
+        || $user->can('senhaunica.docente');
 });
 ```
 
