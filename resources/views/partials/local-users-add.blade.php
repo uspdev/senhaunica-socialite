@@ -1,6 +1,8 @@
+@if(config('senhaunica.allowsLoginLocal'))
 <button class="btn btn-sm btn-outline-primary ml-2" id="localUser">
   <i class="fas fa-plus"></i> Adicionar Usuário Local
 </button>
+@endif
 
 <div class="modal fade" id="senhaunica-socialite-adicionar-local-user-modal" tabindex="-1">
   <div class="modal-dialog">
@@ -13,7 +15,9 @@
       </div>
       <div class="modal-body">
 
-        <form class="" method="POST" action="{{ route(config('senhaunica.localUserRoutes') . '.store') }}">
+        <form class="" method="POST"
+          action="@if(config('senhaunica.allowsLoginLocal')) {{ route(config('senhaunica.localUserRoutes') . '.store') }}@endif">
+
           @csrf
           <div class="form-group row mb-2">
             <label for="name" class="col-sm-2 col-form-label">Nome</label>
