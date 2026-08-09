@@ -59,14 +59,16 @@
           <td>
             @if ($column['key'] === 'name' && $user->local === 1)
               {{ $user->{$column['key']} }}
-              <button id="getLocalUser"
-                type="button"
-                title="Alteração - Usuário Local"
-                class="btn btn-sm btn-link p-0"
-                data-url="{{ route(config('senhaunica.localUserRoutes') . '.edit', $user->id) }}"
-                data-action="{{ route(config('senhaunica.localUserRoutes') . '.update', $user->id) }}">
-                <i class="fa fa-user-plus" aria-hidden="true"></i>
-              </button>
+              @if(config('senhaunica.allowsLoginLocal'))
+                <button id="getLocalUser"
+                  type="button"
+                  title="Alteração - Usuário Local"
+                  class="btn btn-sm btn-link p-0"
+                  data-url="{{ route(config('senhaunica.localUserRoutes') . '.edit', $user->id) }}"
+                  data-action="{{ route(config('senhaunica.localUserRoutes') . '.update', $user->id) }}">
+                  <i class="fa fa-user-plus" aria-hidden="true"></i>
+                </button>
+              @endif
             @else
               {{ $user->{$column['key']} }}
             @endif

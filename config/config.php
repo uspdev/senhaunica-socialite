@@ -85,6 +85,8 @@ return [
     # Controla se a sessão deve ser persistida ao logar usuário (default = true)
     'rememberSession' => (bool) env('SENHAUNICA_REMEMBER_SESSION', true),
 
+    // habilita as rotas de login, crud de usuário e botão de adicionar usuário local
+    'allowsLoginLocal' => (bool) env('SENHAUNICA_ALLOWS_LOGINLOCAL', false),
 
     // SENHAUNICA_KEY e SENHAUNICA_SECRET são carregados em services.php da biblioteca
 ];

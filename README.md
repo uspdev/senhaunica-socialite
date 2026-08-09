@@ -132,6 +132,8 @@ SENHAUNICA_DISABLE_LOGINAS=
 # Controla se a sessão deve ser persistida (default = true)
 SENHAUNICA_REMEMBER_SESSION=
 
+# Habilita o login do usuário local, o botão de adicionar e as rotas do CRUD para o mesmo (default=false).
+#SENHAUNICA_ALLOWS_LOGINLOCAL=
 
 ```
 
