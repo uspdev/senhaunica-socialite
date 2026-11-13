@@ -88,5 +88,7 @@ return [
     // habilita as rotas de login, crud de usuário e botão de adicionar usuário local
     'allowsLoginLocal' => (bool) env('SENHAUNICA_ALLOWS_LOGINLOCAL', false),
 
+    'usar_replicado' => (bool) env('SENHAUNICA_USAR_REPLICADO', true),
+
     // SENHAUNICA_KEY e SENHAUNICA_SECRET são carregados em services.php da biblioteca
 ];

@@ -62,7 +62,6 @@ class User extends Authenticatable
 use \Spatie\Permission\Traits\HasRoles;
 use \Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica;
 
-protected $guard_name = 'senhaunica';
 ...
 ```
 Proceda com a instalação:
@@ -136,6 +135,8 @@ SENHAUNICA_REMEMBER_SESSION=
 # Habilita o login do usuário local, o botão de adicionar e as rotas do CRUD para o mesmo (default=false).
 #SENHAUNICA_ALLOWS_LOGINLOCAL=
 
+# Desliga ou liga consultas ao replicado, mesmo que ele exista no composer.json (default = true)
+SENHAUNICA_USAR_REPLICADO=false
 ```
 
 ### [Permissões e funções da aplicação](docs/permissions.md)

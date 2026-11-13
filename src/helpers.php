@@ -7,7 +7,10 @@ if (!function_exists('hasReplicado')) {
      */
     function hasReplicado()
     {
-        return \class_exists('Uspdev\\Replicado\\Pessoa') ? true : false;
+        if(config('senhaunica.usar_replicado')) {
+            return \class_exists('Uspdev\\Replicado\\Pessoa') ? true : false;
+        }
+        return false;
     }
 }
 
