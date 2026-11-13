@@ -85,6 +85,8 @@ return [
     # Controla se a sessão deve ser persistida ao logar usuário (default = true)
     'rememberSession' => (bool) env('SENHAUNICA_REMEMBER_SESSION', true),
 
+    // habilita as rotas de login, crud de usuário e botão de adicionar usuário local
+    'allowsLoginLocal' => (bool) env('SENHAUNICA_ALLOWS_LOGINLOCAL', false),
 
     'usar_replicado' => (bool) env('SENHAUNICA_USAR_REPLICADO', true),
 
