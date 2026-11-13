@@ -28,6 +28,10 @@ php artisan vendor:publish --provider="Uspdev\SenhaunicaSocialite\SenhaunicaServ
 
   Se true, ele grava no filesystem o retorno json do servidor oauth. O json pode ser viasualizado na interface de suuários da biblioteca.
 
+- **allowsLoginLocal** (padrão `false`)
+
+  Se true ao clicar em entrar é exibido um modal que permite entrar como usuário local ou com senha única. Além de habilitar o botão de cadastro e as rotas do CRUD
+  do usuário local  
 
 #### Rotas e controllers
 
