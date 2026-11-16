@@ -51,7 +51,10 @@ class SenhaunicaController extends Controller
         $user = User::firstOrNew(['codpes' => $userSenhaUnica->codpes]);
         // bind dos dados retornados
         $user->codpes = $userSenhaUnica->codpes;
-        $user->email = $userSenhaUnica->email ?? $userSenhaUnica->emailUsp ?? $userSenhaUnica->emailAlternativo ?? 'invalido' . $user->codpes . '@usp.br';
+        $user->email = $userSenhaUnica->email
+            ?: $userSenhaUnica->emailUsp
+            ?: $userSenhaUnica->emailAlternativo
+            ?: 'invalido' . $user->codpes . '@usp.br';
         $user->name = $userSenhaUnica->nompes;
         $user->save();
 
