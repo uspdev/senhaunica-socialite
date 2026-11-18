@@ -92,3 +92,10 @@ Como as permissões são gates, eles podem ser usados diretamente no blade com a
 ### Gerenciamento das Permissões dos Usuários
 
 Por padrão, a rota /users estará disponível para os admins. Nela é possível gerenciar as permissões dos usuários, incluindo gerentes e admins, desde que não estejam no `.env`.
+
+
+## Configuração laravel-usp-theme
+### Exibição de erros de usuários locais(mensagensFlash)
+Os erros na criação/atualização de usuários locais são tratados pelo Senhaunica-socialite,porém, são exibidos por meio do laravel-usp-theme. Portanto,caso queira que esses erros sejam exibidos você deve acessar a config do laravel-usp-theme(laravel-usp-theme.php) e alterar a variável `mensagensFlash` para `true`:
+    
+    'mensagensFlash' => true,
