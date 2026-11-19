@@ -67,15 +67,7 @@
     @endif
   </span>
 </div>
-@if ($errors->any())
-  <div class="alert alert-danger">
-    <ul>
-      @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-  </div>
-@endif
+
 <div class="form-inline mt-2">
   @include('senhaunica::partials.filterbox')
   @include('senhaunica::partials.users-add')

@@ -2,6 +2,7 @@
 
 namespace Uspdev\SenhaunicaSocialite\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -13,9 +14,9 @@ class LoginLocalController extends Controller
         return view('senhaunica::local.login');
     }
 
-    public function store()
+    public function store(Request $request)
     {
-        $credentials = request()->validate([
+        $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required']
         ]);
@@ -26,7 +27,7 @@ class LoginLocalController extends Controller
             ]);
         }
         
-        request()->session()->regenerate();
+        $request->session()->regenerate();
 
         return redirect('/');
     }
