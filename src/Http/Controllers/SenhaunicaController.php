@@ -27,12 +27,20 @@ class SenhaunicaController extends Controller
         $redirect = $request->redirect ?? $request->session()->get('url.intended') ?? '/';
         $request->session()->push(config('senhaunica.session_key') . '.redirect', $redirect);
 
-        return \Socialite::driver('senhaunica')->redirect();
+        try {
+            return \Socialite::driver('senhaunica')->redirect();
+        } catch (\Throwable $e) {
+            return $this->servicoIndisponivel($e);
+        }
     }
 
     public function handleProviderCallback(Request $request)
     {
-        $userSenhaUnica = \Socialite::driver('senhaunica')->user();
+        try {
+            $userSenhaUnica = \Socialite::driver('senhaunica')->user();
+        } catch (\Throwable $e) {
+            return $this->servicoIndisponivel($e);
+        }
 
         // Vamos retornar uma tela amigável caso não tenha sido configurado a trait
         if ($this->missingTrait()) {
@@ -82,6 +90,20 @@ class SenhaunicaController extends Controller
         session()->invalidate();
         session()->regenerateToken();
         return redirect('/');
+    }
+
+    /**
+     * Falha na comunicação com o servidor OAuth da USP, em vez do erro 500.
+     *
+     * Exemplos: servidor responde 500 ("Error em obter request token"), fora do ar/timeout,
+     * ou callback sem as credenciais temporárias na sessão (sessão expirada, voltar no navegador).
+     * O erro continua registrado no log da aplicação.
+     */
+    protected function servicoIndisponivel(\Throwable $e)
+    {
+        report($e);
+
+        return response()->view('senhaunica::unavailable', ['reason' => 'authServerDown'], 503);
     }
 
     /**
